@@ -1,0 +1,16 @@
+
+OIDC_RP_CLIENT_ID = 'client-id'
+OIDC_RP_CLIENT_SECRET = 'secret string'
+
+OIDC_OP_AUTHORIZATION_ENDPOINT = 'full url'
+OIDC_OP_TOKEN_ENDPOINT = 'full url'
+OIDC_OP_USER_ENDPOINT = 'full url'
+OIDC_OP_JWKS_ENDPOINT = 'full url'
+
+EMAIL_HOST = 'smtp server host'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'smtp authentication user'
+EMAIL_HOST_PASSWORD = 'smtp authentication password'
+EMAIL_USE_SSL = True
+
+DEFAULT_FROM_EMAIL = 'it@studentspex.se'

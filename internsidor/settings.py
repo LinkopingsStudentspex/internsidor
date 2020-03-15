@@ -25,7 +25,7 @@ SECRET_KEY = '1h2i9=^yld5y6q$f1_qkjj23@ytmp-2!i)m@bvr-6$)fa#*149'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -37,7 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'mozilla_django_oidc',
+    'rest_framework',
+    'rest_framework_api_key',
     'batadasen',
+    'oidc_auth',
+    'django_filters'
 ]
 
 MIDDLEWARE = [
@@ -119,3 +124,19 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+AUTHENTICATION_BACKENDS = [
+    'oidc_auth.backends.BatadasenOIDCBackend',
+    'django.contrib.auth.backends.ModelBackend'
+]
+
+OIDC_CREATE_USER = False
+OIDC_RP_SIGN_ALGO = 'RS256'
+
+LOGIN_REDIRECT_URL = '/admin/'
+LOGOUT_REDIRECT_URL = '/'
+
+try: 
+    from .local_settings import *
+except ImportError:
+    pass

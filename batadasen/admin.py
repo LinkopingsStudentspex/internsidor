@@ -1,5 +1,9 @@
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.core import mail
+from django.db import models
+from django import forms
 from .models import *
+from django.conf import settings
 
 class ExtraEmailInline(admin.TabularInline):
     model = ExtraEmail
@@ -13,7 +17,21 @@ class AssociationMembershipInline(admin.TabularInline):
     model = AssociationMembership
     extra = 0
 
+class PersonForm(forms.ModelForm):
+    class Meta:
+        model = Person
+        fields = '__all__'
+
+    send_activation_link = forms.BooleanField(required=False, label='Skicka aktiveringslänk')
+
+    def save(self, commit=True):
+        send_activation_link = self.cleaned_data['send_activation_link']
+        return super().save(commit=commit)
+
+
 class PersonAdmin(admin.ModelAdmin):
+    form = PersonForm
+
     fields = (
         'member_number',
         ('first_name', 'last_name', 'maiden_name'),
@@ -22,6 +40,8 @@ class PersonAdmin(admin.ModelAdmin):
         'street_address',
         ('postal_code', 'postal_locality', 'country'),
         'address_list_email',
+        'send_activation_link',
+        'user'
     )
 
     inlines = [
@@ -35,6 +55,35 @@ class PersonAdmin(admin.ModelAdmin):
             return ['member_number']
         else:
             return []
+    
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+
+        if form.cleaned_data['send_activation_link']:
+            email = form.cleaned_data['email']
+            if email is None or email == '':
+                return
+            
+            existing_user_activations = UserActivation.objects.filter(person=obj)
+            if existing_user_activations.exists():
+                print('Deleting existing user activations in progress')
+                existing_user_activations.delete()
+            
+            activation = UserActivation(person=obj)
+            activation.save()
+
+            mail.send_mail('Aktiveringslänk för spexets internsidor',
+                '''
+                Hej {}!
+                Välkommen till spexet! Ett konto har skapats åt dig på spexets interna
+                hemsidor. Följ länken nedan för att välja ett användarnamn och aktivera ditt
+                konto. Länken fungerar endast en gång.
+                http://localhost:8000/batadasen/activate?token={}
+                '''.format(activation.person.first_name, activation.token),
+                settings.DEFAULT_FROM_EMAIL,
+                [email]
+            )
+            messages.info(request, 'Ett mail med en aktiveringslänk har skickats till {}. Länken går ut {}'.format(email, activation.valid_until.strftime('%Y-%m-%d %H:%M:%S')))
 
 
 class EmailListAdmin(admin.ModelAdmin):
@@ -65,7 +114,7 @@ admin.site.register(AssociationMembership)
 admin.site.register(AssociationYear)
 admin.site.register(EmailList, EmailListAdmin)
 admin.site.register(ExtraEmail)
-admin.site.register(Group)
+admin.site.register(Group, GroupAdmin)
 admin.site.register(Instrument)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Production)
