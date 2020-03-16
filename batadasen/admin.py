@@ -99,10 +99,10 @@ class EmailListAdmin(admin.ModelAdmin):
     fields = (
         'alias',
         'opt_in_members',
-        'opt_out_members',
-        'all_groups',
         'production_groups',
-        'productions'
+        'all_groups',
+        'productions',
+        'opt_out_members',
     )
     filter_horizontal = ('opt_in_members', 'opt_out_members', 'all_groups', 'production_groups', 'productions')
 
@@ -114,6 +114,12 @@ class EmailListAdmin(admin.ModelAdmin):
 
 class TitleAdmin(admin.ModelAdmin):
     fields = ('name',)
+    
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['name']
+        else:
+            return []
 
 class GroupAdmin(admin.ModelAdmin):
     fields = ('short_name', 'name')
@@ -125,7 +131,7 @@ admin.site.register(EmailList, EmailListAdmin)
 admin.site.register(ExtraEmail)
 admin.site.register(AssociationGroupType, GroupAdmin)
 admin.site.register(ProductionGroupType, GroupAdmin)
-admin.site.register(Instrument)
+admin.site.register(Instrument, TitleAdmin)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Production)
 admin.site.register(ProductionGroup)

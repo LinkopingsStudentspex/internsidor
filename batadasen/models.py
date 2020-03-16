@@ -226,7 +226,7 @@ class Instrument(models.Model):
         verbose_name = 'instrument'
         verbose_name_plural = 'instrument'
 
-    name = models.CharField('instrument', max_length=50, primary_key=True)
+    name = models.CharField('instrument', max_length=50, primary_key=True, )
 
     def __str__(self):
         return self.name
@@ -238,7 +238,7 @@ class ProductionMembership(models.Model):
         verbose_name_plural = 'uppsättningsmedlemskap'
         unique_together = [['person', 'group', 'title', 'instrument']]
 
-    person = models.ForeignKey(Person, models.CASCADE, related_name='uppsättningsmedlemsskap', editable=False)
+    person = models.ForeignKey(Person, models.CASCADE, verbose_name='uppsättningsmedlemsskap', related_name='production_memberships', editable=False)
     group = models.ForeignKey(ProductionGroup, models.CASCADE, verbose_name='Grupp')
     title = models.ForeignKey(Title, models.SET_NULL, null=True, blank=True, verbose_name='Titel')
     instrument = models.ForeignKey(Instrument, models.SET_NULL, null=True, blank=True, verbose_name='Instrument')
@@ -278,7 +278,7 @@ class EmailList(models.Model):
     all_groups = models.ManyToManyField(
         ProductionGroupType, 
         related_name='maillistor', 
-        verbose_name='grupper av denna typ i alla uppsättningar', 
+        verbose_name='grupper av dessa typer i alla uppsättningar', 
         blank=True,
         help_text='Denna lista kommer skicka mail till alla personer som någonsin har varit med i dessa grupper')
     production_groups = models.ManyToManyField(
@@ -296,6 +296,37 @@ class EmailList(models.Model):
 
     def __str__(self):
         return self.alias
+    
+    def get_recipients(self):
+        email_set = set()
+        for person in self.opt_in_members.all():
+            email_set.add(person.email)
+            print('{} included due to opt-in'.format(person))
+        
+        for group_type in self.all_groups.all():
+            persons = Person.objects.filter(production_memberships__group__group_type=group_type)
+            for person in persons:
+                email_set.add(person.email)
+                print('{} included due to all_groups'.format(person))
+        
+        for group in self.production_groups.all():
+            persons = Person.objects.filter(production_memberships__group=group)
+            for person in persons:
+                email_set.add(person.email)
+                print('{} included due to production_groups'.format(person))
+        
+        for production in self.productions.all():
+            persons = Person.objects.filter(production_memberships__group__production=production)
+            for person in persons:
+                email_set.add(person.email)
+                print('{} included due to productions'.format(person))
+        
+        for person in self.opt_out_members.all():
+            email_set.discard(person.email)
+            print('Discarded {} from list {} due to opt-out'.format(person, self))
+
+        return email_set
+
     
 
 class AssociationMembership(models.Model):

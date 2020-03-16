@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 from . import forms, models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -46,3 +46,12 @@ def activation_view(request):
         form = forms.ActivationForm()
 
     return render(request, 'batadasen/activate.html', {'form': form, 'person': person})
+
+def view_recipients(request, alias):
+    try:
+        email_list = models.EmailList.objects.get(alias=alias)
+    except models.EmailList.DoesNotExist:
+        return HttpResponseNotFound()
+    
+    return HttpResponse('{}'.format(email_list.get_recipients()))
+
