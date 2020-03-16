@@ -19,6 +19,8 @@ def activation_view(request):
     
     if bad_token:
         return HttpResponse("Du har nog följt en gammal länk eller så har den kopierats fel")
+    
+    person = activations.first().person
 
     if request.method == 'POST':
         form = forms.ActivationForm(request.POST)
@@ -29,7 +31,6 @@ def activation_view(request):
             user = User(username=username)
             user.save()
 
-            person = activations.first().person
 
             if person.user is not None:
                 person.user.delete()
@@ -44,4 +45,4 @@ def activation_view(request):
     else:
         form = forms.ActivationForm()
 
-    return render(request, 'batadasen/activate.html', {'form': form})
+    return render(request, 'batadasen/activate.html', {'form': form, 'person': person})

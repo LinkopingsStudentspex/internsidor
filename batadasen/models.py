@@ -5,7 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import crypto, timezone
 
-from datetime import timedelta
+from datetime import timedelta, datetime, date
 
 
 class Person(models.Model):
@@ -131,17 +131,17 @@ class Title(models.Model):
         return self.name
     
 
-class Group(models.Model):
+class ProductionGroupType(models.Model):
     class Meta:
-        verbose_name = 'grupp'
-        verbose_name_plural = 'grupper'
+        verbose_name = 'uppsättningsgrupptyp'
+        verbose_name_plural = 'uppsättningsgrupptyper'
     
     short_name = models.CharField('kortnamn', max_length=10, primary_key=True)
     name = models.CharField('namn', max_length=50)
     priority = models.IntegerField('prioritet', default=0)
     
     def __str__(self):
-        return '{} - {}'.format(self.short_name, self.name)
+        return self.name
 
 
 def validate_association_year(year):
@@ -149,8 +149,8 @@ def validate_association_year(year):
         raise ValidationError('%(year)s är inte ett giltigt verksamhetsår, föreningen bildades 1978', params={'year': '{}/{}'.format(year-1, year)})
 
 def get_current_assoc_year():
-    today = datetime.date.today()
-    if today > datetime.date(today.year, 6, 30):
+    today = date.today()
+    if today > date(today.year, 6, 30):
         return today.year + 1
     else:
         return today.year
@@ -171,43 +171,54 @@ class AssociationYear(models.Model):
     def __str__(self):
         return '{}/{}'.format(self.end_year % 100 -1, self.end_year % 100)
     
+class AssociationGroupType(models.Model):
+    class Meta:
+        verbose_name = 'föreningsgrupptyp'
+        verbose_name_plural = 'föreningsgrupptyper'
+    
+    short_name = models.CharField('kortnamn', max_length=10, primary_key=True)
+    name = models.CharField('namn', max_length=50)
+    priority = models.IntegerField('prioritet', default=0)
+    
+    def __str__(self):
+        return self.name
 
 class AssociationActivity(models.Model):
     class Meta:
         verbose_name = 'föreningsuppdrag'
         verbose_name_plural = 'föreningsuppdrag'
-        unique_together = [['person', 'group']]
+        unique_together = [['person', 'group_type']]
 
     person = models.ForeignKey(Person, models.CASCADE, verbose_name='person')
-    group = models.ForeignKey(Group, models.CASCADE, verbose_name='grupp')
+    group_type = models.ForeignKey(AssociationGroupType, models.CASCADE, verbose_name='grupp')
     title = models.ForeignKey(Title, models.CASCADE, null=True, verbose_name='titel')
     year = models.ForeignKey(AssociationYear, models.CASCADE, verbose_name='verksamhetsår')
     to_date = models.DateField('till och med datum', null=True, blank=True)
 
     def __str__(self):
         if self.title is None:
-            return '{}: {} {} ({})'.format(self.person, self.group, self.year, self.title)
+            return '{}: {} {}'.format(self.person, self.group_type, self.year)
         else:
-            return '{}: {} {}'.format(self.person, self.group, self.year)
+            return '{}: {} {} ({})'.format(self.person, self.group_type, self.year, self.title)
     
 
 class ProductionGroup(models.Model):
     class Meta:
         verbose_name = 'uppsättningsgrupp'
         verbose_name_plural = 'uppsättningsgrupper'
-        unique_together = ['production', 'group']
+        unique_together = ['production', 'group_type']
 
     production = models.ForeignKey(Production, models.CASCADE, verbose_name='uppsättning')
-    group = models.ForeignKey(Group, models.CASCADE, verbose_name='grupp', null=True, blank=True, help_text='lämna tomt om personen är med i en uppsättning utan att vara med i en specifik grupp')
+    group_type = models.ForeignKey(ProductionGroupType, models.CASCADE, verbose_name='grupptyp', null=True, blank=True, help_text='lämna tomt om personen är med i en uppsättning utan att vara med i en specifik grupp')
 
     def __str__(self):
-        if self.group is None:
+        if self.group_type is None:
             if self.production.short_name == '':
                 return '{} (ingen grupp)'.format( self.production.year)
             else:
                 return '{} (ingen grupp)'.format( self.production.short_name)
         else:
-            return '{}-{}'.format(self.group.short_name, self.production.year % 100)
+            return '{}-{}'.format(self.group_type.short_name, self.production.year % 100)
     
 
 class Instrument(models.Model):
@@ -228,9 +239,9 @@ class ProductionMembership(models.Model):
         unique_together = [['person', 'group', 'title', 'instrument']]
 
     person = models.ForeignKey(Person, models.CASCADE, related_name='uppsättningsmedlemsskap', editable=False)
-    group = models.ForeignKey(ProductionGroup, models.CASCADE)
-    title = models.ForeignKey(Title, models.SET_NULL, null=True, blank=True)
-    instrument = models.ForeignKey(Instrument, models.SET_NULL, null=True, blank=True)
+    group = models.ForeignKey(ProductionGroup, models.CASCADE, verbose_name='Grupp')
+    title = models.ForeignKey(Title, models.SET_NULL, null=True, blank=True, verbose_name='Titel')
+    instrument = models.ForeignKey(Instrument, models.SET_NULL, null=True, blank=True, verbose_name='Instrument')
 
     def __str__(self):
         titles = []
@@ -243,7 +254,7 @@ class ProductionMembership(models.Model):
             title_str = ', '.join(titles)
             return '{}: {} ({})'.format(self.person.member_number, self.group, title_str)
         else:
-            return '{}: {}'.format(self.person.member_numer, self.group)
+            return '{}: {}'.format(self.person.member_number, self.group)
 
     
 class EmailList(models.Model):
@@ -265,9 +276,9 @@ class EmailList(models.Model):
         blank=True,
         help_text='Vilka personer ska inte få mail från denna lista, oavsett vilka grupper de är med i?')
     all_groups = models.ManyToManyField(
-        Group, 
+        ProductionGroupType, 
         related_name='maillistor', 
-        verbose_name='grupper i alla uppsättningar', 
+        verbose_name='grupper av denna typ i alla uppsättningar', 
         blank=True,
         help_text='Denna lista kommer skicka mail till alla personer som någonsin har varit med i dessa grupper')
     production_groups = models.ManyToManyField(

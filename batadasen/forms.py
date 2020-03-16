@@ -1,15 +1,17 @@
 from django import forms
+from django.core.validators import RegexValidator
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-class ActivationForm(forms.Form):
-    username = forms.CharField(label='Användarnamn', max_length=50)
+class ActivationForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['username']
 
-    def clean(self):
-        cleaned_data = super().clean()
-        username = cleaned_data['username']
-        if User.objects.filter(username=username).exists():
-            raise forms.ValidationError("Användarnamnet finns redan.")
-
-        return cleaned_data
+    username = forms.CharField(
+        label='Användarnamn', 
+        validators=[
+            RegexValidator('^[A-Za-z0-9_-]+$', 'Får endast innehålla engelska bokstäver (A-Z, a-z), siffror (0-9) och tecknen "-" och "_"'),
+        ],
+        min_length=2)

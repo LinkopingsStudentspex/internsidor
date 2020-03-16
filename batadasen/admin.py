@@ -4,6 +4,8 @@ from django.db import models
 from django import forms
 from .models import *
 from django.conf import settings
+from django.utils.html import format_html
+from django.urls import reverse
 
 class ExtraEmailInline(admin.TabularInline):
     model = ExtraEmail
@@ -17,17 +19,22 @@ class AssociationMembershipInline(admin.TabularInline):
     model = AssociationMembership
     extra = 0
 
+class AssociationActivityInline(admin.TabularInline):
+    model = AssociationActivity
+    extra = 0
+
 class PersonForm(forms.ModelForm):
     class Meta:
         model = Person
         fields = '__all__'
 
-    send_activation_link = forms.BooleanField(required=False, label='Skicka aktiveringslänk')
+    send_activation_link = forms.BooleanField(required=False, label='Skicka aktiveringslänk för att skapa ny användare.')
 
-    def save(self, commit=True):
-        send_activation_link = self.cleaned_data['send_activation_link']
-        return super().save(commit=commit)
-
+    def clean(self):
+        cleaned_data = super().clean()
+        if self.instance.user is not None and cleaned_data['send_activation_link']:
+            self.add_error('send_activation_link', 'Personen har redan en aktiv användare. Be en administratör ta bort användaren först!')
+        return cleaned_data
 
 class PersonAdmin(admin.ModelAdmin):
     form = PersonForm
@@ -40,21 +47,23 @@ class PersonAdmin(admin.ModelAdmin):
         'street_address',
         ('postal_code', 'postal_locality', 'country'),
         'address_list_email',
+        'user',
         'send_activation_link',
-        'user'
     )
 
     inlines = [
         ProductionMembershipInline,
         AssociationMembershipInline,
+        AssociationActivityInline,
         ExtraEmailInline,
     ]
 
     def get_readonly_fields(self, request, obj=None):
+        ret_fields = ['user']
         if obj:
-            return ['member_number']
-        else:
-            return []
+            ret_fields.append('member_number')
+        
+        return ret_fields
     
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
@@ -114,7 +123,8 @@ admin.site.register(AssociationMembership)
 admin.site.register(AssociationYear)
 admin.site.register(EmailList, EmailListAdmin)
 admin.site.register(ExtraEmail)
-admin.site.register(Group, GroupAdmin)
+admin.site.register(AssociationGroupType, GroupAdmin)
+admin.site.register(ProductionGroupType, GroupAdmin)
 admin.site.register(Instrument)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Production)
