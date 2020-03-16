@@ -133,8 +133,11 @@ AUTHENTICATION_BACKENDS = [
 OIDC_CREATE_USER = False
 OIDC_RP_SIGN_ALGO = 'RS256'
 
-LOGIN_REDIRECT_URL = '/admin/'
-LOGOUT_REDIRECT_URL = '/'
+OIDC_OP_LOGOUT_URL_METHOD = 'oidc_auth.models.logout_url'
+
+LOGIN_REDIRECT_URL = '/'
+
+LOGIN_URL = '/oidc/authenticate/'
 
 try: 
     from .local_settings import *

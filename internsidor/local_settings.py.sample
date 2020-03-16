@@ -7,6 +7,8 @@ OIDC_OP_TOKEN_ENDPOINT = 'full url'
 OIDC_OP_USER_ENDPOINT = 'full url'
 OIDC_OP_JWKS_ENDPOINT = 'full url'
 
+LOGOUT_REDIRECT_URL = 'full logout url'
+
 EMAIL_HOST = 'smtp server host'
 EMAIL_PORT = 465
 EMAIL_HOST_USER = 'smtp authentication user'

@@ -1,0 +1,18 @@
+**** Detta är ett automatgenererat mejl ****
+
+Hej {{ first_name }}!
+
+Välkommen till spexet! Ett konto har skapats åt dig på spexets interna hemsida. För att aktivera det behöver du följa dessa steg:
+
+1: Gå till {{ activation_url }} och välj ett användarnamn för ditt konto.
+
+2: Gå till {{ login_url }}, klicka på "Glömt lösenord" och fyll i ditt nyvalda användarnamn för att få ett mejl skickat till dig med en länk för att välja ett lösenord.
+
+3: Vänta tills du får mailet (kan dröja några minuter) och klicka sedan på länken däri, och välj ditt lösenord.
+
+4: Gå till {{ login_url }} och logga in med dina nya fräscha inloggningsuppgifter.
+
+Är det något som strular eller om du har frågor, kontakta {{ contact_email }} eller svara på detta mejl.
+
+Mvh,
+Spexets datamaskineri

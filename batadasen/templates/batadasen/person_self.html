@@ -1,0 +1,12 @@
+<html>
+
+<body>
+    <h1>{{ person.first_name }} {{ person.last_name }}</h1>
+    <p>Medlemsnummer: {{ person.member_number }}</p>
+    <form action="{% url 'oidc_logout' %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value="Logga ut">
+    </form>
+</body>
+
+</html>

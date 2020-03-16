@@ -2,10 +2,13 @@ from django.contrib import admin, messages
 from django.core import mail
 from django.db import models
 from django import forms
-from .models import *
 from django.conf import settings
 from django.utils.html import format_html
 from django.urls import reverse
+from django.template.loader import render_to_string
+
+from .models import *
+from . import urls
 
 class ExtraEmailInline(admin.TabularInline):
     model = ExtraEmail
@@ -82,13 +85,15 @@ class PersonAdmin(admin.ModelAdmin):
             activation.save()
 
             mail.send_mail('Aktiveringslänk för spexets internsidor',
-                '''
-                Hej {}!
-                Välkommen till spexet! Ett konto har skapats åt dig på spexets interna
-                hemsidor. Följ länken nedan för att välja ett användarnamn och aktivera ditt
-                konto. Länken fungerar endast en gång.
-                http://localhost:8000/batadasen/activate?token={}
-                '''.format(activation.person.first_name, activation.token),
+                render_to_string(
+                    template_name='batadasen/activation_email.txt',
+                    context={
+                        'first_name': activation.person.first_name,
+                        'activation_url': request.build_absolute_uri(reverse('batadasen:activate') + '?token=' + activation.token),
+                        'login_url': request.build_absolute_uri(reverse('oidc_authentication_init')),
+                        'contact_email': settings.DEFAULT_FROM_EMAIL
+                    }
+                ),
                 settings.DEFAULT_FROM_EMAIL,
                 [email]
             )

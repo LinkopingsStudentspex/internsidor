@@ -1,11 +1,11 @@
+from datetime import timedelta, datetime, date
+
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import crypto, timezone
-
-from datetime import timedelta, datetime, date
 
 
 class Person(models.Model):
@@ -209,7 +209,7 @@ class ProductionGroup(models.Model):
         unique_together = ['production', 'group_type']
 
     production = models.ForeignKey(Production, models.CASCADE, verbose_name='uppsättning')
-    group_type = models.ForeignKey(ProductionGroupType, models.CASCADE, verbose_name='grupptyp', null=True, blank=True, help_text='lämna tomt om personen är med i en uppsättning utan att vara med i en specifik grupp')
+    group_type = models.ForeignKey(ProductionGroupType, models.CASCADE, verbose_name='grupptyp', null=True, blank=True, help_text='lämna tomt om den här gruppen ska räknas som att vara med i en uppsättning utan att tillhöra en specifik grupp')
 
     def __str__(self):
         if self.group_type is None:
@@ -219,6 +219,14 @@ class ProductionGroup(models.Model):
                 return '{} (ingen grupp)'.format( self.production.short_name)
         else:
             return '{}-{}'.format(self.group_type.short_name, self.production.year % 100)
+    
+    # Eftersom NULL-värden aldrig är lika med varandra så funkar inte ovanstående unique_together
+    # och vi måste validera fallet när man försöker skapa två uppsättningsgrupper utan grupptyp 
+    # i samma uppsättning.
+    def validate_unique(self, exclude=None):
+        if self.group_type is None and ProductionGroup.objects.exclude(id=self.id).filter(production=self.production, group_type__isnull=True).exists():
+            raise ValidationError("En uppsättningsgrupp utan grupptyp finns redan i denna uppsättning")
+        super(ProductionGroup, self).validate_unique(exclude)
     
 
 class Instrument(models.Model):
