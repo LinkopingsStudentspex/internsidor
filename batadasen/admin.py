@@ -18,6 +18,8 @@ class ProductionMembershipInline(admin.TabularInline):
     model = ProductionMembership
     extra = 0
 
+    autocomplete_fields = ['group']
+
 class AssociationMembershipInline(admin.TabularInline):
     model = AssociationMembership
     extra = 0
@@ -54,12 +56,44 @@ class PersonAdmin(admin.ModelAdmin):
         'send_activation_link',
     )
 
+    list_display = [
+        'member_number',
+        'full_name',
+        'email',
+        'get_production_groups'
+    ]
+
+    search_fields = [
+        'member_number',
+        'first_name',
+        'last_name',
+        'spex_name',
+        'email'
+    ]
+
     inlines = [
         ProductionMembershipInline,
         AssociationMembershipInline,
         AssociationActivityInline,
         ExtraEmailInline,
     ]
+
+    def full_name(self, obj):
+        return obj
+    full_name.short_description = 'Namn'
+
+    def get_production_groups(self, obj):
+        group_list = []
+        count = 0
+        for membership in obj.production_memberships.order_by('-group__production__year'):
+            count += 1
+            if count < 6:
+                group_list.append(membership.short_description())
+            else:
+                group_list.append('...')
+                break
+        return ', '.join(group_list)
+    get_production_groups.short_description = 'Grupper'
 
     def get_readonly_fields(self, request, obj=None):
         ret_fields = ['user']
@@ -129,6 +163,11 @@ class TitleAdmin(admin.ModelAdmin):
 class GroupAdmin(admin.ModelAdmin):
     fields = ('short_name', 'name')
 
+class ProductionGroupAdmin(admin.ModelAdmin):
+    model = ProductionGroup
+
+    search_fields = ['group_type__short_name', 'group_type__name', 'production__short_name']
+
 admin.site.register(AssociationActivity)
 admin.site.register(AssociationMembership)
 admin.site.register(AssociationYear)
@@ -139,5 +178,5 @@ admin.site.register(ProductionGroupType, GroupAdmin)
 admin.site.register(Instrument, TitleAdmin)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Production)
-admin.site.register(ProductionGroup)
+admin.site.register(ProductionGroup, ProductionGroupAdmin)
 admin.site.register(Title, TitleAdmin)

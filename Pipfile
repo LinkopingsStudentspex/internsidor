@@ -11,6 +11,7 @@ mozilla-django-oidc = "*"
 djangorestframework = "*"
 django-filter = "*"
 djangorestframework-api-key = "*"
+pynetstring = "*"
 
 [requires]
 python_version = "3.7"
