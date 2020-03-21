@@ -50,7 +50,7 @@ class PostfixTCPHandler(socketserver.BaseRequestHandler):
             self.request.sendall(pynetstring.encode('NOTFOUND '))
             return
         
-        reply = 'OK {}'.format(','.join(email_list.get_recipients()))
+        reply = 'OK {}'.format(','.join(email_list.get_recipients_email()))
         self.request.sendall(pynetstring.encode(reply))
 
 HOST, PORT = "localhost", 9999

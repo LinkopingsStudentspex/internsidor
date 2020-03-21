@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'rest_framework_api_key',
     'batadasen',
     'oidc_auth',
-    'django_filters'
+    'django_filters',
+    'crispy_forms'
 ]
 
 MIDDLEWARE = [
@@ -134,6 +135,10 @@ OIDC_CREATE_USER = False
 OIDC_RP_SIGN_ALGO = 'RS256'
 
 OIDC_OP_LOGOUT_URL_METHOD = 'oidc_auth.models.logout_url'
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+EMAIL_DOMAIN = 'studentspex.se'
 
 LOGIN_REDIRECT_URL = '/'
 

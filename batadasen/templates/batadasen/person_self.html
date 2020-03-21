@@ -1,12 +1,50 @@
-<html>
+{% extends 'base.html' %}
+{% load i18n %}
 
-<body>
-    <h1>{{ person.first_name }} {{ person.last_name }}</h1>
-    <p>Medlemsnummer: {{ person.member_number }}</p>
-    <form action="{% url 'oidc_logout' %}" method="post">
-        {% csrf_token %}
-        <input type="submit" value="Logga ut">
-    </form>
-</body>
+{% block title %}Min sida{% endblock %}
 
-</html>
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<h2>Välkommen, 
+    {% if object.spex_name != "" %}
+        {{ object.spex_name }} 
+    {% else %} 
+        {{ object.first_name }} {{ object.last_name }}
+    {% endif %}
+    till din egen sida!
+</h2>
+
+<p>
+Ditt användarnamn är {{ object.user.username }}
+</p>
+{% if object.currently_member %}
+<div class="">
+    Du är medlem i föreningen
+</div>
+    {% else %}
+<div class="">
+    Du är inte medlem i föreningen
+</div>
+{% endif %}
+
+<h4>
+Medlem {{ object.member_number }}, {{ object.first_name }} {{ object.last_name }}
+</h4>
+
+{% crispy form form.helper %}
+
+<h2>Medlemskapshistoria</h2>
+<p>
+Baserat på uppgifter som finns i Batadasen. Om du var medlem redan före 1991 finns inte dom uppgiftern med i Batadasen. Även andra uppgifter kan ha ramlat ut i cyberrymden.
+</p>
+
+Du har varit medlem i föreningen under följande verksamhetsår:
+<ul>
+{% for membership in object.association_memberships.all %}
+    <li>{{ membership.year }}</li>
+{% endfor %}
+</ul>
+
+{% endblock %}

@@ -1,12 +1,14 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.utils.decorators import method_decorator
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.utils.http import urlencode
-from django.views.generic import DetailView
-from django.urls import reverse
+from django.views.generic import DetailView, ListView, UpdateView
+from django.urls import reverse, reverse_lazy
 
 from . import forms, models
 
@@ -61,11 +63,39 @@ def view_recipients(request, alias):
     
     return HttpResponse('{}'.format(email_list.get_recipients()))
 
-@login_required
-def person_self_view(request):
-    try:
-        person = models.Person.objects.get(user=request.user)
-    except models.Person.DoesNotExist:
-        return HttpResponseNotFound()
-    
-    return render(request, 'batadasen/person_self.html', {'person': person, 'logout_url': settings.LOGOUT_REDIRECT_URL + '?' + urlencode({'redirect_uri': request.build_absolute_uri(reverse('oidc_authentication_init'))})})
+@method_decorator(login_required, name='dispatch')
+class EmailListListView(ListView):
+    model = models.EmailList
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['email_domain'] = settings.EMAIL_DOMAIN
+        return context
+
+@method_decorator(login_required, name='dispatch')
+class EmailListDetailView(DetailView):
+    model = models.EmailList
+    fields = ['recipients']
+    slug_field = 'alias'
+    slug_url_kwarg = 'alias'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['email_domain'] = settings.EMAIL_DOMAIN
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class PersonDetailView(DetailView):
+    model = models.Person
+
+
+@method_decorator(login_required, name='dispatch')
+class PersonUpdateView(UpdateView):
+    # model = models.Person
+    form_class = forms.PersonForm
+    template_name = 'batadasen/person_self.html'
+    success_url = reverse_lazy('batadasen:person_self')
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(models.Person, user=self.request.user)

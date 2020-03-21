@@ -52,8 +52,11 @@ class PersonAdmin(admin.ModelAdmin):
         'street_address',
         ('postal_code', 'postal_locality', 'country'),
         'address_list_email',
-        'user',
-        'send_activation_link',
+        ('user', 'send_activation_link'),
+        ('lifetime_member', 'honorary_member'),
+        'hundred_club',
+        'deceased',
+        'notes'
     )
 
     list_display = [

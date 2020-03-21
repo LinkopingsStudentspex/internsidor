@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}Mejllista {{ object.alias }}{% endblock %}
+
+{% block content %}
+<h2>{{ object.alias }}@{{ email_domain }}</h2>
+
+Denna maillista går till följande personer:
+
+<table class="table table-sm table-borderless">
+
+{% for person in object.recipients %}
+<tr>
+    <td><a href="{% url 'batadasen:person_detail' person.member_number %}">{{ person.member_number }}</a></td>
+    <td>{{ person }}</td>
+    <td><a href="mailto:{{ person.display_email }}">{{ person.display_email }}</a></td>
+</tr>
+{% endfor %}
+
+</table>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}Mejllistor{% endblock %}
+
+{% block content %}
+<h2>Mejllistor</h2>
+Här är alla mejllistor som finns definierade:
+<table class="table table-sm">
+    {% for emaillist in object_list %}
+    <tr>
+        <td>{{ emaillist.alias }}</td>
+        <td>
+            <a href="{% url 'batadasen:emaillist_detail' emaillist.alias %}">Se medlemmar</a>
+        </td>
+        <td>
+            <a href="mailto:{{ emaillist.alias }}@{{ email_domain }}">Skicka mejl</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

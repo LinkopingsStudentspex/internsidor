@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}Persondetaljer{% endblock %}
+
+{% block content %}
+    <h1>{{ object.first_name }} {{ object.last_name }}</h1>
+    <p>Medlemsnummer: {{ object.member_number }}</p>
+{% endblock %}

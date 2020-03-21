@@ -8,6 +8,13 @@ from django.dispatch import receiver
 from django.utils import crypto, timezone
 
 
+def get_current_assoc_year():
+    today = date.today()
+    if today > date(today.year, 6, 30):
+        return today.year + 1
+    else:
+        return today.year
+
 class Person(models.Model):
     class Meta:
         verbose_name = 'person'
@@ -67,6 +74,21 @@ class Person(models.Model):
             return '{} {}'.format(self.first_name, self.last_name)
         else:
             return '{} "{}" {}'.format(self.first_name, self.spex_name, self.last_name)
+    
+    @property
+    def currently_member(self):
+        if self.lifetime_member or self.honorary_member:
+            return True
+        
+        return self.association_memberships.filter(year__end_year=get_current_assoc_year()).exists()
+    
+    @property
+    def display_email(self):
+        if self.address_list_email != '':
+            return self.address_list_email
+        else:
+            return self.email
+        
 
 def generate_activation_token():
     return crypto.get_random_string(length=50)
@@ -150,13 +172,6 @@ class ProductionGroupType(models.Model):
 def validate_association_year(year):
     if year <= 1978:
         raise ValidationError('%(year)s är inte ett giltigt verksamhetsår, föreningen bildades 1978', params={'year': '{}/{}'.format(year-1, year)})
-
-def get_current_assoc_year():
-    today = date.today()
-    if today > date(today.year, 6, 30):
-        return today.year + 1
-    else:
-        return today.year
 
 class AssociationYear(models.Model):
     class Meta:
@@ -311,7 +326,7 @@ class EmailList(models.Model):
     def __str__(self):
         return self.alias
     
-    def get_recipients(self):
+    def get_recipients_email(self):
         email_set = set()
         for person in self.opt_in_members.all():
             email_set.add(person.email)
@@ -340,11 +355,37 @@ class EmailList(models.Model):
             print('Discarded {} from list {} due to opt-out'.format(person, self))
 
         return email_set
+    
+    @property
+    def recipients(self):
+        person_set = set()
+        for person in self.opt_in_members.all():
+            person_set.add(person)
+        
+        for group_type in self.all_groups.all():
+            persons = Person.objects.filter(production_memberships__group__group_type=group_type)
+            for person in persons:
+                person_set.add(person)
+        
+        for group in self.production_groups.all():
+            persons = Person.objects.filter(production_memberships__group=group)
+            for person in persons:
+                person_set.add(person)
+        
+        for production in self.productions.all():
+            persons = Person.objects.filter(production_memberships__group__production=production)
+            for person in persons:
+                person_set.add(person)
+        
+        for person in self.opt_out_members.all():
+            person_set.discard(person)
+
+        return person_set
 
     
 
 class AssociationMembership(models.Model):
-    person = models.ForeignKey(Person, models.CASCADE, verbose_name='person')
+    person = models.ForeignKey(Person, models.CASCADE, verbose_name='person', related_name='association_memberships')
     year = models.ForeignKey(AssociationYear, models.CASCADE, verbose_name='verksamhetsår')
 
     def __str__(self):
