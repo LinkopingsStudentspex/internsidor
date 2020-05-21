@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}Adresslista{% endblock %}
+{% block content %}
+<h2>Adresslista</h2>
+<table class="table table-sm">
+    <!-- <form action="" method="get">
+        {{ filter.form }}
+        <input type="submit" />
+    </form> -->
+    {% for person in filter.qs %}
+    <tr>
+        <td><a href="{% url 'batadasen:person_detail' person.member_number %}">{{ person.member_number }}</a></td>
+        <td>{{ person }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

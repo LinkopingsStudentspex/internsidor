@@ -92,7 +92,6 @@ class PersonDetailView(DetailView):
 
 @method_decorator(login_required, name='dispatch')
 class PersonUpdateView(UpdateView):
-    # model = models.Person
     form_class = forms.PersonForm
     template_name = 'batadasen/person_self.html'
     success_url = reverse_lazy('batadasen:person_self')
