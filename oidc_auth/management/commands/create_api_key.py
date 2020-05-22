@@ -12,8 +12,7 @@ class Command(BaseCommand):
         if already_exists:
             if options['f']:
                 existing_objects.delete()
-                api_key, key = APIKey.objects.create_key(name=options['name'])
-                print(key)
-        else:
-            api_key, key = APIKey.objects.create_key(name=options['name'])
-            print(key)
+            else:
+                return
+        api_key, key = APIKey.objects.create_key(name=options['name'])
+        print(key)
