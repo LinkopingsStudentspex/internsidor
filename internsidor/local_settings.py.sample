@@ -1,4 +1,9 @@
 
+# For local development, uncomment the following lines to disable the OIDC authentication
+#AUTHENTICATION_BACKENDS = [
+#    'django.contrib.auth.backends.ModelBackend'
+#]
+
 OIDC_RP_CLIENT_ID = 'client-id'
 OIDC_RP_CLIENT_SECRET = 'secret string'
 
