@@ -1,16 +1,23 @@
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound
 from django.conf import settings
-from django.core.exceptions import PermissionDenied
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.db.models import Q
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
 from django.views.generic import DetailView, ListView, UpdateView
-from django.urls import reverse, reverse_lazy
 
-from . import forms, models
+from rest_framework import generics, filters
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework_api_key.permissions import HasAPIKey
+import django_filters
+
+from . import forms, models, serializers
 
 User = get_user_model()
 
@@ -91,10 +98,30 @@ class PersonDetailView(DetailView):
 
 
 @method_decorator(login_required, name='dispatch')
-class PersonUpdateView(UpdateView):
+class PersonSelfView(UpdateView):
     form_class = forms.PersonForm
     template_name = 'batadasen/person_self.html'
     success_url = reverse_lazy('batadasen:person_self')
 
     def get_object(self, queryset=None):
         return get_object_or_404(models.Person, user=self.request.user)
+
+# Returns a JSON response with a list of users, for use by a keycloak user storage provider.
+class UserList(generics.ListAPIView):
+    queryset = models.Person.objects.filter(~Q(user=None))
+    serializer_class = serializers.PersonSerializer
+    permission_classes = [HasAPIKey]
+    filter_backends = [
+        django_filters.rest_framework.DjangoFilterBackend,
+        filters.SearchFilter
+    ]
+    filterset_fields = ['user__username', 'email']
+    search_fields = ['user__username', 'email', 'first_name', 'last_name', 'member_number']
+
+# Returns a JSON response with a the number of users, for use by a keycloak user storage provider.
+@api_view(['GET'])
+@permission_classes([HasAPIKey])
+def user_count(request):
+    user_count = models.Person.objects.filter(~Q(user=None)).count()
+    body = {'count': user_count}
+    return Response(body)

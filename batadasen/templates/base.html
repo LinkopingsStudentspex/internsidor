@@ -27,7 +27,7 @@
 <body>
     {% load i18n %}
     <div id="sidebar">
-        <a class="nav-link" href="/">Till wikin</a>
+        <a class="nav-link" href="/">Start</a>
         <a class="nav-link" href="{% url 'batadasen:person_self' %}">Min sida</a>
         <form action="{% url 'oidc_logout' %}" method="post">
             {% csrf_token %}

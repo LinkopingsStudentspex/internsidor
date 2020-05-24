@@ -48,8 +48,8 @@ class PersonForm(forms.ModelForm):
             'street_address',
             Row(
                 Column('postal_code', css_class='form-group col-md-2 mb-0'),
-                Column('postal_locality', css_class='form-group col-md-8 mb-0'),
-                Column('country', css_class='form-group col-md-1 mb-0'),
+                Column('postal_locality', css_class='form-group col-md-5 mb-0'),
+                Column('country', css_class='form-group col-md-5 mb-0'),
                 css_class='form-row'
             ),
             'email',

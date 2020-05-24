@@ -53,7 +53,7 @@ class Person(models.Model):
     phone_mobile = models.CharField('mobiltelefon', max_length=20, blank=True)
     phone_extra = models.CharField('extra telefon', max_length=20, blank=True)
     domestic_partner = models.IntegerField('sambo', null=True, blank=True)
-    email = models.EmailField('mail', null=True, blank=True, unique=True)
+    email = models.EmailField('mail', null=True, blank=True, unique=True, help_text='Hit kommer mail från spexets maillistor skickas.')
     address_list_email = models.EmailField('adresslistmail', blank=True, help_text='Alternativ mailadress som ska visas istället i medlemslistor och liknande.')
     home_page = models.CharField('hemsida', max_length=100, blank=True)
     wants_spexpressen = models.BooleanField('vill få spexpressen', default=False)

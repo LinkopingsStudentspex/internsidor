@@ -13,20 +13,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '1h2i9=^yld5y6q$f1_qkjj23@ytmp-2!i)m@bvr-6$)fa#*149'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['*']
-
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Application definition
 
@@ -37,11 +24,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'mozilla_django_oidc',
     'rest_framework',
     'rest_framework_api_key',
     'batadasen',
-    'oidc_auth',
     'django_filters',
     'crispy_forms'
 ]
@@ -75,17 +60,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'internsidor.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
 
 
 # Password validation
@@ -126,25 +100,5 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-AUTHENTICATION_BACKENDS = [
-    'oidc_auth.backends.BatadasenOIDCBackend',
-    'django.contrib.auth.backends.ModelBackend'
-]
-
-OIDC_CREATE_USER = False
-OIDC_RP_SIGN_ALGO = 'RS256'
-
-OIDC_OP_LOGOUT_URL_METHOD = 'oidc_auth.models.logout_url'
-
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
-EMAIL_DOMAIN = 'studentspex.se'
-
 LOGIN_REDIRECT_URL = '/'
-
-LOGIN_URL = '/oidc/authenticate/'
-
-try: 
-    from .local_settings import *
-except ImportError:
-    pass
+LOGOUT_REDIRECT_URL = '/'

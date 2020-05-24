@@ -13,12 +13,24 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('oidc/', include('mozilla_django_oidc.urls')),
-    path('auth/', include('oidc_auth.urls')),
     path('batadasen/', include('batadasen.urls')),
 ]
+
+if 'mozilla_django_oidc' in settings.INSTALLED_APPS:
+    urlpatterns.append(path('oidc/', include('mozilla_django_oidc.urls')))
+else:
+    # A simple login view for dev setups that don't have keycloak available
+    urlpatterns.append(path('login/', auth_views.LoginView.as_view(template_name='batadasen/dev_login.html'), name='login'))
+
+    # Fake the oidc_logout url to make the logout button happy
+    urlpatterns.append(path('logout/', auth_views.LogoutView.as_view(), name='oidc_logout'))
+
+
+
