@@ -11,7 +11,7 @@ import os
 import socketserver
 import pynetstring
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'internsidor.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'internsidor.settings.production')
 django.setup()
 
 from batadasen import models
