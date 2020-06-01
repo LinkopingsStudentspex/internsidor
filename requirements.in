@@ -1,0 +1,7 @@
+django
+mozilla-django-oidc
+djangorestframework
+djangorestframework-api-key
+django-filter
+django-crispy-forms
+pynetstring
