@@ -3,4 +3,3 @@ db.sqlite3
 .venv
 *.pyc
 internsidor/settings/local.py
-internsidor/settings/oidc_client_info.py

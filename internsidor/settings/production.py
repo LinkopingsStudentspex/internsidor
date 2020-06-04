@@ -16,21 +16,6 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 LOGIN_URL = '/oidc/authenticate/'
 
-# Load OIDC client configuration.
-# Following variables must be defined in 
-# oidc_client_info.py
-
-# OIDC_RP_CLIENT_ID
-# OIDC_RP_CLIENT_SECRET
-# OIDC_OP_AUTHORIZATION_ENDPOINT
-# OIDC_OP_TOKEN_ENDPOINT
-# OIDC_OP_USER_ENDPOINT
-# OIDC_OP_JWKS_ENDPOINT
-try: 
-    from .oidc_client_info import *
-except ImportError:
-    pass
-
 try: 
     from .local import *
 except ImportError:
