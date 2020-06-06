@@ -16,26 +16,38 @@ Including another URLconf
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from django.urls import path, include
+from django.urls import path, include, reverse
 from django.shortcuts import redirect
+from django.http import HttpResponseRedirect
+from django.views.generic.base import View
 
-urlpatterns = [
-    path('batadasen/', include('batadasen.urls')),
-]
+class CustomLogin(View):
+    def get(self, request, **kwargs):
+        return HttpResponseRedirect(
+            reverse('oidc_authentication_init') + (
+                '?next={}'.format(request.GET['next']) if 'next' in request.GET else ''
+            )
+        )
 
 if 'mozilla_django_oidc' in settings.INSTALLED_APPS:
-    urlpatterns.append(path('oidc/', include('mozilla_django_oidc.urls')))
-    urlpatterns.append(path('admin/login/', lambda request: redirect('oidc_authentication_init', permanent=False)))
-    urlpatterns.append(path('admin/logout/', lambda request: redirect('oidc_logout', permanent=False)))
+    urlpatterns = [
+        path('admin/login/', CustomLogin.as_view()),
+        # path('admin/logout/', lambda request: redirect('oidc_logout', permanent=False)),
+        path('admin/', admin.site.urls),
+        path('batadasen/', include('batadasen.urls')),
+        path('oidc/', include('mozilla_django_oidc.urls'))
+    ]
 else:
-    # A simple login view for dev setups that don't have keycloak available
-    urlpatterns.append(path('login/', auth_views.LoginView.as_view(template_name='batadasen/dev_login.html'), name='login'))
+    urlpatterns = [
+        path('admin/', admin.site.urls),
+        path('batadasen/', include('batadasen.urls')),
 
-    # Fake the oidc_logout url to make the logout button happy
-    urlpatterns.append(path('logout/', auth_views.LogoutView.as_view(), name='oidc_logout'))
+        # A simple login view for dev setups that don't have keycloak available
+        path('login/', auth_views.LoginView.as_view(template_name='batadasen/dev_login.html'), name='login'),
 
-# Now we can append the admin url last
-urlpatterns.append(path('admin/', admin.site.urls))
+        # Fake the oidc_logout url to make the logout button happy
+        path('logout/', auth_views.LogoutView.as_view(), name='oidc_logout'),
+    ]
 
 
 
