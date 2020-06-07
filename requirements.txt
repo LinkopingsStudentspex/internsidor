@@ -5,26 +5,10 @@
 #    pip-compile
 #
 asgiref==3.2.7            # via django
-certifi==2020.4.5.1       # via requests
-cffi==1.14.0              # via cryptography
-chardet==3.0.4            # via requests
-cryptography==2.9.2       # via josepy, mozilla-django-oidc, pyopenssl
 django-crispy-forms==1.9.1  # via -r requirements.in
 django-filter==2.2.0      # via -r requirements.in
-django==3.0.7             # via -r requirements.in, django-filter, djangorestframework, mozilla-django-oidc
+django==3.0.7             # via -r requirements.in, django-filter, djangorestframework
 djangorestframework-api-key==2.0.0  # via -r requirements.in
 djangorestframework==3.11.0  # via -r requirements.in
-idna==2.9                 # via requests
-josepy==1.3.0             # via mozilla-django-oidc
-mozilla-django-oidc==1.2.3  # via -r requirements.in
-pycparser==2.20           # via cffi
-pynetstring==0.5          # via -r requirements.in
-pyopenssl==19.1.0         # via josepy
 pytz==2020.1              # via django
-requests==2.23.0          # via mozilla-django-oidc
-six==1.15.0               # via cryptography, josepy, mozilla-django-oidc, pyopenssl
 sqlparse==0.3.1           # via django
-urllib3==1.25.9           # via requests
-
-# The following packages are considered to be unsafe in a requirements file:
-# setuptools
