@@ -56,6 +56,7 @@ class PersonAdmin(admin.ModelAdmin):
         ('lifetime_member', 'honorary_member'),
         'hundred_club',
         'deceased',
+        ('wants_spexinfo', 'wants_blandat', 'wants_trams'),
         'notes'
     )
 
@@ -144,9 +145,11 @@ class EmailListAdmin(admin.ModelAdmin):
         'production_groups',
         'all_groups',
         'productions',
+        'active_association_groups',
+        'association_groups',
         'opt_out_members',
     )
-    filter_horizontal = ('opt_in_members', 'opt_out_members', 'all_groups', 'production_groups', 'productions')
+    filter_horizontal = ('opt_in_members', 'opt_out_members', 'all_groups', 'production_groups', 'productions', 'active_association_groups', 'association_groups')
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
@@ -177,6 +180,7 @@ admin.site.register(AssociationYear)
 admin.site.register(EmailList, EmailListAdmin)
 admin.site.register(ExtraEmail)
 admin.site.register(AssociationGroupType, GroupAdmin)
+admin.site.register(AssociationGroup)
 admin.site.register(ProductionGroupType, GroupAdmin)
 admin.site.register(Instrument, TitleAdmin)
 admin.site.register(Person, PersonAdmin)

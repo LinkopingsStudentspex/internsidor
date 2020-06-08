@@ -41,16 +41,20 @@ class LissMilter(Milter.Base):
 
         valid_sender = True
 
-        if protected_list:
-            try:
-                models.Person.objects.get(Q(email=self.from_addr) | Q(address_list_email=self.from_addr) | Q(extra_email__email=self.from_addr))
-            except models.Person.DoesNotExist:
-                valid_sender = False
-            pass
+        has_this_email = Q(email=self.from_addr) | Q(address_list_email=self.from_addr) | Q(extra_email__email=self.from_addr)
+
+        if protected_list and not models.Person.objects.filter(has_this_email).exists():
+            valid_sender = False
 
         if extra_protected_list:
-            # TODO: Check if sender is allowed to send to extra protected lists
-            pass
+            current_assoc_year = models.get_current_assoc_year()
+            try:
+                has_this_email = Q(person__email=self.from_addr) | Q(person__address_list_email=self.from_addr) | Q(person__extra_email__email=self.from_addr)
+                if not current_assoc_year.groups.get(Q(group_type__short_name='STYR')).activities.filter(has_this_email).exists():
+                    valid_sender = False
+            except models.AssociationGroup.DoesNotExist:
+                # Should only happen if no AssociationGroup called 'STYR' has been created yet
+                pass
 
         if not valid_sender:
             self.setreply('554', '5.7.2', 'Sender <{}> not authorized for recipient ("{}"). Kontakta en ansvarig om du tycker det borde funka.'.format(self.from_addr, to))

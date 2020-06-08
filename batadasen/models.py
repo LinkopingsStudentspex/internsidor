@@ -4,11 +4,12 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models.signals import post_save
+from django.db.models import Q
 from django.dispatch import receiver
 from django.utils import crypto, timezone
 
 
-def get_current_assoc_year():
+def get_current_assoc_end_year():
     today = date.today()
     if today > date(today.year, 6, 30):
         return today.year + 1
@@ -58,7 +59,6 @@ class Person(models.Model):
     home_page = models.CharField('hemsida', max_length=100, blank=True)
     wants_spexpressen = models.BooleanField('vill få spexpressen', default=False)
     wants_spexinfo = models.BooleanField('vill få spexinfo-mail', default=True)
-    wants_spextjat = models.BooleanField('vill få spextjat-mail', default=False)
     wants_trams = models.BooleanField('vill få trams-mail', default=False)
     wants_blandat = models.BooleanField('vill få blandat-mail', default=True)
     lifetime_member = models.BooleanField('livstidsmedlem', default=False)
@@ -80,7 +80,7 @@ class Person(models.Model):
         if self.lifetime_member or self.honorary_member:
             return True
         
-        return self.association_memberships.filter(year__end_year=get_current_assoc_year()).exists()
+        return self.association_memberships.filter(year=get_current_assoc_year()).exists()
     
     @property
     def display_email(self):
@@ -142,6 +142,11 @@ class Production(models.Model):
         else:
             return '{} - {} ({})'.format(self.number, self.main_title, self.short_name)
 
+DIRECTION_TITLES = [
+    'Directeur',
+    'Ekonomichef',
+    'Producent'
+]
 
 class Title(models.Model):
     class Meta:
@@ -178,7 +183,7 @@ class AssociationYear(models.Model):
         verbose_name = 'verksamhetsår'
         verbose_name_plural = 'verksamhetsår'
 
-    end_year = models.PositiveIntegerField('slutår', default=get_current_assoc_year, validators=[validate_association_year], primary_key=True)
+    end_year = models.PositiveIntegerField('slutår', default=get_current_assoc_end_year, validators=[validate_association_year], primary_key=True)
 
     def get_start_time(self):
         return datetime.datetime(self.end_year-1, 7, 1, 0, 0, 0)
@@ -189,6 +194,11 @@ class AssociationYear(models.Model):
     def __str__(self):
         return '{}/{}'.format(self.end_year % 100 -1, self.end_year % 100)
     
+
+def get_current_assoc_year():
+    return AssociationYear.objects.get(end_year=get_current_assoc_end_year())
+    
+
 class AssociationGroupType(models.Model):
     class Meta:
         verbose_name = 'föreningsgrupptyp'
@@ -201,23 +211,36 @@ class AssociationGroupType(models.Model):
     def __str__(self):
         return self.name
 
+
+class AssociationGroup(models.Model):
+    class Meta:
+        verbose_name = 'föreningsgrupp'
+        verbose_name_plural = 'föreningsgrupp'
+        unique_together = [['year', 'group_type']]
+    
+    year = models.ForeignKey(AssociationYear, models.CASCADE, verbose_name='verksamhetsår', related_name='groups')
+    group_type = models.ForeignKey(AssociationGroupType, models.CASCADE, verbose_name='grupptyp')
+
+    def __str__(self):
+        return '{} {}'.format(self.group_type.short_name, self.year)
+
+
 class AssociationActivity(models.Model):
     class Meta:
         verbose_name = 'föreningsuppdrag'
         verbose_name_plural = 'föreningsuppdrag'
-        unique_together = [['person', 'group_type']]
+        unique_together = [['person', 'group']]
 
-    person = models.ForeignKey(Person, models.CASCADE, verbose_name='person')
-    group_type = models.ForeignKey(AssociationGroupType, models.CASCADE, verbose_name='grupp')
+    person = models.ForeignKey(Person, models.CASCADE, verbose_name='person', related_name='association_activities')
+    group = models.ForeignKey(AssociationGroup, models.CASCADE, verbose_name='grupp', related_name='activities')
     title = models.ForeignKey(Title, models.CASCADE, null=True, verbose_name='titel')
-    year = models.ForeignKey(AssociationYear, models.CASCADE, verbose_name='verksamhetsår')
     to_date = models.DateField('till och med datum', null=True, blank=True)
 
     def __str__(self):
         if self.title is None:
-            return '{}: {} {}'.format(self.person, self.group_type, self.year)
+            return '{}: {}'.format(self.person, self.group)
         else:
-            return '{}: {} {} ({})'.format(self.person, self.group_type, self.year, self.title)
+            return '{}: {} ({})'.format(self.person, self.group, self.title)
     
 
 class ProductionGroup(models.Model):
@@ -226,8 +249,8 @@ class ProductionGroup(models.Model):
         verbose_name_plural = 'uppsättningsgrupper'
         unique_together = ['production', 'group_type']
 
-    production = models.ForeignKey(Production, models.CASCADE, verbose_name='uppsättning')
-    group_type = models.ForeignKey(ProductionGroupType, models.CASCADE, verbose_name='grupptyp', null=True, blank=True, help_text='lämna tomt om den här gruppen ska räknas som att vara med i en uppsättning utan att tillhöra en specifik grupp')
+    production = models.ForeignKey(Production, models.CASCADE, verbose_name='uppsättning', related_name='groups')
+    group_type = models.ForeignKey(ProductionGroupType, models.CASCADE, verbose_name='grupptyp', null=True, blank=True, help_text='lämna tomt om den här gruppen ska räknas som att vara med i en uppsättning utan att tillhöra en specifik grupp', related_name='group_instances')
 
     def __str__(self):
         if self.group_type is None:
@@ -265,7 +288,7 @@ class ProductionMembership(models.Model):
         unique_together = [['person', 'group', 'title', 'instrument']]
 
     person = models.ForeignKey(Person, models.CASCADE, verbose_name='uppsättningsmedlemsskap', related_name='production_memberships', editable=False)
-    group = models.ForeignKey(ProductionGroup, models.CASCADE, verbose_name='Grupp')
+    group = models.ForeignKey(ProductionGroup, models.CASCADE, verbose_name='Grupp', related_name='memberships')
     title = models.ForeignKey(Title, models.SET_NULL, null=True, blank=True, verbose_name='Titel')
     instrument = models.ForeignKey(Instrument, models.SET_NULL, null=True, blank=True, verbose_name='Instrument')
 
@@ -304,6 +327,8 @@ class EmailList(models.Model):
         related_name='opt_out_email_lists', 
         blank=True,
         help_text='Vilka personer ska inte få mail från denna lista, oavsett vilka grupper de är med i?')
+
+    # Production lists
     all_groups = models.ManyToManyField(
         ProductionGroupType, 
         related_name='email_lists', 
@@ -322,66 +347,85 @@ class EmailList(models.Model):
         verbose_name='hela uppsättningar', 
         blank=True,
         help_text='Denna lista kommer skicka mail till följande HELA uppsättningar')
+    
+    # Association lists
+    active_association_groups = models.ManyToManyField(
+        AssociationGroupType,
+        related_name='email_lists',
+        verbose_name='föreningsgrupper för aktivt verksamhetsår',
+        blank=True,
+        help_text='Denna lista kommer skicka mail till dessa aktiva föreningsgrupper')
+    association_groups = models.ManyToManyField(
+        AssociationGroup,
+        related_name='email_lists',
+        verbose_name='föreningsgrupper från enskilda verksamhetsår',
+        blank=True,
+        help_text='Denna lista kommer skicka mail till personer som var med i dessa föreningsgrupper ett visst år')
 
     def __str__(self):
         return self.alias
     
-    def get_recipients_email(self):
-        email_set = set()
-        for person in self.opt_in_members.all():
-            email_set.add(person.email)
-            print('{} included in {} due to opt-in'.format(person, self))
-        
-        for group_type in self.all_groups.all():
-            persons = Person.objects.filter(production_memberships__group__group_type=group_type)
-            for person in persons:
-                email_set.add(person.email)
-                print('{} included in {} due to all_groups'.format(person, self))
-        
-        for group in self.production_groups.all():
-            persons = Person.objects.filter(production_memberships__group=group)
-            for person in persons:
-                email_set.add(person.email)
-                print('{} included in {} due to production_groups'.format(person, self))
-        
-        for production in self.productions.all():
-            persons = Person.objects.filter(production_memberships__group__production=production)
-            for person in persons:
-                email_set.add(person.email)
-                print('{} included in {} due to productions'.format(person, self))
-        
-        for person in self.opt_out_members.all():
-            email_set.discard(person.email)
-            print('Discarded {} from list {} due to opt-out'.format(person, self))
-
-        return email_set
-    
     @property
     def recipients(self):
         person_set = set()
+
         for person in self.opt_in_members.all():
             person_set.add(person)
         
         for group_type in self.all_groups.all():
-            persons = Person.objects.filter(production_memberships__group__group_type=group_type)
-            for person in persons:
+            for person in Person.objects.filter(production_memberships__group__group_type=group_type):
                 person_set.add(person)
         
         for group in self.production_groups.all():
-            persons = Person.objects.filter(production_memberships__group=group)
-            for person in persons:
+            for person in Person.objects.filter(production_memberships__group=group):
                 person_set.add(person)
         
         for production in self.productions.all():
-            persons = Person.objects.filter(production_memberships__group__production=production)
-            for person in persons:
+            for person in Person.objects.filter(production_memberships__group__production=production):
                 person_set.add(person)
         
+        for group in self.association_groups.all():
+            for person in Person.objects.filter(association_activities__group=group):
+                person_set.add(person)
+        
+        current_assoc_year = get_current_assoc_year()
+
+        for group_type in self.active_association_groups.all():
+            for person in Person.objects.filter(association_activities__group__group_type=group_type, association_activities__group__year=current_assoc_year):
+                person_set.add(person)
+        
+        # Additional includes for special lists
+        if self.alias == 'kallelse':
+            for membership in current_assoc_year.memberships:
+                person_set.add(membership.person)
+        elif self.alias == 'spexinfo':
+            for person in Person.objects.filter(wants_spexinfo=True):
+                person_set.add(person)
+        elif self.alias == 'blandat':
+            for person in Person.objects.filter(wants_blandat=True):
+                person_set.add(person)
+        elif self.alias == 'trams':
+            for person in Person.objects.filter(wants_trams=True):
+                person_set.add(person)
+        elif self.alias == 'styrelse-kallelse':
+            active_productions = Production.objects.filter(closed=False)
+            for active_production in active_productions:
+                for person in Person.objects.filter(production_memberships__group__production__closed=False, production_memberships__title__in=DIRECTION_TITLES):
+                    person_set.add(person)
+                for person in Person.objects.filter(production_memberships__group__production__closed=False, production_memberships__group__group_type__short_name='REV'):
+                    person_set.add(person)
+
+            for activity in current_assoc_year.groups.get(Q(group_type__short_name='STYR') | Q(group_type__short_name='REV')).activities.all():
+                person_set.add(activity.person)
+
+        # Last of all, handle opt out requests
         for person in self.opt_out_members.all():
             person_set.discard(person)
 
         return person_set
 
+    def get_recipients_email(self):
+        return map(lambda x: x.email, self.recipients())
     
 
 class AssociationMembership(models.Model):
