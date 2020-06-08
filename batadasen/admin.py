@@ -1,11 +1,14 @@
 from django.contrib import admin, messages
+from django.contrib.auth.admin import UserAdmin as origUserAdmin, GroupAdmin as origGroupAdmin
+from django.contrib.auth.models import User, Group
 from django.core import mail
 from django.db import models
 from django import forms
 from django.conf import settings
-from django.utils.html import format_html
+from django.utils.safestring import mark_safe   
 from django.urls import reverse
 from django.template.loader import render_to_string
+from django.utils.translation import gettext, gettext_lazy as _
 
 from .models import *
 from . import urls
@@ -52,7 +55,7 @@ class PersonAdmin(admin.ModelAdmin):
         'street_address',
         ('postal_code', 'postal_locality', 'country'),
         'address_list_email',
-        ('user', 'send_activation_link'),
+        ('user_link', 'send_activation_link'),
         ('lifetime_member', 'honorary_member'),
         'hundred_club',
         'deceased',
@@ -86,6 +89,15 @@ class PersonAdmin(admin.ModelAdmin):
         return obj
     full_name.short_description = 'Namn'
 
+    def user_link(self, obj):
+        if obj.user is None:
+            return '-'
+
+        return mark_safe('<a href="{}">{}</a>'.format(
+            reverse("admin:auth_user_change", args=(obj.user.pk,)),
+            obj.user.username
+        ))
+
     def get_production_groups(self, obj):
         group_list = []
         count = 0
@@ -100,7 +112,7 @@ class PersonAdmin(admin.ModelAdmin):
     get_production_groups.short_description = 'Grupper'
 
     def get_readonly_fields(self, request, obj=None):
-        ret_fields = ['user']
+        ret_fields = ['user_link']
         if obj:
             ret_fields.append('member_number')
         
@@ -137,6 +149,23 @@ class PersonAdmin(admin.ModelAdmin):
             )
             messages.info(request, 'Ett mail med en aktiveringslänk har skickats till {}. Länken går ut {}'.format(email, activation.valid_until.strftime('%Y-%m-%d %H:%M:%S')))
 
+class UserAdmin(origUserAdmin):
+    fieldsets = (
+        (None, {'fields': ('username',)}),
+        (_('Permissions'), {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+        }),
+        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+    )
+
+class UserInLine(admin.TabularInline):
+    model = Group.user_set.through
+    extra = 0
+
+    autocomplete_fields = ['user']
+
+class GroupAdmin(origGroupAdmin):
+    inlines = [UserInLine]
 
 class EmailListAdmin(admin.ModelAdmin):
     fields = (
@@ -166,7 +195,7 @@ class TitleAdmin(admin.ModelAdmin):
         else:
             return []
 
-class GroupAdmin(admin.ModelAdmin):
+class GenericGroupAdmin(admin.ModelAdmin):
     fields = ('short_name', 'name')
 
 class ProductionGroupAdmin(admin.ModelAdmin):
@@ -179,11 +208,17 @@ admin.site.register(AssociationMembership)
 admin.site.register(AssociationYear)
 admin.site.register(EmailList, EmailListAdmin)
 admin.site.register(ExtraEmail)
-admin.site.register(AssociationGroupType, GroupAdmin)
+admin.site.register(AssociationGroupType, GenericGroupAdmin)
 admin.site.register(AssociationGroup)
-admin.site.register(ProductionGroupType, GroupAdmin)
+admin.site.register(ProductionGroupType, GenericGroupAdmin)
 admin.site.register(Instrument, TitleAdmin)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Production)
 admin.site.register(ProductionGroup, ProductionGroupAdmin)
 admin.site.register(Title, TitleAdmin)
+
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
+
+admin.site.unregister(Group)
+admin.site.register(Group, GroupAdmin)
