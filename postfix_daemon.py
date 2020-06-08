@@ -8,6 +8,7 @@ Karl Linderhed 2020-03-19
 """
 import django
 import os
+import sys
 import socketserver
 import pynetstring
 
@@ -50,10 +51,15 @@ class PostfixTCPHandler(socketserver.BaseRequestHandler):
             self.request.sendall(pynetstring.encode('NOTFOUND '))
             return
         
-        reply = 'OK {}'.format(','.join(email_list.get_recipients_email()))
+        addresses = email_list.get_recipients_email()
+        if len(addresses) == 0:
+            self.request.sendall(pynetstring.encode('TEMP No recipients in list'))
+            return
+        
+        reply = 'OK {}'.format(','.join(addresses))
         self.request.sendall(pynetstring.encode(reply))
 
-HOST, PORT = "localhost", os.argv[1]
+HOST, PORT = "localhost", int(sys.argv[1])
 with socketserver.TCPServer((HOST, PORT), PostfixTCPHandler) as server:
     print("Listening for postfix lookups on {}:{}".format(HOST, PORT))
     server.serve_forever()

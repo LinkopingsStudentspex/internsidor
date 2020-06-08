@@ -425,7 +425,7 @@ class EmailList(models.Model):
         return person_set
 
     def get_recipients_email(self):
-        return map(lambda x: x.email, self.recipients())
+        return set(map(lambda x: x.email, self.recipients))
     
 
 class AssociationMembership(models.Model):
