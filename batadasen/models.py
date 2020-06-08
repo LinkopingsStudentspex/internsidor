@@ -233,7 +233,7 @@ class AssociationActivity(models.Model):
 
     person = models.ForeignKey(Person, models.CASCADE, verbose_name='person', related_name='association_activities')
     group = models.ForeignKey(AssociationGroup, models.CASCADE, verbose_name='grupp', related_name='activities')
-    title = models.ForeignKey(Title, models.CASCADE, null=True, verbose_name='titel')
+    title = models.ForeignKey(Title, models.SET_NULL, null=True, blank=True, verbose_name='titel')
     to_date = models.DateField('till och med datum', null=True, blank=True)
 
     def __str__(self):
@@ -396,7 +396,7 @@ class EmailList(models.Model):
         
         # Additional includes for special lists
         if self.alias == 'kallelse':
-            for membership in current_assoc_year.memberships:
+            for membership in current_assoc_year.memberships.all():
                 person_set.add(membership.person)
         elif self.alias == 'spexinfo':
             for person in Person.objects.filter(wants_spexinfo=True):
@@ -430,7 +430,7 @@ class EmailList(models.Model):
 
 class AssociationMembership(models.Model):
     person = models.ForeignKey(Person, models.CASCADE, verbose_name='person', related_name='association_memberships')
-    year = models.ForeignKey(AssociationYear, models.CASCADE, verbose_name='verksamhetsår')
+    year = models.ForeignKey(AssociationYear, models.CASCADE, verbose_name='verksamhetsår', related_name='memberships')
 
     def __str__(self):
         return '{} var medlem {}'.format(self.person, self.year)

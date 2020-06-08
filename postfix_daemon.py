@@ -53,7 +53,7 @@ class PostfixTCPHandler(socketserver.BaseRequestHandler):
         reply = 'OK {}'.format(','.join(email_list.get_recipients_email()))
         self.request.sendall(pynetstring.encode(reply))
 
-HOST, PORT = "localhost", 9999
+HOST, PORT = "localhost", os.argv[1]
 with socketserver.TCPServer((HOST, PORT), PostfixTCPHandler) as server:
     print("Listening for postfix lookups on {}:{}".format(HOST, PORT))
     server.serve_forever()
