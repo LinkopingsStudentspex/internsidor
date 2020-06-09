@@ -59,6 +59,6 @@ I projektet finns också några små python-skript som kan använda Djangos data
 Filen `postfix_daemon.py` är en liten TCP-server som svarar på anrop från Postfix via API:t från följande sida: http://www.postfix.org/socketmap_table.5.html
 
 ### Mail-filtrering
-För att kunna filtrera ut så att endast vissa personer kan skicka mail till vissa maillistor används ett så kallat milter (mail filter) som är ett program som hakar på i vissa steg av SMTP-protokollet och kan avbryta en mail-transaktion om mottagaren inte uppfyller vissa villkor. Det finns i filen `lissmilter.py` och är baserat på biblioteket `pymilter`.
+För att kunna filtrera ut så att endast vissa personer kan skicka mail till vissa maillistor används ett så kallat milter (mail filter) som är ett program som hakar på i vissa steg av SMTP-protokollet och kan avbryta en mail-transaktion om avsändaren inte uppfyller vissa villkor. Det finns i filen `lissmilter.py` och är baserat på biblioteket `pymilter`.
 
 Vi använder det också för att skriva om ämnesraden till vissa maillistor.
