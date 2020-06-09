@@ -106,6 +106,11 @@ class PersonAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         ret_fields = []
+        if not request.user.is_superuser:
+            # If anyone with edit-person permissions could change the connections between users and persons, 
+            # there is nothing that stops a less privileged user from reassigning a super user to their own person,
+            # which could allow them to get a password reset link for the super user to their own email.
+            ret_fields.append('user')
         if obj:
             ret_fields.append('member_number')
         
