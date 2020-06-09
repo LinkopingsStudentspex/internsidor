@@ -55,7 +55,7 @@ class PersonAdmin(admin.ModelAdmin):
         'street_address',
         ('postal_code', 'postal_locality', 'country'),
         'address_list_email',
-        ('user_link', 'send_activation_link'),
+        ('user', 'send_activation_link'),
         ('lifetime_member', 'honorary_member'),
         'hundred_club',
         'deceased',
@@ -78,6 +78,8 @@ class PersonAdmin(admin.ModelAdmin):
         'email'
     ]
 
+    autocomplete_fields = ['user']
+
     inlines = [
         ProductionMembershipInline,
         AssociationMembershipInline,
@@ -88,15 +90,6 @@ class PersonAdmin(admin.ModelAdmin):
     def full_name(self, obj):
         return obj
     full_name.short_description = 'Namn'
-
-    def user_link(self, obj):
-        if obj.user is None:
-            return '-'
-
-        return mark_safe('<a href="{}">{}</a>'.format(
-            reverse("admin:auth_user_change", args=(obj.user.pk,)),
-            obj.user.username
-        ))
 
     def get_production_groups(self, obj):
         group_list = []
@@ -112,7 +105,7 @@ class PersonAdmin(admin.ModelAdmin):
     get_production_groups.short_description = 'Grupper'
 
     def get_readonly_fields(self, request, obj=None):
-        ret_fields = ['user_link']
+        ret_fields = []
         if obj:
             ret_fields.append('member_number')
         
