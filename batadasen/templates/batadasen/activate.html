@@ -1,13 +1,20 @@
-<html>
-    <body>
-        <p>Här sätter du användarnamnet för ditt nya konto.</p>
-        <form method="post">
-            {% csrf_token %}
-            {{ form }}
-            <br>
-            Tänk på att användarnamnet är skiftlägeskänsligt, "Lisse" är alltså inte samma användarnamn som "lisse".
-            <br>
-            <input type="submit" value="Submit">
-        </form>
-    </body>
-</html>
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}Aktivera konto{% endblock %}
+
+{% load crispy_forms_tags %}
+
+{% block body %}
+
+<p>Här sätter du användarnamnet för ditt nya konto.</p>
+{% crispy form form.helper %}
+<!-- <form method="post">
+    {% csrf_token %}
+    {{ form }}
+    <br>
+    <br>
+    <input type="submit" value="Submit">
+</form> -->
+
+{% endblock %}

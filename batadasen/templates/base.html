@@ -26,24 +26,8 @@
 
 <body>
     {% load i18n %}
-    <div id="sidebar">
-        <a class="nav-link" href="/">Start</a>
-        <a class="nav-link" href="{% url 'batadasen:person_self' %}">Min sida</a>
-        <form action="{% url 'oidc_logout' %}" method="post">
-            {% csrf_token %}
-            <input type="submit" id="logout-btn" class="btn btn-outline-secondary" value="Logga ut">
-        </form>
-        <a class="nav-link" id="admin-link" href="{% url 'admin:index' %}">Admin</a>
-    </div>
-    <div class="container">
-        <div class="col-md-12">
-            <!-- <div class="row">
-            </div>
-            <div class="row"> -->
-                {% block content %} {% endblock %}
-            <!-- </div> -->
-        </div>
-    </div>
+    {% block body %}
+    {% endblock %}
 </body>
 
 </html>

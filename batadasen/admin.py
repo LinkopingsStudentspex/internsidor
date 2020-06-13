@@ -60,7 +60,8 @@ class PersonAdmin(admin.ModelAdmin):
         'hundred_club',
         'deceased',
         ('wants_spexinfo', 'wants_blandat', 'wants_trams'),
-        'notes'
+        'notes',
+        'privacy_setting'
     )
 
     list_display = [
@@ -208,6 +209,10 @@ class ProductionGroupAdmin(admin.ModelAdmin):
 
     search_fields = ['group_type__short_name', 'group_type__name', 'production__short_name']
 
+class UserActivationAdmin(admin.ModelAdmin):
+    model = UserActivation
+    autocomplete_fields = ['person']
+
 admin.site.register(AssociationActivity)
 admin.site.register(AssociationMembership)
 admin.site.register(AssociationYear)
@@ -220,6 +225,7 @@ admin.site.register(Person, PersonAdmin)
 admin.site.register(Production)
 admin.site.register(ProductionGroup, ProductionGroupAdmin)
 admin.site.register(Title, TitleAdmin)
+admin.site.register(UserActivation, UserActivationAdmin)
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)

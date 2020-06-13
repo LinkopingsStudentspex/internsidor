@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base_sidebar.html' %}
 {% load i18n %}
 
 {% block title %}Min sida{% endblock %}
@@ -20,11 +20,11 @@
 Ditt användarnamn är {{ object.user.username }}
 </p>
 {% if object.currently_member %}
-<div class="">
+<div class="alert alert-success" role="alert">
     Du är medlem i föreningen
 </div>
-    {% else %}
-<div class="">
+{% else %}
+<div class="alert alert-warning" role="alert">
     Du är inte medlem i föreningen
 </div>
 {% endif %}

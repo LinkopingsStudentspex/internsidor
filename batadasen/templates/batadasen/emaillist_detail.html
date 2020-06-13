@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base_sidebar.html' %}
 {% load i18n %}
 
 {% block title %}Mejllista {{ object.alias }}{% endblock %}
@@ -13,8 +13,12 @@ Denna maillista går till följande personer:
 {% for person in object.recipients|dictsort:"member_number" %}
 <tr>
     <td><a href="{% url 'batadasen:person_detail' person.member_number %}">{{ person.member_number }}</a></td>
+{% if person.privacy_setting == 'PVT' %}
+    <td colspan="2" class="font-italic text-secondary">Namn och e-postadress visas ej</td>   
+{% else %}
     <td>{{ person.first_name }} {% if person.spex_name %}"{{ person.spex_name }}" {% endif %}{{ person.last_name }}</td>
     <td><a href="mailto:{{ person.display_email }}">{{ person.display_email }}</a></td>
+{% endif %}
 </tr>
 {% endfor %}
 

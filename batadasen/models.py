@@ -22,6 +22,14 @@ class Person(models.Model):
         verbose_name = 'person'
         verbose_name_plural = 'personer'
         ordering = ['member_number']
+        permissions = [
+            ("view_private_info", "Kan se all personinfo oavsett personens inställningar")
+        ]
+    
+    class PrivacySetting(models.TextChoices):
+        PRIVATE = 'PVT', 'Privat', # Only number is visible.
+        LIMITED = 'LIM', 'Begränsad', # Other members can see name and email. Default.
+        OPEN = 'OPN', 'Öppen' # Other members can see everything.
     
     def get_next_member_number():
         # Gamla databasen använde speciella värden i medlemsnumret
@@ -55,7 +63,7 @@ class Person(models.Model):
     phone_mobile = models.CharField('mobiltelefon', max_length=20, blank=True)
     phone_extra = models.CharField('extra telefon', max_length=20, blank=True)
     email = models.EmailField('mail', null=True, blank=True, unique=True, help_text='Hit kommer mail från spexets maillistor skickas.')
-    address_list_email = models.EmailField('adresslistmail', blank=True, help_text='Alternativ mailadress som ska visas istället i medlemslistor och liknande.')
+    address_list_email = models.EmailField('visningsmail', blank=True, help_text='Alternativ mailadress som ska visas istället i medlemslistor och liknande.')
     wants_spexpressen = models.BooleanField('vill få spexpressen', default=False)
     wants_spexinfo = models.BooleanField('vill få spexinfo-mail', default=True)
     wants_trams = models.BooleanField('vill få trams-mail', default=False)
@@ -67,6 +75,15 @@ class Person(models.Model):
     address_changed_date = models.DateTimeField('adress ändrad', null=True, blank=True)
     mail_changed_date = models.DateTimeField('mail ändrad', null=True, blank=True)
     notes = models.TextField('övrigt', max_length=1000, null=True, blank=True)
+    privacy_setting = models.CharField(
+        'sekretessnivå', 
+        max_length=3, 
+        choices=PrivacySetting.choices, 
+        default=PrivacySetting.LIMITED, 
+        help_text='Privat: endast administratörer kan se dina personuppgifter. '
+                  'Begränsad: andra inloggade kan se namn och epostadress. '
+                  'Öppen: andra inloggade kan se all din information. '
+                  'Inga personuppgifter kommer någonsin vara synliga för icke-inloggade.')
 
     def __str__(self):
         if self.spex_name == '':
@@ -96,12 +113,16 @@ def calculate_expiration_time():
     return timezone.now() + timedelta(hours=2)
 
 class UserActivation(models.Model):
+    class Meta:
+        verbose_name = 'användaraktivering'
+        verbose_name_plural = 'användaraktiveringar'
+        ordering = ['person']
     person = models.ForeignKey(Person, models.CASCADE, verbose_name='person')
     valid_until = models.DateTimeField('giltig tills', default=calculate_expiration_time)
     token = models.CharField('token', max_length=50, default=generate_activation_token)
 
     def __str__(self):
-        return 'User activation for {}, {}, {}'.format(self.person, self.created_date, self.token)
+        return 'User activation for {}, valid until {}'.format(self.person, self.valid_until)
 
 class ExtraEmail(models.Model):
     class Meta:
