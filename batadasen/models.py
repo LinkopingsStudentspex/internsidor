@@ -396,8 +396,13 @@ class EmailList(models.Model):
                 person_set.add(person)
         
         for production in self.productions.all():
-            for person in valid_persons.filter(production_memberships__group__production=production):
-                person_set.add(person)
+            # Special handling of email lists to group leaders
+            if self.alias.endswith('gruppledare'):
+                for person in valid_persons.filter(production_memberships__group__production=production, production_memberships__title='Gruppledare'):
+                    person_set.add(person)
+            else:
+                for person in valid_persons.filter(production_memberships__group__production=production):
+                    person_set.add(person)
         
         for group in self.association_groups.all():
             for person in valid_persons.filter(association_activities__group=group):
