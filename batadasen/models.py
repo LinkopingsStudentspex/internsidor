@@ -44,7 +44,6 @@ class Person(models.Model):
     first_name = models.CharField('förnamn', max_length=50)
     spex_name = models.CharField('spexnamn', max_length=50, blank=True)
     last_name = models.CharField('efternamn', max_length=50)
-    maiden_name = models.CharField('flicknamn', max_length=50, blank=True)
     street_address = models.CharField('gatuadress', max_length=100, blank=True)
     postal_locality = models.CharField('postort', max_length=50, blank=True)
     postal_code = models.CharField('postnummer', max_length=50, blank=True)
@@ -53,10 +52,8 @@ class Person(models.Model):
     phone_work = models.CharField('jobbtelefon', max_length=20, blank=True)
     phone_mobile = models.CharField('mobiltelefon', max_length=20, blank=True)
     phone_extra = models.CharField('extra telefon', max_length=20, blank=True)
-    domestic_partner = models.IntegerField('sambo', null=True, blank=True)
     email = models.EmailField('mail', null=True, blank=True, unique=True, help_text='Hit kommer mail från spexets maillistor skickas.')
     address_list_email = models.EmailField('adresslistmail', blank=True, help_text='Alternativ mailadress som ska visas istället i medlemslistor och liknande.')
-    home_page = models.CharField('hemsida', max_length=100, blank=True)
     wants_spexpressen = models.BooleanField('vill få spexpressen', default=False)
     wants_spexinfo = models.BooleanField('vill få spexinfo-mail', default=True)
     wants_trams = models.BooleanField('vill få trams-mail', default=False)
@@ -71,9 +68,9 @@ class Person(models.Model):
 
     def __str__(self):
         if self.spex_name == '':
-            return '{} {}'.format(self.first_name, self.last_name)
+            return '({}) {} {}'.format(self.member_number, self.first_name, self.last_name)
         else:
-            return '{} "{}" {}'.format(self.first_name, self.spex_name, self.last_name)
+            return '({}) {} "{}" {}'.format(self.member_number, self.first_name, self.spex_name, self.last_name)
     
     @property
     def currently_member(self):
@@ -144,6 +141,7 @@ class Production(models.Model):
 
 DIRECTION_TITLES = [
     'Directeur',
+    'Direktör',
     'Ekonomichef',
     'Producent'
 ]
@@ -154,7 +152,7 @@ class Title(models.Model):
         verbose_name_plural = 'titlar'
 
     name = models.CharField('namn', max_length=50, primary_key=True)
-    email_alias = models.CharField('mailalias', max_length=20)
+    email_alias = models.CharField('mailalias', max_length=20, blank=True)
     priority = models.IntegerField('prioritet', default=0)
 
     def __str__(self):
@@ -171,7 +169,7 @@ class ProductionGroupType(models.Model):
     priority = models.IntegerField('prioritet', default=0)
     
     def __str__(self):
-        return self.name
+        return "{} ({})".format(self.name, self.short_name)
 
 
 def validate_association_year(year):
@@ -192,7 +190,7 @@ class AssociationYear(models.Model):
         return datetime.datetime(self.end_year, 6, 30, 23, 59, 59)
 
     def __str__(self):
-        return '{}/{}'.format(self.end_year % 100 -1, self.end_year % 100)
+        return '{:02}/{:02}'.format((self.end_year - 1) % 100, self.end_year % 100)
     
 
 def get_current_assoc_year():
@@ -270,34 +268,21 @@ class ProductionGroup(models.Model):
         super(ProductionGroup, self).validate_unique(exclude)
     
 
-class Instrument(models.Model):
-    class Meta:
-        verbose_name = 'instrument'
-        verbose_name_plural = 'instrument'
-
-    name = models.CharField('instrument', max_length=50, primary_key=True, )
-
-    def __str__(self):
-        return self.name
-
-
 class ProductionMembership(models.Model):
     class Meta:
         verbose_name = 'uppsättningsmedlemskap'
         verbose_name_plural = 'uppsättningsmedlemskap'
-        unique_together = [['person', 'group', 'title', 'instrument']]
+        unique_together = [['person', 'group', 'title']]
 
     person = models.ForeignKey(Person, models.CASCADE, verbose_name='uppsättningsmedlemsskap', related_name='production_memberships', editable=False)
     group = models.ForeignKey(ProductionGroup, models.CASCADE, verbose_name='Grupp', related_name='memberships')
     title = models.ForeignKey(Title, models.SET_NULL, null=True, blank=True, verbose_name='Titel')
-    instrument = models.ForeignKey(Instrument, models.SET_NULL, null=True, blank=True, verbose_name='Instrument')
+    comment = models.CharField(max_length=100, blank=True, verbose_name='kommentar', help_text='Här kan man skriva t.ex. vilket instrument en orkestermedlem spelar')
 
     def short_description(self):
         titles = []
         if self.title is not None:
             titles.append(self.title.name)
-        if self.instrument is not None:
-            titles.append(self.instrument.name)
 
         if len(titles) > 0:
             title_str = ', '.join(titles)
@@ -361,6 +346,14 @@ class EmailList(models.Model):
         verbose_name='föreningsgrupper från enskilda verksamhetsår',
         blank=True,
         help_text='Denna lista kommer skicka mail till personer som var med i dessa föreningsgrupper ett visst år')
+    
+    # Title lists
+    all_titles = models.ManyToManyField(
+        Title,
+        related_name='email_lists',
+        verbose_name='alla personer med denna titel',
+        blank=True,
+        help_text='Denna lista kommer skicka mail till personer som någonsin har haft dessa titlar')
 
     def __str__(self):
         return self.alias
@@ -379,6 +372,10 @@ class EmailList(models.Model):
         for group in self.production_groups.all():
             for person in Person.objects.filter(production_memberships__group=group):
                 person_set.add(person)
+            
+            # Add the current direction to the production group lists
+            for person in Person.objects.filter(production_memberships__group__production=group.production, production_memberships__title__in=DIRECTION_TITLES):
+                person_set.add(person)
         
         for production in self.productions.all():
             for person in Person.objects.filter(production_memberships__group__production=production):
@@ -386,6 +383,10 @@ class EmailList(models.Model):
         
         for group in self.association_groups.all():
             for person in Person.objects.filter(association_activities__group=group):
+                person_set.add(person)
+        
+        for title in self.all_titles.all():
+            for person in Person.objects.filter(Q(production_memberships__title=title) | Q(association_activities__title=title)):
                 person_set.add(person)
         
         current_assoc_year = get_current_assoc_year()

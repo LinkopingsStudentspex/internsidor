@@ -49,7 +49,7 @@ class PersonAdmin(admin.ModelAdmin):
 
     fields = (
         'member_number',
-        ('first_name', 'last_name', 'maiden_name'),
+        ('first_name', 'last_name'),
         'spex_name',
         'email',
         'street_address',
@@ -148,8 +148,12 @@ class PersonAdmin(admin.ModelAdmin):
             messages.info(request, 'Ett mail med en aktiveringslänk har skickats till {}. Länken går ut {}'.format(email, activation.valid_until.strftime('%Y-%m-%d %H:%M:%S')))
 
 class UserAdmin(origUserAdmin):
+    top_fields = ('username',)
+    if 'mozilla_django_oidc' not in settings.INSTALLED_APPS:
+        top_fields = ('username','password')
+
     fieldsets = (
-        (None, {'fields': ('username',)}),
+        (None, {'fields': top_fields}),
         (_('Permissions'), {
             'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
         }),
@@ -174,9 +178,12 @@ class EmailListAdmin(admin.ModelAdmin):
         'productions',
         'active_association_groups',
         'association_groups',
+        'all_titles',
         'opt_out_members',
     )
-    filter_horizontal = ('opt_in_members', 'opt_out_members', 'all_groups', 'production_groups', 'productions', 'active_association_groups', 'association_groups')
+    filter_horizontal = ('opt_in_members', 'opt_out_members', 'all_groups', 'production_groups', 'productions', 'active_association_groups', 'association_groups', 'all_titles')
+
+    search_fields = ['alias']
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
@@ -209,7 +216,6 @@ admin.site.register(ExtraEmail)
 admin.site.register(AssociationGroupType, GenericGroupAdmin)
 admin.site.register(AssociationGroup)
 admin.site.register(ProductionGroupType, GenericGroupAdmin)
-admin.site.register(Instrument, TitleAdmin)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Production)
 admin.site.register(ProductionGroup, ProductionGroupAdmin)

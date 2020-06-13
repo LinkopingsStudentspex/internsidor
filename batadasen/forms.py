@@ -35,7 +35,6 @@ class PersonForm(forms.ModelForm):
             'phone_home',
             'phone_work',
             'phone_extra',
-            'home_page',
             'wants_spexinfo',
             'wants_blandat',
             'wants_trams'
@@ -57,7 +56,6 @@ class PersonForm(forms.ModelForm):
             'phone_mobile',
             'phone_home',
             'phone_work',
-            'home_page',
             'wants_spexinfo',
             'wants_blandat',
             'wants_trams',
