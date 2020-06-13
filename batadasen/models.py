@@ -284,7 +284,7 @@ class ProductionMembership(models.Model):
         verbose_name = 'uppsättningsmedlemskap'
         verbose_name_plural = 'uppsättningsmedlemskap'
         unique_together = [['person', 'group', 'title']]
-        ordering = ['person', 'group']
+        ordering = ['person', 'group__production']
 
     person = models.ForeignKey(Person, models.CASCADE, verbose_name='uppsättningsmedlemsskap', related_name='production_memberships', editable=False)
     group = models.ForeignKey(ProductionGroup, models.CASCADE, verbose_name='Grupp', related_name='memberships')
