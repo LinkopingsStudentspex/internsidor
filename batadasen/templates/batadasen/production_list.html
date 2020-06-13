@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}Uppsättningar{% endblock %}
+
+{% block content %}
+<h2>Uppsättningar</h2>
+<table class="table table-sm">
+    <tr>
+        <th>År</th>
+        <th>Namn</th>
+    </tr>
+    {% for production in object_list|dictsortreversed:"number" %}
+    <tr>
+        <td>{{ production.year }}</td>
+        <td>
+            <a href="{% url 'batadasen:production_detail' production.number %}">{{ production.short_name }} - {{ production.main_title }}</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

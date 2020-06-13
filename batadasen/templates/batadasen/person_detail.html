@@ -4,6 +4,76 @@
 {% block title %}Persondetaljer{% endblock %}
 
 {% block content %}
-    <h1>{{ object.first_name }} {{ object.last_name }}</h1>
-    <p>Medlemsnummer: {{ object.member_number }}</p>
+<h1>Detaljer för medlem {{ object.member_number }}</h1>
+{% if not object.currently_member %}
+<div class="alert alert-warning" role="alert">
+Personen har inte betalat medlemsavgift och är för närvarande inte medlem i föreningen!
+</div>
+{% endif %}
+<table class="table table-sm table-striped">
+<tr>
+    <td>Medlemsnummer</td>
+    <td>{{ object.member_number }}</a></td>
+</tr>
+<tr>
+    <td>Namn</td>
+    <td>{{ object.first_name }} {% if object.spex_name %}"{{ object.spex_name }}" {% endif %}{{ object.last_name }}</td>
+</tr>
+<tr>
+    <td>E-post</td>
+    <td>{% if object.address_list_email %}{{ object.address_list_email }}{% else %}{{ object.email }}{% endif %}</a></td>
+</tr>
+<tr>
+    <td>Telefonnr (mobil)</td>
+    <td>{{ object.phone_mobile }}</a></td>
+</tr>
+<tr>
+    <td>Telefonnr (hem)</td>
+    <td>{{ object.phone_home }}</a></td>
+</tr>
+<tr>
+    <td>Telefonnr (arbete)</td>
+    <td>{{ object.phone_work }}</a></td>
+</tr>
+<tr>
+    <td>Gatuadress</td>
+    <td>{{ object.street_address }}</a></td>
+</tr>
+<tr>
+    <td>Postadress</td>
+    <td>{{ object.postal_code }} {{ object.postal_locality }}</a></td>
+</tr>
+</table>
+
+<h2>Uppsättningshistorik</h2>
+<table class="table table-sm table-striped">
+<tr>
+    <th>Uppsättning</th>
+    <th>Grupp</th>
+    <th>Titel</th>
+    <th>Kommentar</th>
+</tr>
+{% for membership in object.production_memberships.all %}
+<tr>
+    <td>{{ membership.group.production.short_name }}</td>
+    <td>{{ membership.group.group_type.short_name }}</td>
+    <td>{% if membership.title %}{{ membership.title }}{% endif %}</td>
+    <td>{{ membership.comment }}</td>
+</tr>
+{% endfor %}
+</table>
+
+<h2>Föreningsuppdrag</h2>
+<table class="table table-sm table-striped">
+<tr>
+    <th>Grupp</th>
+    <th>Titel</th>
+</tr>
+{% for activity in object.association_activities.all %}
+<tr>
+    <td>{{ activity.group }}</td>
+    <td>{% if activity.title %}{{ activity.title }}{% endif %}</td>
+</tr>
+{% endfor %}
+</table>
 {% endblock %}

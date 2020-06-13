@@ -106,6 +106,31 @@ class PersonSelfView(UpdateView):
     def get_object(self, queryset=None):
         return get_object_or_404(models.Person, user=self.request.user)
 
+@method_decorator(login_required, name='dispatch')
+class ProductionListView(ListView):
+    model = models.Production
+
+
+@method_decorator(login_required, name='dispatch')
+class ProductionDetailView(DetailView):
+    model = models.Production
+
+    # This dance is done to order the memberships in each group by title
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        groups = []
+        for group in context['object'].groups.all():
+            memberships = group.memberships.order_by("-title")
+            if not memberships.exists():
+                continue
+            result_group = dict()
+            result_group['group'] = group
+            result_group['memberships'] = memberships
+            groups.append(result_group)
+        context['groups'] = groups
+        return context
+
+
 # Returns a JSON response with a list of users, for use by a keycloak user storage provider.
 class UserList(generics.ListAPIView):
     queryset = models.Person.objects.filter(~Q(user=None))
