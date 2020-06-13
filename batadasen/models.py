@@ -1,4 +1,5 @@
 from datetime import timedelta, datetime, date
+import re
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -20,6 +21,7 @@ class Person(models.Model):
     class Meta:
         verbose_name = 'person'
         verbose_name_plural = 'personer'
+        ordering = ['member_number']
     
     def get_next_member_number():
         # Gamla databasen använde speciella värden i medlemsnumret
@@ -106,6 +108,7 @@ class ExtraEmail(models.Model):
         verbose_name = 'extra mailadress'
         verbose_name_plural = 'extra mailadresser'
         unique_together = ['person', 'email']
+        ordering = ['person']
     
     person = models.ForeignKey(Person, models.CASCADE, verbose_name='person', related_name='extra_email')
     email = models.EmailField('mail')
@@ -122,6 +125,7 @@ class Production(models.Model):
     class Meta:
         verbose_name = 'uppsättning'
         verbose_name_plural = 'uppsättningar'
+        ordering = ['number']
 
     number = models.IntegerField('nummer', primary_key=True, editable=True)
     main_title = models.CharField('huvudtitel', max_length=100)
@@ -150,6 +154,7 @@ class Title(models.Model):
     class Meta:
         verbose_name = 'titel'
         verbose_name_plural = 'titlar'
+        ordering = ['name']
 
     name = models.CharField('namn', max_length=50, primary_key=True)
     email_alias = models.CharField('mailalias', max_length=20, blank=True)
@@ -163,6 +168,7 @@ class ProductionGroupType(models.Model):
     class Meta:
         verbose_name = 'uppsättningsgrupptyp'
         verbose_name_plural = 'uppsättningsgrupptyper'
+        ordering = ['short_name']
     
     short_name = models.CharField('kortnamn', max_length=10, primary_key=True)
     name = models.CharField('namn', max_length=50)
@@ -180,6 +186,7 @@ class AssociationYear(models.Model):
     class Meta:
         verbose_name = 'verksamhetsår'
         verbose_name_plural = 'verksamhetsår'
+        ordering = ['end_year']
 
     end_year = models.PositiveIntegerField('slutår', default=get_current_assoc_end_year, validators=[validate_association_year], primary_key=True)
 
@@ -201,6 +208,7 @@ class AssociationGroupType(models.Model):
     class Meta:
         verbose_name = 'föreningsgrupptyp'
         verbose_name_plural = 'föreningsgrupptyper'
+        ordering = ['short_name']
     
     short_name = models.CharField('kortnamn', max_length=10, primary_key=True)
     name = models.CharField('namn', max_length=50)
@@ -215,6 +223,7 @@ class AssociationGroup(models.Model):
         verbose_name = 'föreningsgrupp'
         verbose_name_plural = 'föreningsgrupp'
         unique_together = [['year', 'group_type']]
+        ordering = ['group_type','year']
     
     year = models.ForeignKey(AssociationYear, models.CASCADE, verbose_name='verksamhetsår', related_name='groups')
     group_type = models.ForeignKey(AssociationGroupType, models.CASCADE, verbose_name='grupptyp')
@@ -228,6 +237,7 @@ class AssociationActivity(models.Model):
         verbose_name = 'föreningsuppdrag'
         verbose_name_plural = 'föreningsuppdrag'
         unique_together = [['person', 'group']]
+        ordering = ['person', 'group']
 
     person = models.ForeignKey(Person, models.CASCADE, verbose_name='person', related_name='association_activities')
     group = models.ForeignKey(AssociationGroup, models.CASCADE, verbose_name='grupp', related_name='activities')
@@ -246,6 +256,7 @@ class ProductionGroup(models.Model):
         verbose_name = 'uppsättningsgrupp'
         verbose_name_plural = 'uppsättningsgrupper'
         unique_together = ['production', 'group_type']
+        ordering = ['group_type','production']
 
     production = models.ForeignKey(Production, models.CASCADE, verbose_name='uppsättning', related_name='groups')
     group_type = models.ForeignKey(ProductionGroupType, models.CASCADE, verbose_name='grupptyp', null=True, blank=True, help_text='lämna tomt om den här gruppen ska räknas som att vara med i en uppsättning utan att tillhöra en specifik grupp', related_name='group_instances')
@@ -257,7 +268,7 @@ class ProductionGroup(models.Model):
             else:
                 return '{} (ingen grupp)'.format( self.production.short_name)
         else:
-            return '{}-{}'.format(self.group_type.short_name, self.production.year % 100)
+            return '{}-{:02}'.format(self.group_type.short_name, self.production.year % 100)
     
     # Eftersom NULL-värden aldrig är lika med varandra så funkar inte ovanstående unique_together
     # och vi måste validera fallet när man försöker skapa två uppsättningsgrupper utan grupptyp 
@@ -273,6 +284,7 @@ class ProductionMembership(models.Model):
         verbose_name = 'uppsättningsmedlemskap'
         verbose_name_plural = 'uppsättningsmedlemskap'
         unique_together = [['person', 'group', 'title']]
+        ordering = ['person', 'group']
 
     person = models.ForeignKey(Person, models.CASCADE, verbose_name='uppsättningsmedlemsskap', related_name='production_memberships', editable=False)
     group = models.ForeignKey(ProductionGroup, models.CASCADE, verbose_name='Grupp', related_name='memberships')
@@ -298,6 +310,7 @@ class EmailList(models.Model):
     class Meta:
         verbose_name = 'maillista'
         verbose_name_plural = 'maillistor'
+        ordering = ['alias']
 
     alias = models.CharField('alias', max_length=20, primary_key=True)
     opt_in_members = models.ManyToManyField(
@@ -362,62 +375,69 @@ class EmailList(models.Model):
     def recipients(self):
         person_set = set()
 
-        for person in self.opt_in_members.all():
+        valid_email_regex = r'^[^@]+@[^@]+$'
+        pattern = re.compile(valid_email_regex)
+        valid_email = Q(email__regex=valid_email_regex)
+        valid_persons = Person.objects.filter(valid_email)
+
+        for person in self.opt_in_members.filter(valid_email):
             person_set.add(person)
         
         for group_type in self.all_groups.all():
-            for person in Person.objects.filter(production_memberships__group__group_type=group_type):
+            for person in valid_persons.filter(production_memberships__group__group_type=group_type):
                 person_set.add(person)
         
         for group in self.production_groups.all():
-            for person in Person.objects.filter(production_memberships__group=group):
+            for person in valid_persons.filter(production_memberships__group=group):
                 person_set.add(person)
             
             # Add the current direction to the production group lists
-            for person in Person.objects.filter(production_memberships__group__production=group.production, production_memberships__title__in=DIRECTION_TITLES):
+            for person in valid_persons.filter(production_memberships__group__production=group.production, production_memberships__title__in=DIRECTION_TITLES):
                 person_set.add(person)
         
         for production in self.productions.all():
-            for person in Person.objects.filter(production_memberships__group__production=production):
+            for person in valid_persons.filter(production_memberships__group__production=production):
                 person_set.add(person)
         
         for group in self.association_groups.all():
-            for person in Person.objects.filter(association_activities__group=group):
+            for person in valid_persons.filter(association_activities__group=group):
                 person_set.add(person)
         
         for title in self.all_titles.all():
-            for person in Person.objects.filter(Q(production_memberships__title=title) | Q(association_activities__title=title)):
+            for person in valid_persons.filter(Q(production_memberships__title=title) | Q(association_activities__title=title)):
                 person_set.add(person)
         
         current_assoc_year = get_current_assoc_year()
 
         for group_type in self.active_association_groups.all():
-            for person in Person.objects.filter(association_activities__group__group_type=group_type, association_activities__group__year=current_assoc_year):
+            for person in valid_persons.filter(association_activities__group__group_type=group_type, association_activities__group__year=current_assoc_year):
                 person_set.add(person)
         
         # Additional includes for special lists
         if self.alias == 'kallelse':
             for membership in current_assoc_year.memberships.all():
-                person_set.add(membership.person)
+                if re.fullmatch(membership.person.email) is not None:
+                    person_set.add(membership.person)
         elif self.alias == 'spexinfo':
-            for person in Person.objects.filter(wants_spexinfo=True):
+            for person in valid_persons.filter(wants_spexinfo=True):
                 person_set.add(person)
         elif self.alias == 'blandat':
-            for person in Person.objects.filter(wants_blandat=True):
+            for person in valid_persons.filter(wants_blandat=True):
                 person_set.add(person)
         elif self.alias == 'trams':
-            for person in Person.objects.filter(wants_trams=True):
+            for person in valid_persons.filter(wants_trams=True):
                 person_set.add(person)
         elif self.alias == 'styrelse-kallelse':
             active_productions = Production.objects.filter(closed=False)
             for active_production in active_productions:
-                for person in Person.objects.filter(production_memberships__group__production__closed=False, production_memberships__title__in=DIRECTION_TITLES):
+                for person in valid_persons.filter(production_memberships__group__production__closed=False, production_memberships__title__in=DIRECTION_TITLES):
                     person_set.add(person)
-                for person in Person.objects.filter(production_memberships__group__production__closed=False, production_memberships__group__group_type__short_name='REV'):
+                for person in valid_persons.filter(production_memberships__group__production__closed=False, production_memberships__group__group_type__short_name='REV'):
                     person_set.add(person)
 
             for activity in current_assoc_year.groups.get(Q(group_type__short_name='STYR') | Q(group_type__short_name='REV')).activities.all():
-                person_set.add(activity.person)
+                if re.fullmatch(activity.person.email) is not None:
+                    person_set.add(activity.person)
 
         # Last of all, handle opt out requests
         for person in self.opt_out_members.all():
@@ -441,3 +461,4 @@ class AssociationMembership(models.Model):
         verbose_name_plural = 'föreningsmedlemskap'
         
         unique_together = ['person', 'year']
+        ordering = ['person', 'year']

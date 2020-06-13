@@ -10,10 +10,10 @@ Denna maillista går till följande personer:
 
 <table class="table table-sm table-borderless">
 
-{% for person in object.recipients %}
+{% for person in object.recipients|dictsort:"member_number" %}
 <tr>
     <td><a href="{% url 'batadasen:person_detail' person.member_number %}">{{ person.member_number }}</a></td>
-    <td>{{ person }}</td>
+    <td>{{ person.first_name }} {% if person.spex_name %}"{{ person.spex_name }}" {% endif %}{{ person.last_name }}</td>
     <td><a href="mailto:{{ person.display_email }}">{{ person.display_email }}</a></td>
 </tr>
 {% endfor %}
