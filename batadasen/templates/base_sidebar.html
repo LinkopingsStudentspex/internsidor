@@ -4,7 +4,7 @@
 {% load crispy_forms_tags %}
 
 {% block body %}
-    <div id="sidebar">
+    <div id="sidebar" class="col-md-2">
         <a class="nav-link" href="/">Start</a>
         <a class="nav-link" href="{% url 'batadasen:person_self' %}">Min sida</a>
         <form action="{% url 'oidc_logout' %}" method="post">
@@ -13,13 +13,7 @@
         </form>
         <a class="nav-link" id="admin-link" href="{% url 'admin:index' %}">Admin</a>
     </div>
-    <div class="container">
-        <div class="col-md-12">
-            <!-- <div class="row">
-            </div>
-            <div class="row"> -->
-                {% block content %} {% endblock %}
-            <!-- </div> -->
-        </div>
+    <div class="col-md-10">
+        {% block content %} {% endblock %}
     </div>
 {% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'base_sidebar.html' %}
+{% load i18n %}
+
+{% block title %}LiSS internsidor{% endblock %}
+
+{% block content %}
+<h1>LiSS internsidor</h1>
+<p>Här finns diverse funktioner som kan vara användbara för spexare:</p>
+<ul>
+    <li><a href="{% url 'batadasen:production_list' %}">Lista uppsättningar och medlemmar</a></li>
+    <li><a href="{% url 'batadasen:emaillist_list' %}">Se vilka e-postlistor som finns</a></li>
+    <li><a href="{% url 'batadasen:person_self' %}">Redigera dina uppgifter</a></li>
+</ul>
+{% endblock %}

@@ -20,6 +20,8 @@ from django.urls import path, include, reverse
 from django.http import HttpResponseRedirect
 from django.views.generic.base import View, TemplateView
 
+import batadasen
+
 class CustomLogin(View):
     def get(self, request, **kwargs):
         return HttpResponseRedirect(
@@ -40,7 +42,8 @@ if 'mozilla_django_oidc' in settings.INSTALLED_APPS:
 
         path('admin/', admin.site.urls),
         path('batadasen/', include('batadasen.urls')),
-        path('oidc/', include('mozilla_django_oidc.urls'))
+        path('oidc/', include('mozilla_django_oidc.urls')),
+        path('', batadasen.views.index_view)
     ]
 else:
     urlpatterns = [
@@ -52,6 +55,7 @@ else:
 
         # Fake the oidc_logout url to make the logout button happy
         path('logout/', auth_views.LogoutView.as_view(), name='oidc_logout'),
+        path('', batadasen.views.index_view)
     ]
 
 

@@ -61,14 +61,6 @@ def activation_view(request):
 
     return render(request, 'batadasen/activate.html', {'form': form, 'person': person})
 
-@login_required
-def view_recipients(request, alias):
-    try:
-        email_list = models.EmailList.objects.get(alias=alias)
-    except models.EmailList.DoesNotExist:
-        return HttpResponseNotFound()
-    
-    return HttpResponse('{}'.format(email_list.get_recipients()))
 
 @method_decorator(login_required, name='dispatch')
 class EmailListListView(ListView):
@@ -104,7 +96,7 @@ class PersonSelfView(UpdateView):
     success_url = reverse_lazy('batadasen:person_self')
 
     def get_object(self, queryset=None):
-        return get_object_or_404(models.Person, user=self.request.user)
+        return models.Person.objects.filter(user=self.request.user).first()
 
 @method_decorator(login_required, name='dispatch')
 class ProductionListView(ListView):
@@ -130,6 +122,9 @@ class ProductionDetailView(DetailView):
         context['groups'] = groups
         return context
 
+@login_required
+def index_view(request):
+    return render(request, 'batadasen/index.html')
 
 # Returns a JSON response with a list of users, for use by a keycloak user storage provider.
 class UserList(generics.ListAPIView):

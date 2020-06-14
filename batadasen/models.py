@@ -17,6 +17,23 @@ def get_current_assoc_end_year():
     else:
         return today.year
 
+def get_next_member_number():
+    # Gamla databasen använde speciella värden i medlemsnumret
+    # 0-4999: riktiga medlemmar och livstidsmedlemmar
+    # 5000-9999 temporära medlemsnummer, innan personen betalat medlemsavgift
+    # 10000- ett par hedersmedlemmar
+    # -99999 fyllt bakifrån med allehanda medlemmar, lite special- och testkonton och andra föreningar
+    # För att inte förvirra någon i migreringen kommer alla behålla sina gamla nummer men vi kommer
+    # fortsätta föreslå att fylla på från slutet på de vanliga (i skrivande stund nr 1086, det lär räcka ett tag)
+    suggested_num = 1
+    last_regular_member = Person.objects.filter(member_number__lt=5000).order_by('member_number').last()
+    if last_regular_member is not None:
+        suggested_num = last_regular_member.member_number + 1
+        while Person.objects.filter(member_number=suggested_num).exists():
+            suggested_num += 1
+    return suggested_num
+
+
 class Person(models.Model):
     class Meta:
         verbose_name = 'person'
@@ -30,23 +47,6 @@ class Person(models.Model):
         PRIVATE = 'PVT', 'Privat', # Only number is visible.
         LIMITED = 'LIM', 'Begränsad', # Other members can see name and email. Default.
         OPEN = 'OPN', 'Öppen' # Other members can see everything.
-    
-    def get_next_member_number():
-        # Gamla databasen använde speciella värden i medlemsnumret
-        # 0-4999: riktiga medlemmar och livstidsmedlemmar
-        # 5000-9999 temporära medlemsnummer, innan personen betalat medlemsavgift
-        # 10000- ett par hedersmedlemmar
-        # -99999 fyllt bakifrån med allehanda medlemmar, lite special- och testkonton och andra föreningar
-        # För att inte förvirra någon i migreringen kommer alla behålla sina gamla nummer men vi kommer
-        # fortsätta föreslå att fylla på från slutet på de vanliga (i skrivande stund nr 1086, det lär räcka ett tag)
-        suggested_num = 1
-        last_regular_member = Person.objects.filter(member_number__lt=5000).order_by('member_number').last()
-        if last_regular_member is not None:
-            suggested_num = last_regular_member.member_number + 1
-            while Person.objects.filter(member_number=suggested_num).exists():
-                suggested_num += 1
-
-        return suggested_num
     
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='användare', related_name='person')
 

@@ -60,7 +60,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Person',
             fields=[
-                ('member_number', models.PositiveIntegerField(default=batadasen.models.Person.get_next_member_number, primary_key=True, serialize=False, verbose_name='medlemsnummer')),
+                ('member_number', models.PositiveIntegerField(default=batadasen.models.get_next_member_number, primary_key=True, serialize=False, verbose_name='medlemsnummer')),
                 ('first_name', models.CharField(max_length=50, verbose_name='förnamn')),
                 ('spex_name', models.CharField(blank=True, max_length=50, verbose_name='spexnamn')),
                 ('last_name', models.CharField(max_length=50, verbose_name='efternamn')),

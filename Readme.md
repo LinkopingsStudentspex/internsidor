@@ -41,15 +41,6 @@ Django har en inbyggd utvecklingsserver som man kan använda för lokal utveckli
     ```
     Nu kommer du åt hemsidan via http://localhost:8000. Servern kommer automatiskt ladda om sig när man gör ändringar i filer.
 
-Just nu finns ingen förstasida med länkar till de olika sidorna, så man får själv skriva in URL:er för att komma dit man vill. För att se vilka URL:er som finns kan man kika i `internsidor/urls.py` och `batadasen/urls.py`. URL:erna i `batadasen/urls.py` inkluderas under prefixet `/batadasen`. 
-
-Ett urval av de utkast till sidor som finns än så länge:
-  * `/admin` - Djangos administrationsinterface. Här lägger man till och redigerar typ allt; personer, användare, maillistor, uppsättningar etc.
-  * `/batadasen/minsida` - En sida för att redigera sin egen info.
-  * `/batadasen/email_lists` - Lista över e-postlistor och deras medlemmar.
-  * `/persons/<medlemsnummer>` - Information om en person.
-  * `/api` - innehåller endpoints för ett JSON-api för att göra lookups av användare. Går inte att komma åt som vanlig användare utan det krävs att HTTP-anropet har en särskild nyckel som bara inloggningsservern har. 
-
 Något att tänka på när man använder lokala utvecklingsservern är att funktionen att skicka mail till personer så att de kan skapa en användare inte fungerar utan vidare. Man får då skapa en användare manuellt från admin-interfacet. 
 
 ## Extern lookup mot databasen

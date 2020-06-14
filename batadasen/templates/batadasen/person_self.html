@@ -7,6 +7,8 @@
 
 {% block content %}
 
+{% if object %}
+
 <h2>Välkommen, 
     {% if object.spex_name != "" %}
         {{ object.spex_name }} 
@@ -46,5 +48,12 @@ Du har varit medlem i föreningen under följande verksamhetsår:
     <li>{{ membership.year }}</li>
 {% endfor %}
 </ul>
+
+{% else %}
+<div class="alert alert-danger" role="alert">
+Ditt användarkonto ({{ request.user }}) har ingen person kopplad till sig.
+</div>
+
+{% endif %}
 
 {% endblock %}
