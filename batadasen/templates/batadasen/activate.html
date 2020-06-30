@@ -8,13 +8,11 @@
 {% block body %}
 
 <p>Här sätter du användarnamnet för ditt nya konto.</p>
+
+<div>
+
 {% crispy form form.helper %}
-<!-- <form method="post">
-    {% csrf_token %}
-    {{ form }}
-    <br>
-    <br>
-    <input type="submit" value="Submit">
-</form> -->
+
+</div>
 
 {% endblock %}
