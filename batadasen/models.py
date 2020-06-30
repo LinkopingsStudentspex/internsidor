@@ -151,7 +151,7 @@ class Production(models.Model):
     number = models.IntegerField('nummer', primary_key=True, editable=True)
     main_title = models.CharField('huvudtitel', max_length=100)
     subtitle = models.CharField('undertitel', max_length=100, blank=True)
-    short_name = models.CharField('kort namn', max_length=20, blank=True)
+    short_name = models.CharField('kort namn', max_length=50, blank=True)
     year = models.PositiveIntegerField('år', validators=[validate_production_year])
     plot = models.TextField('handling', max_length=1000, blank=True)
     closed = models.BooleanField('avslutad', default=False)
@@ -178,7 +178,7 @@ class Title(models.Model):
         ordering = ['name']
 
     name = models.CharField('namn', max_length=50, primary_key=True)
-    email_alias = models.CharField('mailalias', max_length=20, blank=True)
+    email_alias = models.CharField('mailalias', max_length=50, blank=True)
     priority = models.IntegerField('prioritet', default=0)
 
     def __str__(self):
@@ -191,7 +191,7 @@ class ProductionGroupType(models.Model):
         verbose_name_plural = 'uppsättningsgrupptyper'
         ordering = ['short_name']
     
-    short_name = models.CharField('kortnamn', max_length=10, primary_key=True)
+    short_name = models.CharField('kortnamn', max_length=50, primary_key=True)
     name = models.CharField('namn', max_length=50)
     priority = models.IntegerField('prioritet', default=0)
     
@@ -333,7 +333,7 @@ class EmailList(models.Model):
         verbose_name_plural = 'maillistor'
         ordering = ['alias']
 
-    alias = models.CharField('alias', max_length=20, primary_key=True)
+    alias = models.CharField('alias', max_length=50, primary_key=True)
     opt_in_members = models.ManyToManyField(
         Person, 
         verbose_name='extramedlemmar', 
