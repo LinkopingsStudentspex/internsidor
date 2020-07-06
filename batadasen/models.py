@@ -333,7 +333,7 @@ class EmailList(models.Model):
         verbose_name_plural = 'maillistor'
         ordering = ['alias']
 
-    alias = models.CharField('alias', max_length=50, primary_key=True)
+    alias = models.CharField('alias', max_length=50, primary_key=True, help_text='Namnet på listan, det som står framför @')
     opt_in_members = models.ManyToManyField(
         Person, 
         verbose_name='extramedlemmar', 
