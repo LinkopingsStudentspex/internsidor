@@ -11,15 +11,17 @@ Denna maillista går till följande personer:
 <table class="table table-sm table-borderless">
 
 {% for person in object.recipients|dictsort:"member_number" %}
-<tr>
-    <td><a href="{% url 'batadasen:person_detail' person.member_number %}">{{ person.member_number }}</a></td>
+{% if person.privacy_setting != 'PVT' or perms.batadasen.view_private_info %}
 {% if person.privacy_setting == 'PVT' %}
-    <td colspan="2" class="font-italic text-secondary">Namn och e-postadress visas ej</td>   
+<tr class="table-danger">
 {% else %}
+<tr>
+{% endif %}
+    <td><a href="{% url 'batadasen:person_detail' person.member_number %}">{{ person.member_number }}</a></td>
     <td>{{ person.first_name }} {% if person.spex_name %}"{{ person.spex_name }}" {% endif %}{{ person.last_name }}</td>
     <td><a href="mailto:{{ person.display_email }}">{{ person.display_email }}</a></td>
-{% endif %}
 </tr>
+{% endif %}
 {% endfor %}
 
 </table>

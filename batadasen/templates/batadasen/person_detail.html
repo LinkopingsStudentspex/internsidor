@@ -13,10 +13,13 @@ Personen har inte betalat medlemsavgift och är för närvarande inte medlem i f
 {% endif %}
 
 {% if request.user.person == object %}
-<div class="alert alert-secondary" role="alert">
+
+<div class="alert alert-primary" role="alert">
     Det här är du! Gå till <a href="{% url 'batadasen:person_self' %}">din sida</a> för att redigera din info.
 </div>
-{% elif object.privacy_setting in 'LIM,PVT' %}
+
+{% elif object.privacy_setting == 'LIM' %}
+
 <div class="alert alert-primary" role="alert">
     Personen har valt att inte visa all information för andra medlemmar.
 
@@ -24,6 +27,17 @@ Personen har inte betalat medlemsavgift och är för närvarande inte medlem i f
     <br>Du kan bara se den för att du är administratör.
     {% endif %}
 </div>
+
+{% elif object.privacy_setting == 'PVT' %}
+
+<div class="alert alert-danger" role="alert">
+    Personen har valt att dölja all information för andra medlemmar.
+
+    {% if perms.batadasen.view_private_info %}
+    <br>Du kan bara se den för att du är administratör.
+    {% endif %}
+</div>
+
 {% endif %}
 
 <table class="table table-sm table-striped">

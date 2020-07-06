@@ -10,15 +10,16 @@
 {% for group in groups %}
 <tr class="table-primary"> <td colspan="4">{{ group.group.group_type.name }} ({{ group.group.group_type.short_name }})</td>
 {% for membership in group.memberships.all %}
+
+{% if membership.person.privacy_setting == 'PVT' %}
+<tr class = "table-danger">
+{% else %}
 <tr>
+{% endif %}
     <td><a href="{% url 'batadasen:person_detail' membership.person.member_number %}">{{ membership.person.member_number }}</a></td>
-        {% if membership.person.privacy_setting == 'PVT' %}
-    <td class="font-italic text-secondary">Namn visas ej</td>   
-        {% else %}
     <td>
         {{ membership.person.first_name }} {% if membership.person.spex_name %}"{{ membership.person.spex_name }}" {% endif %}{{ membership.person.last_name }}
     </td>
-        {% endif %}
     <td>{% if membership.title %}{{ membership.title }}{% endif %}</td>
     <td>{% if membership.comment %}{{ membership.comment }}{% endif %}</td>
 </tr>

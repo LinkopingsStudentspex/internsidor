@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Q
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseNotFound, JsonResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -88,6 +88,13 @@ class EmailListDetailView(DetailView):
 class PersonDetailView(DetailView):
     model = models.Person
 
+    def get_object(self, queryset=None):
+        obj = super(PersonDetailView, self).get_object(queryset)
+        if (obj.privacy_setting == models.Person.PrivacySetting.PRIVATE
+            and not self.request.user.has_perm('batadasen.view_private_info')
+            and not self.request.user == obj.user):
+            raise Http404()
+        return obj
 
 @method_decorator(login_required, name='dispatch')
 class PersonSelfView(UpdateView):
@@ -113,6 +120,11 @@ class ProductionDetailView(DetailView):
         groups = []
         for group in context['object'].groups.all():
             memberships = group.memberships.order_by("-title")
+
+            # Exclude persons with private privacy setting for regular users
+            if not self.request.user.has_perm('batadasen.view_private_info'):
+                memberships = memberships.exclude(person__privacy_setting=models.Person.PrivacySetting.PRIVATE)
+
             if not memberships.exists():
                 continue
             result_group = dict()
@@ -138,7 +150,7 @@ class UserList(generics.ListAPIView):
     filterset_fields = ['user__username', 'email']
     search_fields = ['user__username', 'email', 'first_name', 'last_name', 'member_number']
 
-# Returns a JSON response with a the number of users, for use by a keycloak user storage provider.
+# Returns a JSON response with the number of users, for use by a keycloak user storage provider.
 @api_view(['GET'])
 @permission_classes([HasAPIKey])
 def user_count(request):
