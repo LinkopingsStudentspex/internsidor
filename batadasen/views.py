@@ -166,4 +166,4 @@ def user_count(request):
 def no_admin_view(request):
     return render(request, 'batadasen/no_admin.html')
 
-admin.site.login = staff_member_required(admin.site.login, login_url='batadasen:no_admin')
+admin.site.login = login_required(staff_member_required(admin.site.login, login_url='batadasen:no_admin'))

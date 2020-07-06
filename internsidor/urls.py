@@ -22,19 +22,8 @@ from django.views.generic.base import View, TemplateView
 
 import batadasen
 
-class CustomLogin(View):
-    def get(self, request, **kwargs):
-        return HttpResponseRedirect(
-            reverse('oidc_authentication_init') + (
-                '?next={}'.format(request.GET['next']) if 'next' in request.GET else ''
-            )
-        )
-
 if 'mozilla_django_oidc' in settings.INSTALLED_APPS:
     urlpatterns = [
-        # This is a hack to make the admin not attempt to use its own login page.
-        path('admin/login/', CustomLogin.as_view()),
-
         # This is a hack to workaround the fact that the admin logout link uses GET but 
         # the mozilla_django_oidc logout page requires a POST request. 
         # The logout_get.html simply instructs the user to logout with the regular logout button.
