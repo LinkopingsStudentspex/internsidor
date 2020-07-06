@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.contrib import admin
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -157,3 +159,11 @@ def user_count(request):
     user_count = models.Person.objects.filter(~Q(user=None)).count()
     body = {'count': user_count}
     return Response(body)
+
+# This is not pretty... we create a dummy page accessible by an url in order to trick
+# the admin site that this is the login page that it should redirect to for non-staff-users.
+@login_required
+def no_admin_view(request):
+    return render(request, 'batadasen/no_admin.html')
+
+admin.site.login = staff_member_required(admin.site.login, login_url='batadasen:no_admin')
