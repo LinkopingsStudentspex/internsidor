@@ -214,7 +214,7 @@ class EmailListAdmin(admin.ModelAdmin):
             return []
 
 class TitleAdmin(admin.ModelAdmin):
-    fields = ('name',)
+    fields = ('name', 'email_alias')
     
     def get_readonly_fields(self, request, obj=None):
         if obj:

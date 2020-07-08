@@ -484,6 +484,20 @@ class EmailList(models.Model):
             for activity in current_assoc_year.groups.get(Q(group_type__short_name='STYR') | Q(group_type__short_name='REV')).activities.all():
                 if activity.person.email is not None and re.fullmatch(pattern, activity.person.email) is not None:
                     person_set.add(activity.person)
+        elif self.alias == 'styret':
+            for activity in current_assoc_year.groups.get(group_type__short_name='STYR').activities.all():
+                if activity.person.email is not None and re.fullmatch(pattern, activity.person.email) is not None:
+                    person_set.add(activity.person)
+        
+        # Direct title-specific emails to the currently active title holder.
+        # Currently only for board members.
+        try:
+            title = Title.objects.get(email_alias=self.alias)
+            for activity in current_assoc_year.groups.get(group_type__short_name='STYR').activities.filter(title=title):
+                if activity.person.email is not None and re.fullmatch(pattern, activity.person.email) is not None:
+                    person_set.add(activity.person)
+        except Title.DoesNotExist:
+            pass
 
         # Last of all, handle opt out requests
         for person in self.opt_out_members.all():
