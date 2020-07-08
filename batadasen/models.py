@@ -442,7 +442,7 @@ class EmailList(models.Model):
         # Additional includes for special lists
         if self.alias == 'kallelse':
             for membership in current_assoc_year.memberships.all():
-                if re.fullmatch(membership.person.email) is not None:
+                if membership.person.email is not None and re.fullmatch(pattern, membership.person.email) is not None:
                     person_set.add(membership.person)
         elif self.alias == 'spexinfo':
             for person in valid_persons.filter(wants_spexinfo=True):
@@ -456,13 +456,15 @@ class EmailList(models.Model):
         elif self.alias == 'styrelse-kallelse':
             active_productions = Production.objects.filter(closed=False)
             for active_production in active_productions:
+                # Active 'directions'
                 for person in valid_persons.filter(production_memberships__group__production__closed=False, production_memberships__title__in=DIRECTION_TITLES):
                     person_set.add(person)
+                # Auditors for active productions
                 for person in valid_persons.filter(production_memberships__group__production__closed=False, production_memberships__group__group_type__short_name='REV'):
                     person_set.add(person)
 
             for activity in current_assoc_year.groups.get(Q(group_type__short_name='STYR') | Q(group_type__short_name='REV')).activities.all():
-                if re.fullmatch(activity.person.email) is not None:
+                if activity.person.email is not None and re.fullmatch(pattern, activity.person.email) is not None:
                     person_set.add(activity.person)
 
         # Last of all, handle opt out requests
