@@ -171,19 +171,39 @@ class GroupAdmin(origGroupAdmin):
     inlines = [UserInLine]
 
 class EmailListAdmin(admin.ModelAdmin):
-    fields = (
-        'alias',
-        'opt_in_members',
-        'production_groups',
-        'all_groups',
-        'productions',
-        'active_association_groups',
-        'association_groups',
-        'all_titles',
-        'opt_out_members',
+    fieldsets = (
+        (None, {
+            'fields': (
+                'alias',
+                'forward_to',
+                'opt_in_members',
+                'opt_out_members',
+            )
+        }),
+        ('Val för uppsättningslistor', {
+            'fields': (
+                'production_groups',
+                'all_groups',
+                'productions',
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Val för föreningslistor', {
+            'fields': (
+                'active_association_groups',
+                'association_groups',
+            ),
+            'classes': ('collapse',)
+        }),
+        ('Övriga val', {
+            'fields': (
+                'all_titles',
+            ),
+            'classes': ('collapse',)
+        })
     )
     filter_horizontal = ('opt_in_members', 'opt_out_members', 'all_groups', 'production_groups', 'productions', 'active_association_groups', 'association_groups', 'all_titles')
-
+    autocomplete_fields = ['forward_to']
     search_fields = ['alias']
 
     def get_readonly_fields(self, request, obj=None):

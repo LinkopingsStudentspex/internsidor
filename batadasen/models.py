@@ -334,12 +334,22 @@ class EmailList(models.Model):
         ordering = ['alias']
 
     alias = models.CharField('alias', max_length=50, primary_key=True, help_text='Namnet på listan, det som står framför @')
+
+    forward_to = models.ForeignKey(
+        'self',
+        models.SET_NULL,
+        verbose_name='vidarebefordring till annan lista',
+        related_name='list_forwardings',
+        null=True,
+        blank=True,
+        help_text='Ska mail till denna lista skickas vidare till medlemmar i en annan lista?')
+
     opt_in_members = models.ManyToManyField(
         Person, 
-        verbose_name='extramedlemmar', 
+        verbose_name='enskilda personer',
         related_name='opt_in_email_lists', 
         blank=True,
-        help_text='Vilka extra personer ska få mail från denna lista?')
+        help_text='Vilka enskilda personer ska få mail från denna lista?')
     opt_out_members = models.ManyToManyField(
         Person, 
         verbose_name='opt-out-medlemmar', 
@@ -404,6 +414,9 @@ class EmailList(models.Model):
         for person in self.opt_in_members.filter(valid_email):
             person_set.add(person)
         
+        if self.forward_to is not None:
+            person_set.update(self.forward_to.recipients)
+
         for group_type in self.all_groups.all():
             for person in valid_persons.filter(production_memberships__group__group_type=group_type):
                 person_set.add(person)
@@ -475,7 +488,11 @@ class EmailList(models.Model):
 
     def get_recipients_email(self):
         return set(map(lambda x: x.email, self.recipients))
-    
+
+    def clean_fields(self, exclude=None):
+        super(EmailList, self).clean_fields(exclude=exclude)
+        if 'forward_to' not in exclude and self.forward_to == self:
+            raise ValidationError({'forward_to': 'Kan inte vidarebefordra en lista till sig själv'})
 
 class AssociationMembership(models.Model):
     person = models.ForeignKey(Person, models.CASCADE, verbose_name='person', related_name='association_memberships')
