@@ -28,16 +28,31 @@ class LissMilter(Milter.Base):
         self.from_addr = mail_from.lstrip("<").rstrip(">")
         self.from_params = params
         self.alias = ''
-        self.is_list = False
+        self.change_header = False
         self.subject = ''
         return Milter.CONTINUE
 
     def envrcpt(self, mail_to, *str):
         to = mail_to.lstrip("<").rstrip(">")
 
-        protected_list = prod_list_patt.match(to) is not None
-        protected_list |= mass_list_patt.match(to) is not None
-        extra_protected_list = summons_list_patt.match(to) is not None
+        is_production_list = prod_list_patt.match(to) is not None
+        is_mass_list = mass_list_patt.match(to) is not None
+        is_summons_list = summons_list_patt.match(to) is not None
+
+        # Use the first recipient as tag for later header modification
+        if self.alias == '':
+            parts = to.split('@')
+            if len(parts) != 2:
+                return Milter.REJECT
+            self.alias = parts[0]
+
+        try:
+            email_list = models.EmailList.objects.get(alias=self.alias)
+            protected_list = email_list.is_internal
+        except models.EmailList.DoesNotExist:
+            pass
+
+        extra_protected_list = is_summons_list
 
         valid_sender = True
 
@@ -60,15 +75,7 @@ class LissMilter(Milter.Base):
             self.setreply('554', '5.7.2', 'Sender <{}> not authorized for recipient ("{}"). Kontakta en ansvarig om du tycker det borde funka.'.format(self.from_addr, to))
             return Milter.REJECT
 
-        self.is_list = protected_list or extra_protected_list
-
-
-        # Use the first recipient as tag for later header modification
-        if self.alias == '':
-            parts = to.split('@')
-            if len(parts) != 2:
-                return Milter.REJECT
-            self.alias = parts[0]
+        self.change_header = is_production_list or is_mass_list or is_summons_list
 
         return Milter.CONTINUE
 
@@ -79,8 +86,7 @@ class LissMilter(Milter.Base):
         return Milter.CONTINUE
 
     def eom(self):
-        if self.is_list:
-            self.chgfrom('list-bounces@{}'.format(mail_domain))
+        if self.change_header:
             if self.subject != '':
                 self.chgheader('Subject', 0, '[{}] {}'.format(self.alias.capitalize(), self.subject))
         return Milter.CONTINUE
@@ -92,7 +98,6 @@ def main():
 
     # Tell Sendmail which features we use
     flags = Milter.CHGHDRS
-    flags = Milter.CHGFROM
     Milter.set_flags(flags)       
 
     print("%s milter startup" % time.strftime('%Y-%m-%d %H:%M:%S'))

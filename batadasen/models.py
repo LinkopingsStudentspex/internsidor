@@ -336,6 +336,8 @@ class EmailList(models.Model):
 
     alias = models.CharField('alias', max_length=50, primary_key=True, help_text='Namnet på listan, det som står framför @')
 
+    is_internal = models.BooleanField('intern lista', default=True, help_text="Ska endast spexare få skicka till denna lista?")
+
     forward_to = models.ForeignKey(
         'self',
         models.SET_NULL,

@@ -176,6 +176,7 @@ class EmailListAdmin(admin.ModelAdmin):
             'fields': (
                 'alias',
                 'forward_to',
+                'is_internal',
                 'opt_in_members',
                 'opt_out_members',
             )

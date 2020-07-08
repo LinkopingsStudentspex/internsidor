@@ -5,10 +5,11 @@
 
 {% block content %}
 <h2>Mejllistor</h2>
-Här är alla mejllistor som finns definierade:
+<p>Här är alla mejllistor som finns definierade.</p>
+<p>Gul bakgrund innebär att listan är publik. Annars kan endast spexare skicka mail till den.</p>
 <table class="table table-sm">
     {% for emaillist in object_list %}
-    <tr>
+    <tr class="{% if not emaillist.is_internal %} table-warning {% endif %}">
         <td>{{ emaillist.alias }}</td>
         <td>
             <a href="{% url 'batadasen:emaillist_detail' emaillist.alias %}">Se medlemmar</a>
