@@ -194,6 +194,7 @@ class ProductionGroupType(models.Model):
     short_name = models.CharField('kortnamn', max_length=50, primary_key=True)
     name = models.CharField('namn', max_length=50)
     priority = models.IntegerField('prioritet', default=0)
+    exclude_from_production_email = models.BooleanField('uteslut från uppsättningslistor', default=False, help_text='Uteslut grupper av denna typ från att vara med på maillistor för hela uppsättningar?')
     
     def __str__(self):
         return "{} ({})".format(self.name, self.short_name)
@@ -435,7 +436,9 @@ class EmailList(models.Model):
                 for person in valid_persons.filter(production_memberships__group__production=production, production_memberships__title='Gruppledare'):
                     person_set.add(person)
             else:
-                for person in valid_persons.filter(production_memberships__group__production=production):
+                for person in valid_persons.filter(
+                    production_memberships__group__production=production,
+                    production_memberships__group__group_type__exclude_from_production_email=False):
                     person_set.add(person)
         
         for group in self.association_groups.all():

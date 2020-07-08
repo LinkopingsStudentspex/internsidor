@@ -224,6 +224,9 @@ class TitleAdmin(admin.ModelAdmin):
 class GenericGroupAdmin(admin.ModelAdmin):
     fields = ('short_name', 'name')
 
+class ProductionGroupTypeAdmin(admin.ModelAdmin):
+    fields = ('short_name', 'name', 'exclude_from_production_email')
+
 class ProductionGroupAdmin(admin.ModelAdmin):
     model = ProductionGroup
 
@@ -240,7 +243,7 @@ admin.site.register(EmailList, EmailListAdmin)
 admin.site.register(ExtraEmail)
 admin.site.register(AssociationGroupType, GenericGroupAdmin)
 admin.site.register(AssociationGroup)
-admin.site.register(ProductionGroupType, GenericGroupAdmin)
+admin.site.register(ProductionGroupType, ProductionGroupTypeAdmin)
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Production)
 admin.site.register(ProductionGroup, ProductionGroupAdmin)
