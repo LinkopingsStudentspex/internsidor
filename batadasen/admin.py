@@ -203,9 +203,23 @@ class EmailListAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         })
     )
-    filter_horizontal = ('opt_in_members', 'opt_out_members', 'all_groups', 'production_groups', 'productions', 'active_association_groups', 'association_groups', 'all_titles')
+    filter_horizontal = (
+        'opt_in_members',
+        'opt_out_members',
+        'all_groups',
+        'production_groups',
+        'productions',
+        'active_association_groups',
+        'association_groups',
+        'all_titles',
+    )
     autocomplete_fields = ['forward_to']
     search_fields = ['alias']
+    list_display = [
+        'alias',
+        'is_internal',
+        'forward_to',
+    ]
 
     def get_readonly_fields(self, request, obj=None):
         if obj:
