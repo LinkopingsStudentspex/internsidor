@@ -30,7 +30,7 @@ for person in models.Person.objects.all():
               WHERE medlemsnummer={medlemsnummer};
 
               INSERT INTO person (medlemsnummer, fornamn, efternamn, maillistmail) 
-              VALUES ({medlemsnummer}, '{fornamn}', '{efternamn}', '{maillistmail}') 
+              SELECT {medlemsnummer}, '{fornamn}', '{efternamn}', '{maillistmail}' 
               WHERE NOT EXISTS (SELECT 1 FROM person WHERE medlemsnummer = {medlemsnummer});
 
               """.format(
@@ -48,7 +48,7 @@ for production in models.Production.objects.all():
               WHERE nr={nr};
               
               INSERT INTO uppsattning (nr, namn, kortnamn, ar) 
-              VALUES ({nr}, '{namn}', '{kortnamn}' {ar}) 
+              SELECT {nr}, '{namn}', '{kortnamn}', {ar} 
               WHERE NOT EXISTS (SELECT 1 FROM uppsattning WHERE nr = {nr});
 
               """.format(
