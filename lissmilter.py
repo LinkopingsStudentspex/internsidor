@@ -46,6 +46,8 @@ class LissMilter(Milter.Base):
                 return Milter.REJECT
             self.alias = parts[0]
 
+        protected_list = False
+
         try:
             email_list = models.EmailList.objects.get(alias=self.alias)
             protected_list = email_list.is_internal
