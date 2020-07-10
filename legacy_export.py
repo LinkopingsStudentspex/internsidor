@@ -19,33 +19,42 @@ from batadasen import models
 output = 'START TRANSACTION;'
 
 for person in models.Person.objects.all():
-    output += """INSERT INTO person (medlemsnummer, fornamn, efternamn, maillistmail) 
+    email = ''
+    if person.email is not None:
+        email = person.email.replace('\'', '\'\'')
+    output += """
+              UPDATE person SET 
+                fornamn='{fornamn}', 
+                efternamn='{efternamn}', 
+                maillistmail='{maillistmail}' 
+              WHERE medlemsnummer={medlemsnummer};
+
+              INSERT INTO person (medlemsnummer, fornamn, efternamn, maillistmail) 
               VALUES ({medlemsnummer}, '{fornamn}', '{efternamn}', '{maillistmail}') 
-              ON CONFLICT (medlemsnummer) DO UPDATE SET 
-                fornamn = '{fornamn}', 
-                efternamn = '{efternamn}', 
-                maillistmail = '{maillistmail}' 
-              WHERE medlemsnummer = {medlemsnummer};
+              WHERE NOT EXISTS (SELECT 1 FROM person WHERE medlemsnummer = {medlemsnummer});
 
               """.format(
                     medlemsnummer=person.member_number,
-                    fornamn=person.first_name,
-                    efternamn=person.last_name,
-                    maillistmail=person.email)
+                    fornamn=person.first_name.replace('\'', '\'\''),
+                    efternamn=person.last_name.replace('\'', '\'\''),
+                    maillistmail=email)
 
 for production in models.Production.objects.all():
-    output += """INSERT INTO uppsattning (nr, namn, kortnamn, ar) 
+    output += """
+              UPDATE uppsattning SET
+                namn='{namn}', 
+                kortnamn='{kortnamn}', 
+                ar={ar}
+              WHERE nr={nr};
+              
+              INSERT INTO uppsattning (nr, namn, kortnamn, ar) 
               VALUES ({nr}, '{namn}', '{kortnamn}' {ar}) 
-              ON CONFLICT (nr) DO UPDATE SET 
-                namn = '{namn}', 
-                kortnamn = '{kortnamn}', 
-                ar = {ar} 
-              WHERE nr = {nr};
+              WHERE NOT EXISTS (SELECT 1 FROM uppsattning WHERE nr = {nr});
 
               """.format(
                   nr=production.number,
-                  namn=production.main_title,
-                  kortnamn=production.short_name,
+                  namn=production.main_title.replace('\'', '\'\''),
+                  kortnamn=production.short_name.replace('\'', '\'\''),
                   ar=production.year)
 
 output += 'COMMIT;'
