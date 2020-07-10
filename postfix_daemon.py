@@ -11,11 +11,59 @@ import os
 import sys
 import socketserver
 import pynetstring
+import re
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'internsidor.settings.production')
 django.setup()
 
 from batadasen import models
+
+def spellcorrect(alias):
+    direction_match = re.match(r'^(direktion|direcktion)(?P<year>[0-9][0-9])$', alias)
+    if direction_match is not None:
+        return 'direction{}'.format(direction_match.group('year'))
+
+    directionen_match = re.match(r'^(direktionen|direcktionen)$', alias)
+    if directionen_match is not None:
+        return 'directionen'
+
+    directeur_match = re.match(r'^(direktor|director|direcktor)(?P<year>[0-9][0-9])$', alias)
+    if directeur_match is not None:
+        return 'directeur{}'.format(directeur_match.group('year'))
+
+    biljetter_match = re.match(r'^(biljett|biletter|billetter|billjett|billjetter|bijett|bijetter)$', alias)
+    if biljetter_match is not None:
+        return 'biljetter'
+
+    ordf_match = re.match(r'^(ordforanden|ordforande)$', alias)
+    if ordf_match is not None:
+        return 'ordf'
+
+    redaktoren_match = re.match(r'^(red|redaktor|redaktionen)$', alias)
+    if redaktoren_match is not None:
+        return 'redaktoren'
+
+    forvaltaren_match = re.match(r'^(forvaltare)$', alias)
+    if forvaltaren_match is not None:
+        return 'forvaltaren'
+
+    kassoren_match = re.match(r'^(kassor)$', alias)
+    if kassoren_match is not None:
+        return 'kassoren'
+
+    sekreteraren_match = re.match(r'^(sekr|sekreterare)$', alias)
+    if sekreteraren_match is not None:
+        return 'sekreteraren'
+
+    vordf_match = re.match(r'^(viceordforanden|viceordforande)$', alias)
+    if vordf_match is not None:
+        return 'vordf'
+
+    valberedningen_match = re.match(r'^(valberedning)$', alias)
+    if valberedningen_match is not None:
+        return 'valberedningen'
+
+    return ''
 
 class PostfixTCPHandler(socketserver.BaseRequestHandler):
     def server_bind(self):
@@ -48,8 +96,12 @@ class PostfixTCPHandler(socketserver.BaseRequestHandler):
         try:
             email_list = models.EmailList.objects.get(alias=alias)
         except models.EmailList.DoesNotExist:
-            self.request.sendall(pynetstring.encode('NOTFOUND '))
-            return
+            # Perhaps it matches some common (and uncommon) misspellings
+            try:
+                email_list = models.EmailList.objects.get(alias=spellcorrect(alias))
+            except models.EmailList.DoesNotExist:
+                self.request.sendall(pynetstring.encode('NOTFOUND '))
+                return
         
         addresses = email_list.get_recipients_email()
         if len(addresses) == 0:
