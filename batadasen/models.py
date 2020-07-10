@@ -85,11 +85,15 @@ class Person(models.Model):
                   'Öppen: andra inloggade kan se all din information. '
                   'Inga personuppgifter kommer någonsin vara synliga för icke-inloggade.')
 
-    def __str__(self):
+    @property
+    def full_name(self):
         if self.spex_name == '':
-            return '({}) {} {}'.format(self.member_number, self.first_name, self.last_name)
+            return '{} {}'.format(self.first_name, self.last_name)
         else:
-            return '({}) {} "{}" {}'.format(self.member_number, self.first_name, self.spex_name, self.last_name)
+            return '{} "{}" {}'.format(self.first_name, self.spex_name, self.last_name)
+
+    def __str__(self):
+        return '({}) {}'.format(self.member_number, self.full_name)
     
     @property
     def currently_member(self):

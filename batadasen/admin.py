@@ -6,6 +6,7 @@ from django.db import models
 from django import forms
 from django.conf import settings
 from django.utils.safestring import mark_safe   
+from django.utils.html import format_html
 from django.urls import reverse
 from django.template.loader import render_to_string
 from django.utils.translation import gettext, gettext_lazy as _
@@ -68,7 +69,8 @@ class PersonAdmin(admin.ModelAdmin):
         'member_number',
         'full_name',
         'email',
-        'get_production_groups'
+        'user_link',
+        'get_production_groups',
     ]
 
     search_fields = [
@@ -76,7 +78,8 @@ class PersonAdmin(admin.ModelAdmin):
         'first_name',
         'last_name',
         'spex_name',
-        'email'
+        'email',
+        'user__username',
     ]
 
     autocomplete_fields = ['user']
@@ -89,8 +92,16 @@ class PersonAdmin(admin.ModelAdmin):
     ]
 
     def full_name(self, obj):
-        return obj
+        return obj.full_name
+
     full_name.short_description = 'Namn'
+
+    def user_link(self, obj):
+        if obj.user is not None:
+            return format_html("<a href='{url}'>{username}</a>", url=reverse('admin:auth_user_change', args=(obj.user.id,)), username=obj.user.username)
+        else:
+            return "-"
+    user_link.short_description = 'Användare'
 
     def get_production_groups(self, obj):
         group_list = []
