@@ -172,6 +172,36 @@ class UserAdmin(origUserAdmin):
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
 
+    list_display = [
+        'username',
+        'person_name',
+        'get_auth_groups',
+        'is_staff',
+    ]
+
+    search_fields = [
+        'username',
+        'person__first_name',
+        'person__last_name',
+        'person__member_number',
+    ]
+
+    def person_name(self, obj):
+        if obj.person is None:
+            return ""
+        else:
+            return obj.person
+    person_name.short_description = 'Person'
+
+    def get_auth_groups(self, obj):
+        group_list = []
+        count = 0
+        for group in obj.groups.all():
+            count += 1
+            group_list.append(group.name)
+        return ', '.join(group_list)
+    get_auth_groups.short_description = 'Grupprättigheter'
+
 class UserInLine(admin.TabularInline):
     model = Group.user_set.through
     extra = 0
