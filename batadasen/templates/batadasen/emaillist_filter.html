@@ -1,0 +1,36 @@
+{% extends 'base_sidebar.html' %}
+{% load i18n %}
+
+<!-- {% load crispy_forms_tags %} -->
+{% block title %}Mejllistor{% endblock %}
+
+{% block content %}
+<h2>Mejllistor</h2>
+<p>Här är alla mejllistor som finns definierade.</p>
+<p>Grå bakgrund för en lista innebär att endast spexare kan skicka mail till den, annars är den öppen för utomstående.</p>
+
+<form method="get" action="{% url 'batadasen:emaillist_list' %}">
+
+    <div class="input-group mb-3">
+  <input type="text" class="form-control" name="alias" value="{{ alias_search }}" placeholder="Sök listnamn..." aria-label="" aria-describedby="basic-addon2">
+  <div class="input-group-append">
+    <span class="input-group-text" id="basic-addon2">@{{ email_domain }}</span>
+    <input type="submit" class="btn btn-primary" value="Sök">
+  </div>
+</div>
+</form>
+
+<table class="table table-sm">
+    {% for emaillist in filter.qs %}
+    <tr class="{% if emaillist.is_internal %} table-secondary {% endif %}">
+        <td>{{ emaillist.alias }}</td>
+        <td>
+            <a href="{% url 'batadasen:emaillist_detail' emaillist.alias %}">Se medlemmar</a>
+        </td>
+        <td>
+            <a href="mailto:{{ emaillist.alias }}@{{ email_domain }}">Skicka mejl</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

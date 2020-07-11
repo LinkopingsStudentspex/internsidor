@@ -13,6 +13,8 @@ from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
 from django.views.generic import DetailView, ListView, UpdateView
 
+from django_filters.filterset import FilterSet
+
 from rest_framework import generics, filters
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -139,6 +141,24 @@ class ProductionDetailView(DetailView):
 @login_required
 def index_view(request):
     return render(request, 'batadasen/index.html')
+
+class EmailListFilter(FilterSet):
+    alias = django_filters.CharFilter(field_name='alias', lookup_expr='contains')
+    class Meta:
+        model = models.EmailList
+        fields = ['alias']
+
+@login_required
+def email_list_filter(request):
+    context = {}
+    context['filter'] = EmailListFilter(request.GET, queryset=models.EmailList.objects.all())
+    context['email_domain'] = settings.EMAIL_DOMAIN
+    if request.GET.get('alias')is None:
+        context['alias_search'] = ""
+    else:
+        context['alias_search'] = request.GET.get('alias')
+
+    return render(request, 'batadasen/emaillist_filter.html', context)
 
 # Returns a JSON response with a list of users, for use by a keycloak user storage provider.
 class UserList(generics.ListAPIView):

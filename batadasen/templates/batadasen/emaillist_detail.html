@@ -6,6 +6,10 @@
 {% block content %}
 <h2>{{ object.alias }}@{{ email_domain }}</h2>
 
+{% if object.is_internal %}
+<div class="alert alert-secondary" role="alert">Denna lista kan endast spexare skicka till.</div>
+{% endif %}
+
 Denna maillista går till följande personer:
 
 <table class="table table-sm table-borderless">
