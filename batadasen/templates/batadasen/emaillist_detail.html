@@ -4,14 +4,118 @@
 {% block title %}Mejllista {{ object.alias }}{% endblock %}
 
 {% block content %}
+<p>
+<a href="{% url 'batadasen:emaillist_list' %}">Tillbaka till listan över mejllistor</a>
+</p>
+
 <h2>{{ object.alias }}@{{ email_domain }}</h2>
 
 {% if object.is_internal %}
 <div class="alert alert-secondary" role="alert">Denna lista kan endast spexare skicka till.</div>
 {% endif %}
 
-Denna maillista går till följande personer:
+<div>
+<h3>Varför ser den här listan ut som den gör?</h3>
 
+{% if object.forward_to %}
+<p>Listan går till alla medlemmar i listan <a href="{% url 'batadasen:emaillist_detail' object.forward_to.alias %}">{{ object.forward_to.alias }}</a></p>
+{% endif %}
+
+{% if object.all_groups.all %}
+<p>Listan går till alla som någonsin har varit med i någon av följande grupper:
+<ul>
+{% for group_type in object.all_groups.all %}
+    <li>{{ group_type }}</li>
+{% endfor %}
+</ul>
+</p>
+{% endif %}
+
+{% if object.production_groups.all %}
+<p>Listan går till alla som är med i följande uppsättningsgrupper:
+<ul>
+{% for group in object.production_groups.all %}
+    <li>{{ group }}</li>    
+{% endfor %}
+</ul>
+</p>
+{% endif %}
+
+{% if object.productions.all %}
+<p>Listan går till alla som är med i följande uppsättningar:
+<ul>
+{% for production in object.productions.all %}
+    <li>{{ production }}</li>
+{% endfor %}
+</ul>
+</p>
+{% endif %}
+
+{% if object.active_association_groups.all %}
+<p>Listan går till alla som är med i följande föreningsgrupper för aktivt verksamhetsår:
+<ul>
+{% for group_type in object.active_association_groups.all %}
+    <li>{{ group_type }}</li>
+{% endfor %}
+</ul>
+</p>
+{% endif %}
+
+{% if object.association_groups.all %}
+<p>Listan går till alla som är med i följande årsspecifika föreningsgrupper:
+<ul>
+{% for group in object.association_groups.all %}
+    <li>{{ group }}</li>
+{% endfor %}
+</ul>
+</p>
+{% endif %}
+
+{% if object.all_titles.all %}
+<p>Listan går till alla som någonsin har haft någon av följande titlar:
+<ul>
+{% for title in object.all_titles.all %}
+    <li>{{ title }}</li>
+{% endfor %}
+</ul>
+</p>
+{% endif %}
+
+<!-- Motivate and apologize for the dirty handling of special lists -->
+{% if object.alias in 'kallelse,spexinfo,blandat,trams,styrelse-kallelse,ordf,vordf,sekreteraren,kassoren,forvaltaren,it,redaktoren' %}
+<p>Denna lista har specialhantering som styr vilka som inkluderas, vilket inte beskrivs här.</p>
+{% endif %}
+
+
+{% if object.opt_in_members.all %}
+<p>Följande personer har lagts till explicit:
+<ul>
+{% for person in object.opt_in_members.all %}
+    {% if person.privacy_setting != 'PVT' or perms.batadasen.view_private_info %}
+    <li>{{ person }}</li>
+    {% endif %}
+{% endfor %}
+</ul></p>
+{% endif %}
+
+{% if object.opt_out_members.all %}
+<p>Följande personer har valt att opt-out från listan:
+<ul>
+{% for person in object.opt_out_members.all %}
+    {% if person.privacy_setting != 'PVT' or perms.batadasen.view_private_info %}
+    <li>{{ person }}</li>
+    {% endif %}
+{% endfor %}
+</ul></p>
+{% endif %}
+
+{% if perms.batadasen.change_emaillist and request.user.is_staff %}
+<p>Redigera på <a href="{% url 'admin:batadasen_emaillist_change' object.alias %}">adminsidan</a></p>
+{% endif %}
+</div>
+
+<div>
+<h3>Alla mottagare</h3>
 <table class="table table-sm table-borderless">
 
 {% for person in object.recipients|dictsort:"member_number" %}
@@ -29,4 +133,5 @@ Denna maillista går till följande personer:
 {% endfor %}
 
 </table>
+</div>
 {% endblock %}
