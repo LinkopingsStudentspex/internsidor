@@ -11,7 +11,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
-from django.views.generic import DetailView, ListView, UpdateView
+from django.views.generic import DetailView, ListView, UpdateView, CreateView
 
 from django_filters.filterset import FilterSet
 
@@ -108,8 +108,28 @@ class PersonSelfView(UpdateView):
     template_name = 'batadasen/person_self.html'
     success_url = reverse_lazy('batadasen:person_self')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if 'object' in context:
+            context['extra_emails'] = models.ExtraEmail.objects.filter(person=context['object'])
+        return context
+
     def get_object(self, queryset=None):
         return models.Person.objects.filter(user=self.request.user).first()
+
+@method_decorator(login_required, name='dispatch')
+class ExtraEmailView(CreateView):
+    form_class = forms.ExtraEmailForm
+    template_name = 'batadasen/extraemail_form.html'
+    success_url = reverse_lazy('batadasen:person_self')
+
+    def form_valid(self, form):
+        if form.is_valid():
+            extra_email = form.save(commit=False)
+            extra_email.person = self.request.user.person
+            extra_email.save()
+        return redirect('batadasen:person_self')
+
 
 @method_decorator(login_required, name='dispatch')
 class ProductionListView(ListView):

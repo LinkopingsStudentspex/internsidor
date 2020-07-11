@@ -1,0 +1,16 @@
+{% extends 'base_sidebar.html' %}
+{% load i18n %}
+
+{% block title %}Lägg till mailadress{% endblock %}
+
+{% block content %}
+
+<h2>Ny extra mailadress</h2>
+<p>Här lägger du till en ny extra mailadress för person {{ request.user.person }}</p>
+
+<form method="post" class="">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Lägg till">
+</form>
+
+{% endblock %}

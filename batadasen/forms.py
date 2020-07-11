@@ -85,4 +85,8 @@ class PersonForm(forms.ModelForm):
             'privacy_setting',
             Submit('submit', 'Uppdatera!')
         )
-    
+
+class ExtraEmailForm(forms.ModelForm):
+    class Meta:
+        model = models.ExtraEmail
+        fields = ('email',)

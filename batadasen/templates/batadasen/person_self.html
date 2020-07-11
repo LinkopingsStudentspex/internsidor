@@ -35,7 +35,23 @@ Ditt användarnamn är {{ object.user.username }}
 Medlem {{ object.member_number }}, {{ object.first_name }} {{ object.last_name }}
 </h4>
 
+<div>
 {% crispy form form.helper %}
+</div>
+
+<div>
+<h2>Extra mailadresser</h2>
+<p>Vissa maillistor accepterar bara mail från spexare, baserat på vilken mailadress man skickar från. Om du behöver skicka mail från
+    andra adresser än de du skrivit in ovan behöver du lägga till dem som extra mailadresser här (tidigare kallat vitlistan):
+</p>
+<ul>
+{% for email in extra_emails %}
+    <li>{{ email.email }}</li>
+{% endfor %}
+</ul>
+<p><a href="{% url 'batadasen:person_extra_email' %}">Lägg till ny mailadress</a></p>
+<p>Kontakta någon i styrelsen eller directionen om du vill ta bort en mailadress.</p>
+</div>
 
 <h2>Medlemskapshistoria</h2>
 <p>
