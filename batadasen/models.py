@@ -382,7 +382,7 @@ class EmailList(models.Model):
         related_name='email_lists', 
         verbose_name='hela uppsättningar', 
         blank=True,
-        help_text='Denna lista kommer skicka mail till följande HELA uppsättningar')
+        help_text='Denna lista kommer skicka mail till följande HELA uppsättningar, förutom i de fall då listans namn slutar med \"gruppledare\".')
     
     # Association lists
     active_association_groups = models.ManyToManyField(

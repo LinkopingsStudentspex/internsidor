@@ -32,7 +32,7 @@
 {% endif %}
 
 {% if object.production_groups.all %}
-<p>Listan går till alla som är med i följande uppsättningsgrupper:
+<p>Listan går till alla som är med i följande uppsättningsgrupper, samt deras directioner:
 <ul>
 {% for group in object.production_groups.all %}
     <li>{{ group }}</li>    
@@ -42,7 +42,11 @@
 {% endif %}
 
 {% if object.productions.all %}
-<p>Listan går till alla som är med i följande uppsättningar:
+{% if gruppledare %}
+    <p>Listan går till gruppledare i följande uppsättningar:
+{% else %}
+    <p>Listan går till alla som är med i följande uppsättningar:
+{% endif %}
 <ul>
 {% for production in object.productions.all %}
     <li>{{ production }}</li>

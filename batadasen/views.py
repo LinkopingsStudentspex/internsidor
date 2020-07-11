@@ -85,6 +85,8 @@ class EmailListDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['email_domain'] = settings.EMAIL_DOMAIN
+        if context['object'].alias.endswith('gruppledare'):
+            context['gruppledare'] = True
         return context
 
 
