@@ -143,7 +143,7 @@ def index_view(request):
     return render(request, 'batadasen/index.html')
 
 class EmailListFilter(FilterSet):
-    alias = django_filters.CharFilter(field_name='alias', lookup_expr='contains')
+    alias = django_filters.CharFilter(field_name='alias', lookup_expr='icontains')
     class Meta:
         model = models.EmailList
         fields = ['alias']
