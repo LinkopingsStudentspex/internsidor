@@ -12,7 +12,9 @@
             {% csrf_token %}
             <input type="submit" id="logout-btn" class="btn btn-outline-secondary" value="Logga ut">
         </form>
+        {% if request.user.is_staff %}
         <a class="nav-link" id="admin-link" href="{% url 'admin:index' %}">Admin</a>
+        {% endif %}
     </div>
     <div class="col-md-10">
         {% block content %} {% endblock %}
