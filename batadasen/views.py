@@ -182,6 +182,12 @@ def email_list_filter(request):
 
     return render(request, 'batadasen/emaillist_filter.html', context)
 
+class UserFilter(FilterSet):
+    user__username = django_filters.CharFilter(field_name='user__username', lookup_expr='iexact')
+    class Meta:
+        model = models.Person
+        fields = ['user__username', 'email']
+
 # Returns a JSON response with a list of users, for use by a keycloak user storage provider.
 class UserList(generics.ListAPIView):
     queryset = models.Person.objects.filter(~Q(user=None))
@@ -192,6 +198,7 @@ class UserList(generics.ListAPIView):
         filters.SearchFilter
     ]
     filterset_fields = ['user__username', 'email']
+    filterset_class = UserFilter
     search_fields = ['user__username', 'email', 'first_name', 'last_name', 'member_number']
 
 # Returns a JSON response with the number of users, for use by a keycloak user storage provider.
