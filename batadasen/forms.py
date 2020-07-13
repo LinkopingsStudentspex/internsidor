@@ -20,8 +20,7 @@ class ActivationForm(forms.ModelForm):
             RegexValidator('^[A-Za-z0-9_-]+$', 'Får endast innehålla engelska bokstäver (A-Z, a-z), siffror (0-9) och tecknen "-" och "_"'),
         ],
         min_length=2,
-        max_length=150,
-        help_text='Tänk på att användarnamnet är skiftlägeskänsligt, "Lisse" är alltså inte samma användarnamn som "lisse".')
+        max_length=150)
 
     def __init__(self, *args, **kwargs):
         super(ActivationForm, self).__init__(*args, **kwargs)
@@ -33,6 +32,13 @@ class ActivationForm(forms.ModelForm):
             'username',
             Submit('submit', 'Aktivera!')
         )
+
+    # Validate username uniqueness, case-insensitively
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if User.objects.filter(username__iexact=username).exists():
+            raise forms.ValidationError('Användarnamnet är redan upptaget.')
+        return username
 
 class PersonForm(forms.ModelForm):
     class Meta:

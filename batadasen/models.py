@@ -108,6 +108,12 @@ class Person(models.Model):
             return self.address_list_email
         else:
             return self.email
+
+    # Validates case-insensitive email address uniqueness
+    def validate_unique(self, exclude=None):
+        if Person.objects.exclude(member_number=self.member_number).filter(email__iexact=self.email).exists():
+            raise ValidationError({'email': 'En person med denna mailadress finns redan.'})
+        super(Person, self).validate_unique(exclude)
         
 
 def generate_activation_token():
