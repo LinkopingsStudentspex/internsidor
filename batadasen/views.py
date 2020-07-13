@@ -58,7 +58,7 @@ def activation_view(request):
 
             activations.delete()
 
-            return redirect('batadasen:person_self')
+            return redirect('batadasen:person_settings')
 
     else:
         form = forms.ActivationForm()
@@ -105,8 +105,8 @@ class PersonDetailView(DetailView):
 @method_decorator(login_required, name='dispatch')
 class PersonSelfView(UpdateView):
     form_class = forms.PersonForm
-    template_name = 'batadasen/person_self.html'
-    success_url = reverse_lazy('batadasen:person_self')
+    template_name = 'batadasen/person_settings.html'
+    success_url = reverse_lazy('batadasen:person_settings')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -121,14 +121,14 @@ class PersonSelfView(UpdateView):
 class ExtraEmailView(CreateView):
     form_class = forms.ExtraEmailForm
     template_name = 'batadasen/extraemail_form.html'
-    success_url = reverse_lazy('batadasen:person_self')
+    success_url = reverse_lazy('batadasen:person_settings')
 
     def form_valid(self, form):
         if form.is_valid():
             extra_email = form.save(commit=False)
             extra_email.person = self.request.user.person
             extra_email.save()
-        return redirect('batadasen:person_self')
+        return redirect('batadasen:person_settings')
 
 
 @method_decorator(login_required, name='dispatch')

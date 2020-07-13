@@ -1,7 +1,7 @@
 {% extends 'base_sidebar.html' %}
 {% load i18n %}
 
-{% block title %}Min sida{% endblock %}
+{% block title %}Inställningar{% endblock %}
 
 {% load crispy_forms_tags %}
 
@@ -9,18 +9,16 @@
 
 {% if object %}
 
-<h2>Välkommen, 
-    {% if object.spex_name != "" %}
-        {{ object.spex_name }} 
-    {% else %} 
-        {{ object.first_name }} {{ object.last_name }}
-    {% endif %}
-    till din egen sida!
-</h2>
+<h2>Inställningar och personuppgifter</h2>
 
 <p>
-Ditt användarnamn är {{ object.user.username }}
+    Här redigerar du dina personuppgifter och inställningar för hemsidan. 
 </p>
+
+<p>
+<a href="{% url 'batadasen:person_detail' object.member_number %}">Gå till din profilsida</a>
+</p>
+
 {% if object.currently_member %}
 <div class="alert alert-success" role="alert">
     Du är medlem i föreningen
@@ -32,8 +30,11 @@ Ditt användarnamn är {{ object.user.username }}
 {% endif %}
 
 <h4>
-Medlem {{ object.member_number }}, {{ object.first_name }} {{ object.last_name }}
+Medlem {{ object.member_number }}, {{ object.first_name }}{% if object.spex_name %} "{{ object.spex_name }}"{% endif %} {{ object.last_name }}
 </h4>
+<p>
+Användarnamn: {{ object.user.username }}
+</p>
 
 <div>
 {% crispy form form.helper %}

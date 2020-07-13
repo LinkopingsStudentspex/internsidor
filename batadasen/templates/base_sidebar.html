@@ -7,7 +7,7 @@
     <div id="sidebar" class="col-md-2">
         <a class="nav-link" href="/">Start</a>
         <a class="nav-link" href="https://wiki.studentspex.se">Wiki</a>
-        <a class="nav-link" href="{% url 'batadasen:person_self' %}">Min sida</a>
+        <a class="nav-link" href="{% url 'batadasen:person_settings' %}">Inställningar</a>
         <form action="{% url 'oidc_logout' %}" method="post">
             {% csrf_token %}
             <input type="submit" id="logout-btn" class="btn btn-outline-secondary" value="Logga ut">

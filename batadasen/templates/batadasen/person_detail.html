@@ -15,7 +15,7 @@ Personen har inte betalat medlemsavgift och är för närvarande inte medlem i f
 {% if request.user.person == object %}
 
 <div class="alert alert-primary" role="alert">
-    Det här är du! Gå till <a href="{% url 'batadasen:person_self' %}">din sida</a> för att redigera din info.
+    Det här är du! Gå till <a href="{% url 'batadasen:person_settings' %}">inställningar</a> för att redigera din info.
 </div>
 
 {% elif object.privacy_setting == 'LIM' %}
