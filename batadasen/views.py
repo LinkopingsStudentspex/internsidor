@@ -184,6 +184,7 @@ def email_list_filter(request):
 
 class UserFilter(FilterSet):
     user__username = django_filters.CharFilter(field_name='user__username', lookup_expr='iexact')
+    email = django_filters.CharFilter(field_name='email', lookup_expr='iexact')
     class Meta:
         model = models.Person
         fields = ['user__username', 'email']
