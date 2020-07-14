@@ -18,16 +18,6 @@ Personen har inte betalat medlemsavgift och är för närvarande inte medlem i f
     Det här är du! Gå till <a href="{% url 'batadasen:person_settings' %}">inställningar</a> för att redigera din info.
 </div>
 
-{% elif object.privacy_setting == 'LIM' %}
-
-<div class="alert alert-primary" role="alert">
-    Personen har valt att inte visa all information för andra medlemmar.
-
-    {% if perms.batadasen.view_private_info %}
-    <br>Du kan bara se den för att du är administratör.
-    {% endif %}
-</div>
-
 {% elif object.privacy_setting == 'PVT' %}
 
 <div class="alert alert-danger" role="alert">
@@ -45,7 +35,6 @@ Personen har inte betalat medlemsavgift och är för närvarande inte medlem i f
     <td>Medlemsnummer</td>
     <td>{{ object.member_number }}</a></td>
 </tr>
-{% if object.privacy_setting in 'LIM,OPN' or perms.batadasen.view_private_info or request.user.person == object %}
 <tr>
     <td>Namn</td>
     <td>{{ object.first_name }} {% if object.spex_name %}"{{ object.spex_name }}" {% endif %}{{ object.last_name }}</td>
@@ -54,8 +43,6 @@ Personen har inte betalat medlemsavgift och är för närvarande inte medlem i f
     <td>E-post</td>
     <td>{% if object.address_list_email %}{{ object.address_list_email }}{% else %}{{ object.email }}{% endif %}</a></td>
 </tr>
-{% endif %}
-{% if object.privacy_setting == 'OPN' or perms.batadasen.view_private_info  or request.user.person == object %}
 <tr>
     <td>Telefonnr (mobil)</td>
     <td>{{ object.phone_mobile }}</a></td>
@@ -76,7 +63,6 @@ Personen har inte betalat medlemsavgift och är för närvarande inte medlem i f
     <td>Postadress</td>
     <td>{{ object.postal_code }} {{ object.postal_locality }}</a></td>
 </tr>
-{% endif %}
 </table>
 
 <h2>Uppsättningshistorik</h2>

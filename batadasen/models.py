@@ -44,8 +44,7 @@ class Person(models.Model):
         ]
     
     class PrivacySetting(models.TextChoices):
-        PRIVATE = 'PVT', 'Privat', # Only number is visible.
-        LIMITED = 'LIM', 'Begränsad', # Other members can see name and email. Default.
+        PRIVATE = 'PVT', 'Privat' # Invisible except for admins
         OPEN = 'OPN', 'Öppen' # Other members can see everything.
     
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='användare', related_name='person')
@@ -77,9 +76,8 @@ class Person(models.Model):
         'sekretessnivå', 
         max_length=3, 
         choices=PrivacySetting.choices, 
-        default=PrivacySetting.LIMITED, 
+        default=PrivacySetting.OPEN, 
         help_text='Privat: endast administratörer kan se dina personuppgifter. '
-                  'Begränsad: andra inloggade kan se namn och epostadress. '
                   'Öppen: andra inloggade kan se all din information. '
                   'Inga personuppgifter kommer någonsin vara synliga för icke-inloggade.')
 
