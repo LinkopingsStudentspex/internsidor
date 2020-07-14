@@ -215,15 +215,16 @@ with open(input_filename) as json_file:
         for json_medlemskap in data['medlemskap']:
             print("Importing {}/{} association memberships".format(current, num_medlemskap))
             person = models.Person.objects.get(member_number=json_medlemskap['medlem'])
-            if json_medlemskap['medlemstyp'] == 'Vanlig medlem':
-                assoc_year, created = models.AssociationYear.objects.get_or_create(end_year=json_medlemskap['ar'])
-                membership, created = models.AssociationMembership.objects.get_or_create(person=person, year=assoc_year)
-            elif json_medlemskap['medlemstyp'] == 'Hedersmedlem':
-                person.honorary_member = True
-                person.save()
+            assoc_year, created = models.AssociationYear.objects.get_or_create(end_year=json_medlemskap['ar'])
+
+            if json_medlemskap['medlemstyp'] == 'Hedersmedlem':
+                membership_type = models.AssociationMembership.MembershipType.HONORARY
             elif json_medlemskap['medlemstyp'] == 'Livstidsmedlem':
-                person.lifetime_member = True
-                person.save()
+                membership_type = models.AssociationMembership.MembershipType.LIFETIME
+            else:
+                membership_type = models.AssociationMembership.MembershipType.STANDARD
+
+            membership, created = models.AssociationMembership.objects.get_or_create(person=person, year=assoc_year, membership_type=membership_type)
             current += 1
      
         num_mejllistor = len(data['mejllistor'])

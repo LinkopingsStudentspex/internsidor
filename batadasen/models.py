@@ -68,8 +68,6 @@ class Person(models.Model):
     wants_spexinfo = models.BooleanField('vill få spexinfo-mail', default=True)
     wants_trams = models.BooleanField('vill få trams-mail', default=False)
     wants_blandat = models.BooleanField('vill få blandat-mail', default=True)
-    lifetime_member = models.BooleanField('livstidsmedlem', default=False)
-    honorary_member = models.BooleanField('hedersmedlem', default=False)
     hundred_club = models.BooleanField('hundraklubben', default=False)
     deceased = models.BooleanField('avliden', default=False)
     address_changed_date = models.DateTimeField('adress ändrad', null=True, blank=True)
@@ -97,10 +95,11 @@ class Person(models.Model):
     
     @property
     def currently_member(self):
-        if self.lifetime_member or self.honorary_member:
-            return True
+        current_standard_member = Q(year=get_current_assoc_year(), membership_type=AssociationMembership.MembershipType.STANDARD)
+        honorary_member = Q(year__lte=get_current_assoc_year(), membership_type=AssociationMembership.MembershipType.HONORARY)
+        lifetime_member = Q(year__lte=get_current_assoc_year(), membership_type=AssociationMembership.MembershipType.LIFETIME)
         
-        return self.association_memberships.filter(year=get_current_assoc_year()).exists()
+        return self.association_memberships.filter(current_standard_member | honorary_member | lifetime_member).exists()
     
     @property
     def display_email(self):
@@ -520,15 +519,33 @@ class EmailList(models.Model):
             raise ValidationError({'forward_to': 'Kan inte vidarebefordra en lista till sig själv'})
 
 class AssociationMembership(models.Model):
-    person = models.ForeignKey(Person, models.CASCADE, verbose_name='person', related_name='association_memberships')
-    year = models.ForeignKey(AssociationYear, models.CASCADE, verbose_name='verksamhetsår', related_name='memberships')
-
-    def __str__(self):
-        return '{} var medlem {}'.format(self.person, self.year)
-    
     class Meta:
         verbose_name = 'föreningsmedlemskap'
         verbose_name_plural = 'föreningsmedlemskap'
-        
-        unique_together = ['person', 'year']
+
+        unique_together = ['person', 'year', 'membership_type']
         ordering = ['person', 'year']
+
+    class MembershipType(models.TextChoices):
+        STANDARD = 'STD', 'Vanlig medlem'
+        HONORARY = 'HON', 'Hedersmedlem'
+        LIFETIME = 'LIF', 'Livstidsmedlem'
+
+    person = models.ForeignKey(Person, models.CASCADE, verbose_name='person', related_name='association_memberships')
+    year = models.ForeignKey(AssociationYear, models.CASCADE, verbose_name='verksamhetsår', related_name='memberships')
+    membership_type = models.CharField('medlemskapstyp',
+        max_length=3,
+        choices=MembershipType.choices,
+        default=MembershipType.STANDARD,
+        help_text='För vanligt medlemskap, lägg till nytt medlemskap för varje år.'
+                  'För livstidsmedlemskap och hedersmedlemskap, lägg in det året de blev livstid- eller hedersmedlemmar.')
+
+    def __str__(self):
+        if self.membership_type == AssociationMembership.MembershipType.HONORARY:
+            return '{} blev hedersmedlem {}'.format(self.person, self.year)
+        elif self.membership_type == AssociationMembership.MembershipType.LIFETIME:
+            return '{} blev livstidsmedlem {}'.format(self.person, self.year)
+        else:
+            return '{} var medlem {}'.format(self.person, self.year)
+
+

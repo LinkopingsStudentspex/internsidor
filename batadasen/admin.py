@@ -57,7 +57,6 @@ class PersonAdmin(admin.ModelAdmin):
         ('postal_code', 'postal_locality', 'country'),
         'address_list_email',
         ('user', 'send_activation_link'),
-        ('lifetime_member', 'honorary_member'),
         'hundred_club',
         'deceased',
         ('wants_spexinfo', 'wants_blandat', 'wants_trams'),
@@ -292,8 +291,13 @@ class UserActivationAdmin(admin.ModelAdmin):
     model = UserActivation
     autocomplete_fields = ['person']
 
+class AssociationMembershipAdmin(admin.ModelAdmin):
+    model = AssociationMembership
+    list_display = ['year', 'person', 'membership_type']
+    list_filter = ['membership_type', 'year']
+
 admin.site.register(AssociationActivity)
-admin.site.register(AssociationMembership)
+admin.site.register(AssociationMembership, AssociationMembershipAdmin)
 admin.site.register(AssociationYear)
 admin.site.register(EmailList, EmailListAdmin)
 admin.site.register(ExtraEmail)

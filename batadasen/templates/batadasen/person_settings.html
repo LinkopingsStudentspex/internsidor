@@ -54,18 +54,6 @@ Användarnamn: {{ object.user.username }}
 <p>Kontakta någon i styrelsen eller directionen om du vill ta bort en mailadress.</p>
 </div>
 
-<h2>Medlemskapshistoria</h2>
-<p>
-Baserat på uppgifter som finns i Batadasen. Om du var medlem redan före 1991 finns inte dom uppgiftern med i Batadasen. Även andra uppgifter kan ha ramlat ut i cyberrymden.
-</p>
-
-Du har varit medlem i föreningen under följande verksamhetsår:
-<ul>
-{% for membership in object.association_memberships.all %}
-    <li>{{ membership.year }}</li>
-{% endfor %}
-</ul>
-
 {% else %}
 <div class="alert alert-danger" role="alert">
 Ditt användarkonto ({{ request.user }}) har ingen person kopplad till sig.

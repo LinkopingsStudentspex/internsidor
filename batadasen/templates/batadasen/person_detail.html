@@ -110,4 +110,23 @@ Personen har inte betalat medlemsavgift och är för närvarande inte medlem i f
 </tr>
 {% endfor %}
 </table>
+
+<h2>Medlemskapshistorik</h2>
+<p>Här beskrivs personens medlemskap i föreningen genom åren.</p>
+<table class="table table-sm table-striped">
+    <tr>
+        <th>Verksamhetsår</th>
+        <th>Typ</th>
+    </tr>
+    {% for membership in object.association_memberships.all %}
+    <tr>
+        {% if membership.membership_type == 'STD' %}
+        <td>{{ membership.year }}</td>
+        {% else %}
+        <td>Från och med {{ membership.year }}</td>
+        {% endif %}
+        <td>{{ membership.get_membership_type_display }}</td>
+    </tr>
+    {% endfor %}
+</table>
 {% endblock %}
