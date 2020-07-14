@@ -18,6 +18,9 @@ django.setup()
 
 from batadasen import models
 
+# Mailgun modifies the bounce address to be like bounce+stuff-address=domain@studentspex.se
+bounce_pattern = re.compile(r'^bounce\+')
+
 def spellcorrect(alias):
     direction_match = re.match(r'^(direktion|direcktion)(?P<year>[0-9][0-9])$', alias)
     if direction_match is not None:
@@ -92,6 +95,10 @@ class PostfixTCPHandler(socketserver.BaseRequestHandler):
             return
         
         alias = email_parts[0]
+
+        # If it's a bounce address, send it to the 'list-bounces' list
+        if bounce_pattern.match(alias) is not None:
+            alias = 'list-bounces'
 
         try:
             email_list = models.EmailList.objects.get(alias=alias)
