@@ -4,7 +4,7 @@ Hej {{ first_name }}!
 
 Välkommen till spexet! Ett konto har skapats åt dig på spexets interna hemsida. För att aktivera det behöver du följa dessa steg:
 
-1: Gå till {{ activation_url }} och välj ett användarnamn för ditt konto.
+1: Gå till {{ activation_url }} och välj ett användarnamn för ditt konto. Länken är bara giltig i en vecka.
 
 2: Du borde skickas vidare till en inloggningsruta. Klicka på "Glömt lösenord" och fyll i ditt nyvalda användarnamn för att få ett mejl skickat till dig med en länk för att välja ett lösenord.
 
