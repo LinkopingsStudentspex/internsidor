@@ -153,7 +153,7 @@ class PersonAdmin(admin.ModelAdmin):
                         'contact_email': settings.DEFAULT_FROM_EMAIL
                     }
                 ),
-                settings.DEFAULT_FROM_EMAIL,
+                '"Spexets internsidor" <{}>'.format(settings.DEFAULT_FROM_EMAIL),
                 [email]
             )
             messages.info(request, 'Ett mail med en aktiveringslänk har skickats till {}. Länken går ut {}'.format(email, activation.valid_until.strftime('%Y-%m-%d %H:%M:%S')))
