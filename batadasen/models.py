@@ -117,7 +117,7 @@ def generate_activation_token():
     return crypto.get_random_string(length=50)
 
 def calculate_expiration_time():
-    return timezone.now() + timedelta(hours=2)
+    return timezone.now() + timedelta(hours=48)
 
 class UserActivation(models.Model):
     class Meta:
