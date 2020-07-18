@@ -297,7 +297,10 @@ class ProductionGroup(models.Model):
             else:
                 return '{} (ingen grupp)'.format( self.production.short_name)
         else:
-            return '{}-{:02}'.format(self.group_type.short_name, self.production.year % 100)
+            if self.production.regular:
+                return '{}-{:02}'.format(self.group_type.short_name, self.production.year % 100)
+            else:
+                return '{}-{}'.format(self.group_type.short_name, self.production.short_name)
     
     # Eftersom NULL-värden aldrig är lika med varandra så funkar inte ovanstående unique_together
     # och vi måste validera fallet när man försöker skapa två uppsättningsgrupper utan grupptyp 
