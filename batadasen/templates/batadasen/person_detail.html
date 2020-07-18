@@ -68,6 +68,7 @@ Personen har inte betalat medlemsavgift och är för närvarande inte medlem i f
 <h2>Uppsättningshistorik</h2>
 <table class="table table-sm table-striped">
 <tr>
+    <th>År</th>
     <th>Uppsättning</th>
     <th>Grupp</th>
     <th>Titel</th>
@@ -75,7 +76,8 @@ Personen har inte betalat medlemsavgift och är för närvarande inte medlem i f
 </tr>
 {% for membership in object.production_memberships.all %}
 <tr>
-    <td>{{ membership.group.production.short_name }}</td>
+    <td>{{ membership.group.production.year }}</td>
+    <td><a href="{% url 'batadasen:production_detail' membership.group.production.number %}">{{ membership.group.production.main_title }}</a></td>
     <td>{{ membership.group.group_type.short_name }}</td>
     <td>{% if membership.title %}{{ membership.title }}{% endif %}</td>
     <td>{{ membership.comment }}</td>
