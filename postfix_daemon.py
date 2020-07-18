@@ -17,6 +17,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'internsidor.settings.production
 django.setup()
 
 from batadasen import models
+User = django.contrib.auth.get_user_model()
 
 # Mailgun modifies the bounce address to be like bounce+stuff-address=domain@studentspex.se
 bounce_pattern = re.compile(r'^bounce\+')
@@ -100,15 +101,38 @@ class PostfixTCPHandler(socketserver.BaseRequestHandler):
         if bounce_pattern.match(alias) is not None:
             alias = 'list-bounces'
 
+        found = False
+
         try:
             email_list = models.EmailList.objects.get(alias=alias)
+            found = True
         except models.EmailList.DoesNotExist:
+            found = False
+
+        if found == False:
+            # Perhaps it's a username
+            try:
+                user = User.objects.get(username=alias)
+                if user.person is not None and user.person.email is not None and user.person.email != '':
+                    reply = 'OK {}'.format(user.person.email)
+                    self.request.sendall(pynetstring.encode(reply))
+                    return
+                else:
+                    found = False
+            except User.DoesNotExist:
+                found = False
+
+        if found == False:
             # Perhaps it matches some common (and uncommon) misspellings
             try:
                 email_list = models.EmailList.objects.get(alias=spellcorrect(alias))
+                found = True
             except models.EmailList.DoesNotExist:
-                self.request.sendall(pynetstring.encode('NOTFOUND '))
-                return
+                found = False
+
+        if found == False:
+            self.request.sendall(pynetstring.encode('NOTFOUND '))
+            return
         
         addresses = email_list.get_recipients_email()
         if len(addresses) == 0:
