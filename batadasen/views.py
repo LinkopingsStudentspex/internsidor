@@ -22,6 +22,8 @@ from rest_framework_api_key.permissions import HasAPIKey
 import django_filters
 
 from . import forms, models, serializers
+if settings.PROVISION_GSUITE_ACCOUNTS:
+    from . import gsuite
 
 User = get_user_model()
 
@@ -39,7 +41,8 @@ def activation_view(request):
     if bad_token:
         return HttpResponse("Du har nog följt en gammal länk eller så har den kopierats fel")
     
-    person = activations.first().person
+    activation = activations.first()
+    person = activation.person
 
     if request.method == 'POST':
         form = forms.ActivationForm(request.POST)
@@ -55,6 +58,9 @@ def activation_view(request):
 
             person.user = user
             person.save()
+
+            if settings.PROVISION_GSUITE_ACCOUNTS and activation.provision_gsuite_account:
+                gsuite.create_user(person.user.username, person.first_name, person.last_name)
 
             activations.delete()
 

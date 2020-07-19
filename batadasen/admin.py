@@ -14,6 +14,9 @@ from django.utils.translation import gettext, gettext_lazy as _
 from .models import *
 from . import urls
 
+if settings.PROVISION_GSUITE_ACCOUNTS:
+    from . import gsuite
+
 class ExtraEmailInline(admin.TabularInline):
     model = ExtraEmail
     extra = 0
@@ -38,11 +41,21 @@ class PersonForm(forms.ModelForm):
         fields = '__all__'
 
     send_activation_link = forms.BooleanField(required=False, label='Skicka aktiveringslänk för att skapa ny användare.')
+    provision_gsuite_account = forms.BooleanField(required=False, label='Aktivera Google-konto för användaren.')
 
     def clean(self):
         cleaned_data = super().clean()
         if self.instance.user is not None and cleaned_data['send_activation_link']:
             self.add_error('send_activation_link', 'Personen har redan en aktiv användare. Be en administratör ta bort användaren först!')
+
+        requested_gsuite_activation = 'provision_gsuite_account' in cleaned_data and cleaned_data['provision_gsuite_account']
+
+        if requested_gsuite_activation and self.instance.user is None and not cleaned_data['send_activation_link']:
+            self.add_error('provision_gsuite_account', 'Personen har ingen användare och du har inte klickat i att en ny användare ska skapas.')
+
+        if requested_gsuite_activation and not settings.PROVISION_GSUITE_ACCOUNTS:
+            self.add_error('provision_gsuite_account', 'Aktivering av Google-konton är inaktiverat.')
+
         return cleaned_data
 
 class PersonAdmin(admin.ModelAdmin):
@@ -56,7 +69,7 @@ class PersonAdmin(admin.ModelAdmin):
         'street_address',
         ('postal_code', 'postal_locality', 'country'),
         'address_list_email',
-        ('user', 'send_activation_link'),
+        ('user', 'send_activation_link', 'provision_gsuite_account'),
         'hundred_club',
         'deceased',
         ('wants_spexinfo', 'wants_blandat', 'wants_trams'),
@@ -140,7 +153,7 @@ class PersonAdmin(admin.ModelAdmin):
                 print('Deleting existing user activations in progress')
                 existing_user_activations.delete()
             
-            activation = UserActivation(person=obj)
+            activation = UserActivation(person=obj, provision_gsuite_account=form.cleaned_data['provision_gsuite_account'])
             activation.save()
 
             mail.send_mail('Aktiveringslänk för spexets internsidor',
@@ -157,6 +170,9 @@ class PersonAdmin(admin.ModelAdmin):
                 [email]
             )
             messages.info(request, 'Ett mail med en aktiveringslänk har skickats till {}. Länken går ut {}'.format(email, activation.valid_until.strftime('%Y-%m-%d %H:%M:%S')))
+        elif settings.PROVISION_GSUITE_ACCOUNTS and form.cleaned_data['provision_gsuite_account'] and obj.user is not None:
+            gsuite.create_user(obj.user.username, obj.first_name, obj.last_name)
+
 
 class UserAdmin(origUserAdmin):
     top_fields = ('username',)

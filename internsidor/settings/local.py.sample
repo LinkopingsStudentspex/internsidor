@@ -36,3 +36,9 @@
 #        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 #    }
 # }
+
+# G Suite account provisioning
+# PROVISION_GSUITE_ACCOUNTS = False
+# GSUITE_AUTH_EMAIL = '' # Email of authorized user to impersonate during requests
+# GSUITE_SERVICE_ACCOUNT_FILE = '' # Location of JSON file with credentials for the service account to use
+# GSUITE_DOMAIN = '' # Domain for the G Suite account

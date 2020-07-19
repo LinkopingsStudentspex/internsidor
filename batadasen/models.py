@@ -127,6 +127,7 @@ class UserActivation(models.Model):
     person = models.ForeignKey(Person, models.CASCADE, verbose_name='person')
     valid_until = models.DateTimeField('giltig tills', default=calculate_expiration_time)
     token = models.CharField('token', max_length=50, default=generate_activation_token)
+    provision_gsuite_account = models.BooleanField('aktivera Google-konto', default=False)
 
     def __str__(self):
         return 'User activation for {}, valid until {}'.format(self.person, self.valid_until)
