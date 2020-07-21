@@ -1,0 +1,32 @@
+{% extends "base_sidebar.html" %}
+{% load i18n %}
+
+{% block content %}
+    <h2>{% trans "Asset model" %}</h2>
+    <table class="table">
+        <tbody>
+            <tr>
+                <td class="table-fit">{% trans "Manufacturer" %}:</td>
+                <td>{{ object.manufacturer }}</td>
+            </tr>
+            <tr>
+                <td class="table-fit">{% trans "Model name" %}:</td>
+                <td>{{ object.model_name }}</td>
+            </tr>
+            <tr>
+                <td class="table-fit">{% trans "Description" %}:</td>
+                <td>{{ object.model_description }}</td>
+            </tr>
+            <tr>
+                <td class="table-fit">{% trans "Categories" %}:</td>
+                <td>
+                    <ul>
+                        {% for cat in object.categories.all %}
+                        <li>{{ cat }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}

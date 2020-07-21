@@ -1,0 +1,49 @@
+{% extends "base_sidebar.html" %}
+{% load i18n %}
+
+{% block content %}
+    {{ form.media }}
+    <form method="post">{% csrf_token %}
+        {{ form.non_field_errors }}
+        <table class="table">
+            <tr>
+                <th>
+                    <label for="{{ form.manufacturer.id_for_label }}">{% trans "Manufacturer" %}:</label>
+                </th>
+                <td>
+                    {{form.manufacturer.errors}} 
+                    {{ form.manufacturer}}
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <label for="{{ form.model_name.id_for_label }}">{% trans "Model name" %}:</label>
+                </th>
+                <td>
+                    {{form.model_name.errors}} 
+                    {{ form.model_name}}
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <label for="{{ form.model_description.id_for_label }}">{% trans "Description" %}:</label>
+                </th>
+                <td>
+                    {{form.model_description.errors}} 
+                    {{ form.model_description}}
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <label for="{{ form.categories.id_for_label }}">{% trans "Categories" %}:</label>
+                </th>
+                <td>
+                    {{form.categories.errors}} 
+                    {{ form.categories}}
+                    <a class="btn btn-secondary" href="{% url 'assetmanager:category_add' %}">{% trans "Add new category" %}</a>
+                </td>
+            </tr>
+        </table>
+        <input class="btn btn-primary" type="submit" value='{% trans "Add model" %}'/>
+    </form>
+{% endblock %}

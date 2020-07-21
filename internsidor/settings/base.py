@@ -28,7 +28,9 @@ INSTALLED_APPS = [
     'rest_framework_api_key',
     'batadasen',
     'django_filters',
-    'crispy_forms'
+    'crispy_forms',
+    'assetmanager',
+    'ajax_select',
 ]
 
 MIDDLEWARE = [

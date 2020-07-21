@@ -3,3 +3,4 @@ djangorestframework
 djangorestframework-api-key
 django-filter
 django-crispy-forms
+django-ajax-selects

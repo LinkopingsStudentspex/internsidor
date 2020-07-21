@@ -20,7 +20,10 @@ from django.urls import path, include, reverse
 from django.http import HttpResponseRedirect
 from django.views.generic.base import View, TemplateView
 
+from ajax_select import urls as ajax_select_urls
+
 import batadasen
+import assetmanager
 
 if 'mozilla_django_oidc' in settings.INSTALLED_APPS:
     urlpatterns = [
@@ -31,6 +34,8 @@ if 'mozilla_django_oidc' in settings.INSTALLED_APPS:
 
         path('admin/', admin.site.urls),
         path('batadasen/', include('batadasen.urls')),
+        path('lissinv/', include('assetmanager.urls')),
+        path('ajax_select/', include(ajax_select_urls)),
         path('oidc/', include('mozilla_django_oidc.urls')),
         path('', batadasen.views.index_view)
     ]
@@ -38,6 +43,8 @@ else:
     urlpatterns = [
         path('admin/', admin.site.urls),
         path('batadasen/', include('batadasen.urls')),
+        path('lissinv/', include('assetmanager.urls')),
+        path('ajax_select/', include(ajax_select_urls)),
 
         # A simple login view for dev setups that don't have keycloak available
         path('login/', auth_views.LoginView.as_view(template_name='batadasen/dev_login.html'), name='login'),

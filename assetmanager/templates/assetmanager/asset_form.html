@@ -1,0 +1,29 @@
+{% extends "base_sidebar.html" %}
+{% load i18n %}
+
+{% block content %}
+    {{ form.media }}
+    <form method="post">{% csrf_token %}
+        <table class="table">
+            {% for field in form %}
+                <tr>
+                    <th>
+                        {% if field.field.required %}
+                        <label class="required-field" for="{{ field.name }}">{{field.label}} *</label>
+                        {% else %}
+                        <label for="{{ field.name }}">{{ field.label }}</label>
+                        {% endif %}
+                    </th>
+                    <td>
+                        {{ field.errors}}
+                        {{ field }}
+                        {% if field is form.model %}
+                            <a href="{% url 'assetmanager:assetmodel_add' %}" class="btn btn-secondary">{% trans 'Add model' %}</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        <input class="btn btn-primary" type="submit" value="{% trans 'Add' %}" />
+    </form>
+{% endblock %}

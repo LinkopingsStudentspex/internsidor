@@ -1,0 +1,15 @@
+{% extends 'base_sidebar.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "New log entry" %}{% endblock %}
+
+{% block content %}
+<h2>{% trans "New log entry for asset number " %}{{ asset_inst.number }}</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input class="btn btn-primary" type="submit" value="Save" />
+    <a href="{% url 'assetmanager:asset_detail' asset_inst.number %}" class="btn btn-light">Cancel</a>
+</form>
+
+{% endblock %}

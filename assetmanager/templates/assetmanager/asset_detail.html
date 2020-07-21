@@ -1,0 +1,62 @@
+{% extends "base_sidebar.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Asset" %} {{ object.number }}{% endblock %}
+
+{% block content %}
+    <h2>{% trans "Asset details" %}</h2>
+    <table class="table table-sm">
+        <tbody>
+            <tr>
+                <td class="table-fit">Number:</td>
+                <td>{{ object.number }}</td>
+            </tr>
+            <tr>
+                <td class="table-fit">{% trans "Model" %}</td>
+                <td><a href="{% url 'assetmanager:assetmodel_detail' object.model_id %}">{{ object.model }}</a></td>
+            </tr>
+            <tr>
+                <td class="table-fit">{% trans "Status" %}</td>
+                <td>{{ object.status_readable }}</td>
+            </tr>
+            <tr>
+                <td class="table-fit">{% trans "Standard location" %}</td>
+                <td>{{ object.standard_location }}</td>
+            </tr>
+            <tr>
+                <td class="table-fit">{% trans "Owner" %}</td>
+                <td>{{ object.owner }}</td>
+            </tr>
+            <tr>
+                <td class="table-fit">{% trans "Purchase time" %}</td>
+                <td>{{ object.purchase_time }}</td>
+            </tr>
+            <tr>
+                <td class="table-fit">{% trans "Purchase price" %}</td>
+                <td>{{ object.purchase_price }}</td>
+            </tr>
+            <tr>
+                <td class="table-fit">{% trans "Supplier" %}</td>
+                <td>{{ object.supplier }}</td>
+            </tr>
+            <tr>
+                <td class="table-fit">{% trans "Comments" %}</td>
+                <td>{{ object.comments }}</td>
+            </tr>
+            <tr>
+                <td class="table-fit">{% trans "Log" %}</td>
+                <td>
+                    <ul>
+                        {% for event in object.log_entries.all %}
+                            <li>
+                                {{ event.timestamp|date:"Y-m-d H:i:s"}}: {{ event.get_new_status_display }} <br/>
+                                {{ event.notes }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <a href="{% url 'assetmanager:create_log_entry' object.number %}" class="btn btn-primary">{% trans "Add log entry" %}</a>
+{% endblock %}

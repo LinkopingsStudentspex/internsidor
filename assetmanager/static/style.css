@@ -1,0 +1,80 @@
+@media (min-width: 900px) {
+    .container {
+        width: 800px;
+    }
+}
+
+.container {
+    margin-left: 250px;
+}
+
+#sidebar {
+    height:100%;
+    width: 250px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    padding-top: 20px;
+}
+
+#admin-link {
+    margin-top: 50px;
+}
+
+#sidebar a {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display:block;
+}
+
+#sidebar a:hover {
+    color: #f1f1f1;
+}
+
+.table {
+    display: table;
+    table-layout: auto;
+}
+
+.table-row {
+    display: table-row;
+}
+
+.table-row:hover {
+    background-color: #dddddd;
+}
+
+.table-link {
+    display: block;
+    padding-top: 0.75em;
+    padding-bottom: 0.75em;
+    padding-left: 20px;
+}
+
+.table-link:hover {
+    text-decoration: none;
+}
+
+td.table-cell {
+    padding: 0;
+}
+
+.table-header {
+    display: table-header-group;
+    text-align: center;
+}
+
+#toprow  {
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+#add-asset-button {
+    float: right;
+}
+
