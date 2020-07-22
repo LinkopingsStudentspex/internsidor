@@ -28,7 +28,8 @@ class AssetModelDetailView(LoginRequiredMixin, generic.DetailView):
     model = AssetModel
 
 
-@permission_required('assetmanager.add_logentry')
+# @permission_required('assetmanager.add_logentry')
+@login_required
 def new_logentry_view(request, number):
     asset_inst = get_object_or_404(Asset, number=number)
 
@@ -38,9 +39,10 @@ def new_logentry_view(request, number):
         if form.is_valid():
             logentry_inst = LogEntry(**form.cleaned_data)
             logentry_inst.asset = asset_inst
+            logentry_inst.user = request.user
             logentry_inst.save()
 
-            return HttpResponseRedirect(reverse('asset_detail', kwargs={'number':asset_inst.number}))
+            return HttpResponseRedirect(reverse('assetmanager:asset_detail', kwargs={'number':asset_inst.number}))
         
     else:
         form = LogEntryForm()
@@ -53,8 +55,9 @@ def new_logentry_view(request, number):
     
     return render(request, 'assetmanager/logentry_form.html', {'form': form, 'asset_inst': asset_inst})
 
-@permission_required('assetmanager.add_asset')
+# @permission_required('assetmanager.add_asset')
 @never_cache
+@login_required
 def new_asset_view(request):
     if request.method == 'POST':
         form = AssetForm(request.POST)
@@ -69,13 +72,14 @@ def new_asset_view(request):
             entry = LogEntry(asset=asset_inst, notes=initial_log_entry, new_status=initial_status)
             entry.save()
 
-            return HttpResponseRedirect(reverse('asset_detail', kwargs={'number':asset_inst.number}))
+            return HttpResponseRedirect(reverse('assetmanager:asset_detail', kwargs={'number':asset_inst.number}))
     else:
         form = AssetForm()
 
     return render(request, 'assetmanager/asset_form.html', {'form': form})
         
-@permission_required('assetmanager.add_assetmodel')
+# @permission_required('assetmanager.add_assetmodel')
+@login_required
 def new_assetmodel_view(request):
     if request.method == 'POST':
         form = AssetModelForm(request.POST)
@@ -91,13 +95,14 @@ def new_assetmodel_view(request):
 
             assetmodel_inst.save()
 
-            return HttpResponseRedirect(reverse('asset_add'))
+            return HttpResponseRedirect(reverse('assetmanager:asset_add'))
     else:
         form = AssetModelForm()
 
     return render(request, 'assetmanager/assetmodel_form.html', {'form': form})
 
-@permission_required('assetmanager.add_category')
+# @permission_required('assetmanager.add_category')
+@login_required
 def new_category_view(request):
     if request.method == 'POST':
         form = CategoryForm(request.POST)
@@ -106,7 +111,7 @@ def new_category_view(request):
             category_inst = Category(**form.cleaned_data)
             category_inst.save()
 
-            return HttpResponseRedirect(reverse('assetmodel_add'))
+            return HttpResponseRedirect(reverse('assetmanager:assetmodel_add'))
     else:
         form = CategoryForm()
     
@@ -117,9 +122,9 @@ def search_view(request):
     if request.method == 'GET':
         asset_id = request.GET.get('id')
         if Asset.objects.filter(number=asset_id).exists():
-            return HttpResponseRedirect(reverse('asset_detail', args=[asset_id]))
+            return HttpResponseRedirect(reverse('assetmanager:asset_detail', args=[asset_id]))
 
-        return HttpResponseRedirect(reverse('asset_list'))
+        return HttpResponseRedirect(reverse('assetmanager:asset_list'))
 
 
 

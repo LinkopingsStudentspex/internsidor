@@ -43,20 +43,38 @@
                 <td class="table-fit">{% trans "Comments" %}</td>
                 <td>{{ object.comments }}</td>
             </tr>
+        </tbody>
+    </table>
+    <h3>{% trans "Log" %}</h3>
+    <table class="table table-sm">
+        <tr>
+            <th>{% trans "Timestamp" %}</th>
+            <th>{% trans "Status" %}</th>
+            <th>{% trans "Notes" %}</th>
+            <th>{% trans "Entered by" %}</th>
+        </tr>
+        {% for event in object.log_entries.all %}
             <tr>
-                <td class="table-fit">{% trans "Log" %}</td>
                 <td>
-                    <ul>
-                        {% for event in object.log_entries.all %}
-                            <li>
-                                {{ event.timestamp|date:"Y-m-d H:i:s"}}: {{ event.get_new_status_display }} <br/>
-                                {{ event.notes }}
-                            </li>
-                        {% endfor %}
-                    </ul>
+                {{ event.timestamp|date:"Y-m-d H:i:s"}} 
+                </td>
+                <td>
+                {{ event.get_new_status_display }}
+                </td>
+                <td>
+                {{ event.notes }}
+                </td>
+                <td>
+                {% if event.user.person %} 
+                    {% if event.user.person.privacy_setting != 'PVT' %}
+                    <a href="{% url 'batadasen:person_detail' event.user.person.member_number %}">{{ event.user.person.full_name }}</a>
+                    {% endif %}
+                {% elif event.user %}
+                    {{ event.user }}
+                {% endif %}
                 </td>
             </tr>
-        </tbody>
+        {% endfor %}
     </table>
     <a href="{% url 'assetmanager:create_log_entry' object.number %}" class="btn btn-primary">{% trans "Add log entry" %}</a>
 {% endblock %}

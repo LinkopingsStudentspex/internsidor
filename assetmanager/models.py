@@ -1,10 +1,14 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 import datetime
 
+User = get_user_model()
+
 class Category(models.Model):
     name = models.CharField(_("Name"),max_length=100)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name=_("User"), related_name='added_assetcategories')
 
     def __str__(self):
         return self.name
@@ -14,6 +18,7 @@ class AssetModel(models.Model):
     model_name = models.CharField(_("Model name"), max_length=100)
     model_description = models.TextField(_("Model description"), blank=True)
     categories = models.ManyToManyField(Category, verbose_name=_("Categories"), related_name='asset_types')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name=_("User"), related_name='added_assetmodels')
 
     def __str__(self):
         return '%s - %s' % (self.manufacturer, self.model_name)
@@ -43,6 +48,7 @@ class Asset(models.Model):
     description = models.TextField(_("Description"), blank=True)
 
     owner = models.ForeignKey(Owner, on_delete=models.PROTECT, verbose_name=_("Owner"), related_name='assets')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name=_("User"), related_name='added_assets')
 
     @property
     def status_readable(self):
@@ -63,6 +69,7 @@ class LogEntry(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE, verbose_name=_("Asset"), related_name='log_entries')
     timestamp = models.DateTimeField(_("Timestamp"), default=datetime.datetime.now)
     notes = models.TextField(_("Notes") ) 
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name=_("User"), related_name='log_entries')
 
     STATUS_OK           = 'OK'           # Fully functional and ready for use
     STATUS_DEGRADED     = 'DEG'     # Missing some functionality but still usable
