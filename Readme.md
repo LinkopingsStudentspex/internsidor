@@ -10,9 +10,13 @@ Systemet är byggt på Django och använder sig av OpenID Connect för autentise
   * Allehanda småfunktioner för användare, som att kunna redigera sin egen info eller räkna föreställningar.
 
 ## Projektstruktur
-Django-hemsidor organiseras i olika moduler eller "apps". I detta projekt finns bara en enda app utvecklad, "batadasen", vilket är där den mesta av koden och logiken finns. I mappen "internsidor" finns inställningarna och konfigurationen för hela hemsidan.
+Django-hemsidor organiseras i olika moduler eller "apps", vilket är där själva koden och logiken finns. I mappen "internsidor" finns inställningarna och konfigurationen för hela hemsidan.
 
 Anledningen till denna struktur är att Django-appar lätt ska kunna återanvändas i andra hemsidor. Exempelvis använder detta projekt appen `mozilla_django_oidc` som sköter autentiseringen via OpenID Connect.
+
+I detta projekt finns för närvarande två appar:
+  * `batadasen`: innehåller den mesta koden som har med medlemsregistret och e-postlistor att göra.
+  * `assetmanager`: inventariesystemet för spexets prylar.
 
 Filer för frontend-utveckling finns i mappen `batadasen/templates/batadasen` och `batadasen/static/batadasen`. Html-filerna är Django-templates som återanvänder kod genom att `base.html` innehåller den grundläggande html-strukturen och sedan fyller varje templatefil sen på själva `content`-blocket med rätt innehåll. 
 
