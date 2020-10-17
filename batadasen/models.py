@@ -470,7 +470,10 @@ class EmailList(models.Model):
         
         # Additional includes for special lists
         if self.alias == 'kallelse':
-            for membership in current_assoc_year.memberships.all():
+            current_standard_member = Q(year=get_current_assoc_year(), membership_type=AssociationMembership.MembershipType.STANDARD)
+            honorary_member = Q(year__lte=get_current_assoc_year(), membership_type=AssociationMembership.MembershipType.HONORARY)
+            lifetime_member = Q(year__lte=get_current_assoc_year(), membership_type=AssociationMembership.MembershipType.LIFETIME)
+            for membership in AssociationMembership.objects.filter(current_standard_member | honorary_member | lifetime_member):
                 if membership.person.email is not None and re.fullmatch(pattern, membership.person.email) is not None:
                     person_set.add(membership.person)
         elif self.alias == 'spexinfo':
