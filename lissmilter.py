@@ -58,7 +58,7 @@ class LissMilter(Milter.Base):
 
         valid_sender = True
 
-        has_this_email = Q(email=self.from_addr) | Q(address_list_email=self.from_addr) | Q(extra_email__email=self.from_addr)
+        has_this_email = Q(email__iexact=self.from_addr) | Q(address_list_email__iexact=self.from_addr) | Q(extra_email__email__iexact=self.from_addr)
 
         if protected_list and not models.Person.objects.filter(has_this_email).exists():
             valid_sender = False
@@ -66,7 +66,7 @@ class LissMilter(Milter.Base):
         if extra_protected_list:
             current_assoc_year = models.get_current_assoc_year()
             try:
-                has_this_email = Q(person__email=self.from_addr) | Q(person__address_list_email=self.from_addr) | Q(person__extra_email__email=self.from_addr)
+                has_this_email = Q(person__email__iexact=self.from_addr) | Q(person__address_list_email__iexact=self.from_addr) | Q(person__extra_email__email__iexact=self.from_addr)
                 if not current_assoc_year.groups.get(Q(group_type__short_name='STYR')).activities.filter(has_this_email).exists():
                     valid_sender = False
             except models.AssociationGroup.DoesNotExist:
