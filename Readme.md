@@ -1,6 +1,6 @@
 # LiSS internsidor
 
-Ett utkast till hur en ny generation av internsidor för LiSS kan se ut.
+Linköpings Studentspex internsidor anno 2020, året då pesten kom till byn.
 
 Systemet är byggt på Django och använder sig av OpenID Connect för autentisering. Tanken är att det här ska vara den enda vägen in till databasen med medlemsregistret, genom att följande funktioner hanteras:
   * Administration av medlemsregistret, via Djangos admin-gränssnitt.
