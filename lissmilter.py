@@ -5,7 +5,6 @@ import re
 import os
 import django
 from django.db.models import Q
-from Milter.utils import parse_addr
 
 connection_string = sys.argv[1]
 mail_domain = sys.argv[2]
@@ -102,7 +101,7 @@ def main():
 
     # Tell Sendmail which features we use
     flags = Milter.CHGHDRS
-    Milter.set_flags(flags)       
+    Milter.set_flags(flags)
 
     print("%s milter startup" % time.strftime('%Y-%m-%d %H:%M:%S'))
     sys.stdout.flush()
