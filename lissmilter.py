@@ -88,6 +88,8 @@ class LissMilter(Milter.Base):
         return Milter.CONTINUE
 
     def eom(self):
+        # We always need to change the sender address in case the sender uses SPF
+        self.chgfrom('list-bounces@{}'.format(mail_domain))
         if self.change_header:
             if self.subject != '':
                 self.chgheader('Subject', 0, '[{}] {}'.format(self.alias.capitalize(), self.subject))
