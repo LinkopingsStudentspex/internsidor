@@ -4,13 +4,12 @@
 #
 #    pip-compile
 #
-asgiref==3.2.7            # via django
-django-ajax-selects==1.9.1  # via -r requirements.in
-django-crispy-forms==1.9.1  # via -r requirements.in
-django-filter==2.2.0      # via -r requirements.in
-django==3.0.7             # via -r requirements.in, django-filter, djangorestframework
+asgiref==3.3.1            # via django
+django-ajax-selects==2.1.0  # via -r requirements.in
+django-crispy-forms==1.11.2  # via -r requirements.in
+django-filter==2.4.0      # via -r requirements.in
+django==3.1.7             # via -r requirements.in, django-filter, djangorestframework
 djangorestframework-api-key==2.0.0  # via -r requirements.in
-djangorestframework==3.11.0  # via -r requirements.in
-pytz==2020.1              # via django
-six==1.15.0               # via django-ajax-selects
-sqlparse==0.3.1           # via django
+djangorestframework==3.12.4  # via -r requirements.in
+pytz==2021.1              # via django
+sqlparse==0.4.1           # via django
