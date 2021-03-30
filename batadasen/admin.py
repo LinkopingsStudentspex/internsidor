@@ -68,6 +68,8 @@ class PersonAdmin(admin.ModelAdmin):
         'email',
         'street_address',
         ('postal_code', 'postal_locality', 'country'),
+        'phone_mobile',
+        ('phone_home', 'phone_work', 'phone_extra'),
         'address_list_email',
         ('user', 'send_activation_link', 'provision_gsuite_account'),
         'hundred_club',
