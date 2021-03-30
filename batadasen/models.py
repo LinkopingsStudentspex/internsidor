@@ -67,6 +67,11 @@ class Person(models.Model):
     wants_spexinfo = models.BooleanField('vill få spexinfo-mail', default=True)
     wants_trams = models.BooleanField('vill få trams-mail', default=False)
     wants_blandat = models.BooleanField('vill få blandat-mail', default=True)
+    email_active = models.BooleanField(
+        'mailadress aktiv',
+        default=True,
+        help_text='Är personens mailadress aktiv och fungerande? '
+                  'Om denna ruta kryssas ur kommer personen inte längre få några brev från spexets maillistor.')
     hundred_club = models.BooleanField('hundraklubben', default=False)
     deceased = models.BooleanField('avliden', default=False)
     address_changed_date = models.DateTimeField('adress ändrad', null=True, blank=True)
@@ -422,7 +427,7 @@ class EmailList(models.Model):
 
         valid_email_regex = r'^[^@]+@[^@]+$'
         pattern = re.compile(valid_email_regex)
-        valid_email = Q(email__regex=valid_email_regex)
+        valid_email = Q(email__regex=valid_email_regex) & Q(email_active=True)
         valid_persons = Person.objects.filter(valid_email)
 
         for person in self.opt_in_members.filter(valid_email):

@@ -73,8 +73,9 @@ class PersonAdmin(admin.ModelAdmin):
         'hundred_club',
         'deceased',
         ('wants_spexinfo', 'wants_blandat', 'wants_trams'),
+        'email_active',
         'notes',
-        'privacy_setting'
+        'privacy_setting',
     )
 
     list_display = [
