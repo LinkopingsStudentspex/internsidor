@@ -97,6 +97,11 @@ class PostfixTCPHandler(socketserver.BaseRequestHandler):
         
         alias = email_parts[0]
 
+        # Ignore lookup requests for other domains than our own
+        if email_parts[1] != django.conf.settings.EMAIL_DOMAIN:
+            self.request.sendall(pynetstring.encode('NOTFOUND '))
+            return
+
         # If it's a bounce address, send it to the 'list-bounces' list
         if bounce_pattern.match(alias) is not None:
             alias = 'list-bounces'
