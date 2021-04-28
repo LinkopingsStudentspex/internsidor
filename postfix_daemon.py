@@ -112,7 +112,7 @@ class PostfixTCPHandler(socketserver.BaseRequestHandler):
         if found == False:
             # Perhaps it's a username
             try:
-                user = User.objects.get(username__iexact=alias)
+                user = User.objects.annotate(username_lower=django.db.models.functions.Lower('username')).get(username_lower=alias.lower())
                 if user.person is not None and user.person.email is not None and user.person.email != '':
                     reply = 'OK {}'.format(user.person.email)
                     self.request.sendall(pynetstring.encode(reply))
