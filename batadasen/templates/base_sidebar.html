@@ -4,7 +4,7 @@
 {% load crispy_forms_tags %}
 
 {% block body %}
-    <div id="sidebar" class="col-md-2">
+    <div id="sidebar" class="col-md-3">
         <a class="nav-link" href="/">Start</a>
         <a class="nav-link" href="https://wiki.studentspex.se">Wiki</a>
         <a class="nav-link" href="{% url 'batadasen:person_settings' %}">Inställningar</a>
@@ -16,7 +16,7 @@
         <a class="nav-link" id="admin-link" href="{% url 'admin:index' %}">Admin</a>
         {% endif %}
     </div>
-    <div class="col-md-10">
+    <div class="col-md-9">
         {% block content %} {% endblock %}
     </div>
 {% endblock %}
