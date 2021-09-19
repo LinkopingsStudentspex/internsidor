@@ -491,16 +491,15 @@ class EmailList(models.Model):
             for person in valid_persons.filter(wants_trams=True):
                 person_set.add(person)
         elif self.alias == 'styrelse-kallelse':
-            active_productions = Production.objects.filter(closed=False)
-            for active_production in active_productions:
-                # Active 'directions'
-                for person in valid_persons.filter(production_memberships__group__production__closed=False, production_memberships__title__in=DIRECTION_TITLES):
-                    person_set.add(person)
-                # Auditors for active productions
-                for person in valid_persons.filter(production_memberships__group__production__closed=False, production_memberships__group__group_type__short_name='REV'):
-                    person_set.add(person)
+            # Active 'directions'
+            for person in valid_persons.filter(production_memberships__group__production__closed=False, production_memberships__title__in=DIRECTION_TITLES):
+                person_set.add(person)
+            # Auditors for active productions
+            for person in valid_persons.filter(production_memberships__group__production__closed=False, production_memberships__group__group_type__short_name='REV'):
+                person_set.add(person)
 
-            for activity in current_assoc_year.groups.get(Q(group_type__short_name='STYR') | Q(group_type__short_name='REV')).activities.all():
+            # Active association board and association auditors
+            for activity in AssociationActivity.objects.filter(group__in=current_assoc_year.groups.filter(Q(group_type__short_name='STYR') | Q(group_type__short_name='REV'))).all():
                 if activity.person.email is not None and re.fullmatch(pattern, activity.person.email) is not None:
                     person_set.add(activity.person)
         
