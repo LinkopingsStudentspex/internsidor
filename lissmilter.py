@@ -108,11 +108,13 @@ class LissMilter(Milter.Base):
         # Change From and Reply-To headers to improve deliverability
         if self.display_name == '':
             new_header_from = 'donotreply@{}'.format(mail_domain)
+            new_reply_to = self.header_from_addr
         else:
             new_header_from = '{} <donotreply@{}>'.format(self.display_name, mail_domain)
+            new_reply_to = '{} <{}>'.format(self.display_name, self.header_from_addr)
 
         self.chgheader('From', 0, new_header_from)
-        self.chgheader('Reply-To', 0, self.header_from_addr)
+        self.chgheader('Reply-To', 0, new_reply_to)
 
         return Milter.CONTINUE
 
