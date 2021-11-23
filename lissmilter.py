@@ -12,6 +12,7 @@ mail_domain = sys.argv[2]
 prod_list_patt = re.compile(r'^(spex|jubel)[0-9][0-9].*@' + mail_domain)
 mass_list_patt = re.compile(r'^(spexinfo|spex-info|blandat|trams)@' + mail_domain)
 summons_list_patt = re.compile(r'kallelse@' + mail_domain)
+display_name_patt = re.compile(r'^\s*(?P<display_name>[^<]+)<(?P<addr>\S+)>')
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'internsidor.settings.production')
 django.setup()
@@ -24,11 +25,13 @@ class LissMilter(Milter.Base):
 
     @Milter.noreply
     def envfrom(self, mail_from, *params):
-        self.from_addr = mail_from.lstrip("<").rstrip(">")
+        self.envelope_from = mail_from.lstrip("<").rstrip(">")
         self.from_params = params
         self.alias = ''
-        self.change_header = False
+        self.change_subject = False
         self.subject = ''
+        self.display_name = ''
+        self.header_from_addr = ''
         return Milter.CONTINUE
 
     def envrcpt(self, mail_to, *str):
@@ -57,7 +60,7 @@ class LissMilter(Milter.Base):
 
         valid_sender = True
 
-        has_this_email = Q(email__iexact=self.from_addr) | Q(address_list_email__iexact=self.from_addr) | Q(extra_email__email__iexact=self.from_addr)
+        has_this_email = Q(email__iexact=self.envelope_from) | Q(address_list_email__iexact=self.envelope_from) | Q(extra_email__email__iexact=self.envelope_from)
 
         if protected_list and not models.Person.objects.filter(has_this_email).exists():
             valid_sender = False
@@ -65,7 +68,7 @@ class LissMilter(Milter.Base):
         if extra_protected_list:
             current_assoc_year = models.get_current_assoc_year()
             try:
-                has_this_email = Q(person__email__iexact=self.from_addr) | Q(person__address_list_email__iexact=self.from_addr) | Q(person__extra_email__email__iexact=self.from_addr)
+                has_this_email = Q(person__email__iexact=self.envelope_from) | Q(person__address_list_email__iexact=self.envelope_from) | Q(person__extra_email__email__iexact=self.envelope_from)
                 if not current_assoc_year.groups.get(Q(group_type__short_name='STYR')).activities.filter(has_this_email).exists():
                     valid_sender = False
             except models.AssociationGroup.DoesNotExist:
@@ -73,10 +76,10 @@ class LissMilter(Milter.Base):
                 pass
 
         if not valid_sender:
-            self.setreply('554', '5.7.2', 'Sender <{}> not authorized for recipient ("{}"). Kontakta en ansvarig om du tycker det borde funka.'.format(self.from_addr, to))
+            self.setreply('554', '5.7.2', 'Sender <{}> not authorized for recipient ("{}"). Kontakta en ansvarig om du tycker det borde funka.'.format(self.envelope_from, to))
             return Milter.REJECT
 
-        self.change_header = is_production_list or is_mass_list or is_summons_list
+        self.change_subject = is_production_list or is_mass_list or is_summons_list
 
         return Milter.CONTINUE
 
@@ -84,14 +87,33 @@ class LissMilter(Milter.Base):
     def header(self, name, hval):
         if name.lower() == 'subject':
             self.subject = hval
+        if name.lower() == 'from':
+            name_match = display_name_patt.match(hval)
+            if name_match:
+                self.display_name = name_match.group('display_name').strip()
+                self.header_from_addr = name_match.group('addr').strip()
+            else:
+                self.display_name = ''
+                self.header_from_addr = hval
         return Milter.CONTINUE
 
     def eom(self):
         # We always need to change the sender address in case the sender uses SPF
         self.chgfrom('list-bounces@{}'.format(mail_domain))
-        if self.change_header:
+
+        if self.change_subject:
             if self.subject != '':
                 self.chgheader('Subject', 0, '[{}] {}'.format(self.alias.capitalize(), self.subject))
+
+        # Change From and Reply-To headers to improve deliverability
+        if self.display_name == '':
+            new_header_from = 'donotreply@{}'.format(mail_domain)
+        else:
+            new_header_from = '{} <donotreply@{}>'.format(self.display_name, mail_domain)
+
+        self.chgheader('From', 0, new_header_from)
+        self.chgheader('Reply-To', 0, self.header_from_addr)
+
         return Milter.CONTINUE
 
 
