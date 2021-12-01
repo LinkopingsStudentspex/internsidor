@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'django_filters',
     'crispy_forms',
     'assetmanager',
+    'showcounter',
     'ajax_select',
 ]
 
@@ -95,6 +96,8 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
