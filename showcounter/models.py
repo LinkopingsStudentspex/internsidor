@@ -24,14 +24,14 @@ class Performance(models.Model):
 
     number = models.AutoField(primary_key=True, verbose_name='nummer')
     date = models.DateField('datum')
-    time = models.TimeField('time', null=True)
-    notes = models.CharField(max_length=400, verbose_name='övrigt', blank=True)
+    time = models.TimeField('time', null=True, blank=True)
+    notes = models.CharField(max_length=400, verbose_name='övrigt', blank=True, help_text="Allmäna övriga anmärkningar om föreställningen")
     production = models.ForeignKey(Production, on_delete=models.CASCADE, verbose_name='uppsättning', related_name='performances')
     theatre = models.ForeignKey(Theatre, on_delete=models.CASCADE, verbose_name='teater', related_name='performances')
-    tag = models.CharField(verbose_name='tag', max_length=20, blank=True)
+    tag = models.CharField(verbose_name='tag', max_length=20, blank=True, help_text="Vilken typ av föreställning, t.ex. Premiär, Genrep, Extra")
 
     def __str__(self):
-        return '{} - {}'.format(self.production.main_title, self.date)
+        return f"({self.number}) {self.production.main_title} - {self.date}"
 
 
 class Participation(models.Model):

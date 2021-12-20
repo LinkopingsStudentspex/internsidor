@@ -1,0 +1,73 @@
+{% extends 'base_sidebar.html' %}
+{% load i18n %}
+
+{% block title %}Räkna föreställningar{% endblock %}
+
+{% block content %}
+
+<h2>Räkna föreställningar i {{ production.main_title }}</h2>
+
+
+<div class="col">
+
+    <form method="POST">
+        {% csrf_token %}
+
+        {{ performance_formset.management_form }}
+
+        <div>
+            <div class="row">
+                <div class="col">
+                    Nummer
+                </div>
+                <div class="col">
+                    Anm
+                </div>
+                <div class="col">
+                    Datum
+                </div>
+                <div class="col">
+                    Teater
+                </div>
+                <div class="col">
+                    Medverkat?
+                </div>
+            </div>
+
+            {% for form in performance_formset %}
+            <div class="row">
+                {% if form.non_field_errors %}
+                <div class="row">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+
+                <div class="col">
+                    {{ form.number }}
+                    {{ form.number.errors }}
+                    {{ form.number.value }}
+                </div>
+                <div class="col">
+                    {{ form.tag.value }}
+                </div>
+                <div class="col">
+                    {{ form.date.value|date:"Y-m-d" }}
+                </div>
+                <div class="col">
+                    {{ form.theatre.value }}
+                </div>
+                <div class="col">
+                    {{ form.participated.errors }}
+                    {{ form.participated }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="col-md-4 offset-md-8">
+            <a role="button" class="btn btn-secondary" href="{% url 'showcounter:overview' %}">Tillbaka</a>
+            <button type="submit" class="btn btn-primary">Spara</button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

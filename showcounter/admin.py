@@ -10,6 +10,14 @@ class TheatreAdmin(admin.ModelAdmin):
 class PerformanceAdmin(admin.ModelAdmin):
     model = models.Performance
     search_fields = ['production__year', 'production__short_name', 'production__main_title', 'date', 'theatre__name']
+    fields = [
+        'production',
+        'tag',
+        'date',
+        'time',
+        'theatre',
+        'notes',
+    ]
 
     autocomplete_fields = ['theatre']
 
