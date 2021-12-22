@@ -1,4 +1,4 @@
-{% extends 'base_sidebar.html' %}
+{% extends 'base.html' %}
 {% load i18n %}
 
 {% block title %}Inställningar{% endblock %}
@@ -8,6 +8,8 @@
 {% block content %}
 
 {% if object %}
+
+<div class="col-xl-6">
 
 <h2>Inställningar och personuppgifter</h2>
 
@@ -52,6 +54,8 @@ Användarnamn: {{ object.user.username }}
 </ul>
 <p><a href="{% url 'batadasen:person_extra_email' %}">Lägg till ny mailadress</a></p>
 <p>Kontakta någon i styrelsen eller directionen om du vill ta bort en mailadress.</p>
+</div>
+
 </div>
 
 {% else %}

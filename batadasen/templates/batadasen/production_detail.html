@@ -1,9 +1,10 @@
-{% extends 'base_sidebar.html' %}
+{% extends 'base.html' %}
 {% load i18n %}
 
 {% block title %}Uppsättningslista {{ object.short_name }}{% endblock %}
 
 {% block content %}
+<div class="col-xl-8">
 <h2>{{ object.short_name }} - {{ object.main_title }}</h2>
 
 <p>Om bakgrunden är röd så är personen inte medlem i föreningen.</p>
@@ -35,5 +36,7 @@ Om bakgrunden är gul så har personen valt att dölja sina personuppgifter för
 {% endfor %}
 {% endfor %}
 </table>
+
+</div>
 
 {% endblock %}

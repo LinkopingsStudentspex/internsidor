@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> {% load static %}
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -26,12 +27,51 @@
 
 <body>
     {% load i18n %}
-    <div class="container h-100">
-        <div class="row h-100 justify-content-center">
-            {% block body %}
-            {% endblock %}
+    <div id="wrapper">
+        <div id="sidebar-wrapper">
+            <ul class="sidebar-nav">
+                <li class="sidebar-brand">
+                    <a href="/">
+                        <img src="{% static 'images/lisse.png' %}">
+                    </a>
+                    <a class="nav-link" href="/">Hem</a>
+                </li>
+                <li>
+                    <a class="nav-link" href="https://wiki.studentspex.se">Till wikin</a>
+                </li>
+                <li>
+                    <a class="nav-link" href="{% url 'batadasen:person_settings' %}">Inställningar</a>
+                </li>
+                {% if request.user.is_authenticated %}
+                <li>
+                    <form id="logout-form" action="{% url 'oidc_logout' %}" method="post">
+                        {% csrf_token %}
+                    </form>
+                    <a class="nav-link" href="#" onclick="document.forms['logout-form'].submit();">Logga ut</a>
+                </li>
+                {% endif %}
+                {% if request.user.is_staff %}
+                <li>
+                    <a class="nav-link" id="admin-link" href="{% url 'admin:index' %}">Admin</a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+        <div id="page-content-wrapper">
+            <div id="page-header" class="row">
+                <button class="btn btn-outline-secondary" onclick="toggleSidebar()">&#8801;</button>
+            </div>
+            <div id="main-container" class="container-fluid">
+                {% block content %} {% endblock %}
+            </div>
         </div>
     </div>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById("wrapper").classList.toggle("toggled");
+        }
+    </script>
 </body>
 
 </html>
