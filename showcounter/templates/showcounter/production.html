@@ -11,10 +11,10 @@
 <div class="col-xl-8">
 
     <div>
-        Markera/avmarkera alla denna uppsättning: <input type='checkbox' name='Setall' onClick='setall(document.getElementById("theform"), this)'>
+        Markera/avmarkera alla denna uppsättning: <input type='checkbox' name='Setall' onClick='setall(document.getElementById("performance_form"), this)'>
     </div>
 
-    <form id="theform" method="POST">
+    <form id="performance_form" method="POST">
         {% csrf_token %}
 
         {{ performance_formset.management_form }}
@@ -22,21 +22,11 @@
         <table class="table table-sm table-striped">
             <thead>
                 <tr>
-                    <th>
-                        Nummer
-                    </th>
-                    <th>
-                        Anm
-                    </th>
-                    <th>
-                        Datum
-                    </th>
-                    <th>
-                        Teater
-                    </th>
-                    <th>
-                        Medverkat?
-                    </th>
+                    <th> Nummer </th>
+                    <th> Anm </th>
+                    <th> Datum </th>
+                    <th> Teater </th>
+                    <th> Medverkat? </th>
                 </tr>
             </thead>
 
@@ -56,15 +46,9 @@
                     {{ form.number.errors }}
                     {{ form.number.value }}
                 </td>
-                <td>
-                    {{ form.tag.value }}
-                </td>
-                <td>
-                    {{ form.date.value|date:"Y-m-d" }}
-                </td>
-                <td>
-                    {{ form.theatre.value }}
-                </td>
+                <td> {{ form.tag.value }} </td>
+                <td> {{ form.date.value|date:"Y-m-d" }} </td>
+                <td> {{ form.theatre.value }} </td>
                 <td>
                     {{ form.participated.errors }}
                     {{ form.participated }}

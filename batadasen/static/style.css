@@ -5,9 +5,6 @@ html, body {
 #wrapper {
     padding-left: 0;
     height: 100%;
-    -webkit-transition: all 0.2s ease;
-    -moz-transition: all 0.2s ease;
-    -o-transition: all 0.2s ease;
     transition: all 0.2s ease;
 }
 
@@ -32,9 +29,6 @@ For large screens, the presence of .toggled hides the sidebar.
     top: 0;
     overflow-y: auto;
     background: #eeeeee;
-    -webkit-transition: all 0.2s ease;
-    -moz-transition: all 0.2s ease;
-    -o-transition: all 0.2s ease;
     transition: all 0.2s ease;
 }
 
@@ -69,9 +63,6 @@ For large screens, the presence of .toggled hides the sidebar.
     width: 100%;
     top: 0;
     margin-left: 0px;
-    -webkit-transition: all 0.2s ease;
-    -moz-transition: all 0.2s ease;
-    -o-transition: all 0.2s ease;
     transition: all 0.2s ease;
 }
 
@@ -82,16 +73,13 @@ For large screens, the presence of .toggled hides the sidebar.
     margin-left: -50px;
 }
 
-#main-container {
+main {
     margin-top: 50px;
     padding-top: 10px;
-    -webkit-transition: all 0.2s ease;
-    -moz-transition: all 0.2s ease;
-    -o-transition: all 0.2s ease;
     transition: all 0.2s ease;
 }
 
-#wrapper.toggled #main-container {
+#wrapper.toggled main {
     margin-top: 0px;
 }
 
@@ -121,12 +109,12 @@ For large screens, the presence of .toggled hides the sidebar.
         margin-right: 0;
     }
 
-    #main-container {
+    main {
         margin-top: 0px;
         padding-left: 50px;
     }
 
-    #wrapper.toggled #main-container {
+    #wrapper.toggled main {
         margin-top: 60px;
     }
 
