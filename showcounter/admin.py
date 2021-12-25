@@ -14,7 +14,7 @@ class PerformanceAdmin(admin.ModelAdmin):
         'production',
         'tag',
         'date',
-        'time',
+        'start_time',
         'theatre',
         'notes',
     ]

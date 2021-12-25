@@ -311,7 +311,7 @@ def import_showcounter(data):
             performance = showcounter.models.Performance(number=json_forestallning['nummer'])
 
         performance.date = json_forestallning['datum']
-        performance.time = json_forestallning['tid']
+        performance.start_time = json_forestallning['tid']
         performance.notes = non_null_or_blank(json_forestallning['ovrigt'])
         performance.production = batadasen.models.Production.objects.get(number=json_forestallning['uppsattning'])
         performance.theatre = showcounter.models.Theatre.objects.get(id=json_forestallning['teater'])
