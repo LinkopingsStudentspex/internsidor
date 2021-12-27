@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}Räkna föreställningar{% endblock %}
+
+{% block content %}
+
+<h2>Räkna föreställningar i {{ production.short_name }} - {{ production.main_title }}</h2>
+
+
+<div class="col-xl-8">
+
+    <div>
+        Markera/avmarkera alla denna uppsättning: <input type='checkbox' name='Setall' onClick='setall(document.getElementById("performance_form"), this)'>
+    </div>
+
+    <form id="performance_form" method="POST">
+        {% csrf_token %}
+
+        {{ performance_formset.management_form }}
+
+        <table class="table table-sm table-striped">
+            <thead>
+                <tr>
+                    <th> Nummer </th>
+                    <th> Anm </th>
+                    <th> Datum </th>
+                    <th> Teater </th>
+                    <th> Medverkat? </th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for form in performance_formset %}
+            <tr>
+                {% if form.non_field_errors %}
+                <td>
+                    {{ form.non_field_errors }}
+                </td>
+                {% endif %}
+            </tr>
+            <tr>
+                <td>
+                    {{ form.number }}
+                    {{ form.number.errors }}
+                    {{ form.number.value }}
+                </td>
+                <td> {{ form.tag.value }} </td>
+                <td> {{ form.date.value|date:"Y-m-d" }} </td>
+                <td> {{ form.theatre.value }} </td>
+                <td>
+                    {{ form.participated.errors }}
+                    {{ form.participated }}
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div style="display: flex; justify-content: flex-end">
+            <a role="button" class="btn btn-secondary" href="{% url 'showcounter:overview' %}">Tillbaka</a>
+            <button type="submit" class="btn btn-primary" style="margin-left: 5px">Spara</button>
+        </div>
+    </form>
+</div>
+
+<script>
+function setall(form, source) {
+    form.querySelectorAll("input[type='checkbox']").forEach(function(box) {
+        box.checked = source.checked; 
+    });
+}
+</script>
+
+{% endblock %}

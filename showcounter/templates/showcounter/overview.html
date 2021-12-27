@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}Räkna föreställningar{% endblock %}
+
+{% block content %}
+
+<h2>Räkna föreställningar du varit med på!</h2>
+
+<p>
+Den här sidan är främst tänkt som ett stöd för att som spexare räkna hur många föreställningar man har varit med på.
+</p>
+<p>
+Se <a href="https://wiki.studentspex.se/index.php?title=100-klubben">wikisidan för 100-klubben</a> för lite riktlinjer över hur man kan räkna.
+</p>
+
+<p><b>Medlem {{ request.user.person.member_number }}, {{ request.user.person.full_name }}, har medverkat vid totalt {{ total_participations }} föreställningar</b>.</p>
+<p>Välj en uppsättning nedan för att redigera vilka föreställningar du medverkat vid:</p>
+
+<div class="col-sm-8">
+
+<table class="table table-sm">
+    <tr>
+        <th>
+            År
+        </th>
+        <th>
+            Uppsättning
+        </th>
+        <th>
+            Antal
+        </th>
+    </tr>
+{% for production in productions %}
+    <tr>
+        <td>
+            {{ production.year }}
+        </td>
+        <td>
+            <a href="{% url 'showcounter:production' production.number %}">{{ production.main_title }}</a>
+        </td>
+        <td>
+            {{ production.num_participations }}
+        </td>
+    </tr>
+{% endfor %}
+</table>
+</div>
+
+{% endblock %}

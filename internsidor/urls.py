@@ -35,6 +35,7 @@ if 'mozilla_django_oidc' in settings.INSTALLED_APPS:
         path('admin/', admin.site.urls),
         path('batadasen/', include('batadasen.urls')),
         path('lissinv/', include('assetmanager.urls')),
+        path('showcounter/', include('showcounter.urls')),
         path('ajax_select/', include(ajax_select_urls)),
         path('oidc/', include('mozilla_django_oidc.urls')),
         path('', batadasen.views.index_view)
@@ -44,6 +45,7 @@ else:
         path('admin/', admin.site.urls),
         path('batadasen/', include('batadasen.urls')),
         path('lissinv/', include('assetmanager.urls')),
+        path('showcounter/', include('showcounter.urls')),
         path('ajax_select/', include(ajax_select_urls)),
 
         # A simple login view for dev setups that don't have keycloak available
