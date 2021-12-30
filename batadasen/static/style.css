@@ -42,7 +42,8 @@ For large screens, the presence of .toggled hides the sidebar.
     height: 50px;
     font-size: 30px;
     padding: 0;
-    color: #333;
+    color: #555;
+    border-color: #ccc;
 }
 
 #page-content-wrapper {
