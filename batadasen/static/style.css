@@ -13,7 +13,7 @@ The .toggled class toggles if the default behaviour of the sidebar should be use
 leaving the #wrapper div without .toggled.
 
 For small screens, the sidebar should be hidden by default and shown when .toggled is set on #wrapper.
-For large screens, the presence of .toggled hides the sidebar. 
+For large screens, the presence of .toggled hides the sidebar.
 */
 #wrapper.toggled {
     padding-left: 250px;
@@ -139,40 +139,37 @@ main {
     margin: 0;
     padding: 0;
     list-style: none;
+    height: 100%;
+    flex-wrap: nowrap;
 }
 
-.sidebar-nav li {
-    text-indent: 20px;
-    line-height: 40px;
-}
-
-.sidebar-nav li a {
+.sidebar-nav a {
     display: block;
     text-decoration: none;
-    color: #999999;
+    color: #555;
+    text-indent: 16px;
+    line-height: 24px;
 }
 
-.sidebar-nav li a:hover {
+.sidebar-nav a:hover {
     text-decoration: none;
     color: #fff;
     background: rgba(0,0,0,0.2);
 }
 
-.sidebar-nav li a:active,
-.sidebar-nav li a:focus {
-    text-decoration: none;
-}
-
 .sidebar-nav > .sidebar-brand {
-    margin: 30px 0 30px 0;
+    margin: 24px 0 0 24px;
 }
 
-.sidebar-nav > .sidebar-brand a {
-    color: #999999;
-}
-
-.sidebar-nav > .sidebar-brand a:hover {
+.sidebar-nav > .sidebar-brand:hover {
     background: none;
+}
+
+.sidebar-nav > h5 {
+    margin: 16px 0 4px 0;
+    font-weight: 100;
+    font-size: 12px;
+    text-indent: 16px;
 }
 
 .sidebar-brand img {
@@ -180,8 +177,8 @@ main {
     margin-right: auto;
 }
 
-#admin-link {
-    margin-top: 50px;
+#admin-link, .logout{
+    margin-top: auto;
 }
 
 .table {
@@ -221,4 +218,3 @@ td.table-cell {
     margin-top: 20px;
     margin-bottom: 30px;
 }
-

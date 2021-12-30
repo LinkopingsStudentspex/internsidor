@@ -31,33 +31,29 @@
     {% load i18n %}
     <div id="wrapper">
         <div id="sidebar-wrapper">
-            <ul class="sidebar-nav">
-                <li class="sidebar-brand">
-                    <a href="/">
-                        <img src="{% static 'images/lisse.png' %}">
-                    </a>
-                </li>
-                <li>
-                  <a class="nav-link" href="/">Hem</a>
-                </li>
-                <li>
-                    <a class="nav-link" href="https://wiki.studentspex.se">Till wikin</a>
-                </li>
-                <li>
-                    <a class="nav-link" href="{% url 'batadasen:person_settings' %}">Inställningar</a>
-                </li>
+            <nav class="sidebar-nav nav flex-column">
+                <a class="sidebar-brand" href="/"><img src="{% static 'images/lisse.png' %}"></a>
+                <h5>Spextjänster</h5>
+                <a class="nav-link" href="https://wiki.studentspex.se">Wiki</a>
+                <a class="nav-link" href="https://spexflix.studentspex.se">Spexflix</a>
+                <h5>Internsidor</h5>
+                <a class="nav-link" href="{% url 'batadasen:person_settings' %}">Inställningar</a>
+                <a class="nav-link" href="{% url 'batadasen:production_list' %}">Uppsättningar</a>
+                <a class="nav-link" href="{% url 'batadasen:emaillist_list' %}">Epostlistor</a>
+                <a class="nav-link" href="{% url 'assetmanager:asset_list' %}">Inventarier</a>
+                <a class="nav-link" href="{% url 'showcounter:overview' %}">Föreställningsräknare</a>
+                <h5>Gamla internsidor</h5>
+                <a class="nav-link" href="https://old.studentspex.se/nominera/index.php">Nominera</a>
+                <a class="nav-link" href="https://old.studentspex.se/ansokan/index.php">Internansökan</a>
+                <a class="nav-link" href="https://old.studentspex.se/spexpay/index.php">Spexpay</a>
                 {% if request.user.is_authenticated %}
-                <li>
-                    <form id="logout-form" action="{% url 'oidc_logout' %}" method="post">
-                        {% csrf_token %}
-                    </form>
-                    <a class="nav-link" href="#" onclick="document.forms['logout-form'].submit();">Logga ut</a>
-                </li>
+                <form id="logout-form" action="{% url 'oidc_logout' %}" method="post">
+                  {% csrf_token %}
+                </form>
+                <a class="nav-link logout" href="#" onclick="document.forms['logout-form'].submit();">Logga ut</a>
                 {% endif %}
                 {% if request.user.is_staff %}
-                <li>
-                    <a class="nav-link" id="admin-link" href="{% url 'admin:index' %}">Admin</a>
-                </li>
+                <a class="nav-link" id="admin-link" href="{% url 'admin:index' %}">Admin</a>
                 {% endif %}
             </ul>
         </div>
