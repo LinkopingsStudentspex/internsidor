@@ -21,7 +21,23 @@ I detta projekt finns för närvarande två appar:
 Filer för frontend-utveckling finns i mappen `batadasen/templates/batadasen` och `batadasen/static/batadasen`. Html-filerna är Django-templates som återanvänder kod genom att `base.html` innehåller den grundläggande html-strukturen och sedan fyller varje templatefil sen på själva `content`-blocket med rätt innehåll. 
 
 ## Utvecklingsmiljö
-Django har en inbyggd utvecklingsserver som man kan använda för lokal utveckling. Innan du kan komma igång behöver du ha installerat Python 3.6 eller högre.
+Django har en inbyggd utvecklingsserver som man kan använda för lokal utveckling. Innan du kan komma igång behöver du ha installerat Python 3.6 eller högre. Det är också starkt rekommenderat att du sköter utveckilengen i en så kallad virtuella miljö, inte att förväxla med en virtuell maskin.
+
+1. Skapa först den virtuella miljön:
+   ```
+   python3 -m venv virtual-environment
+   ```
+   Vad det i praktiken gör är att det skapar en mapp `virtual-environment` som kommer innehålla en pythoninstallation separat från operativsystemets.
+   
+   Var gång du sedan ska utveckla internsidorna ska du börja med att "aktivera" den här utvecklingsmiljön i ditt skal:
+   ```
+   # På Linux, Mac OS eller Windows POSIX-kompabilitetslager likt WSL och MingW
+   source virtual-environment/bin/activate 
+   # På Windows med cmd
+   virtual-environment\Scripts\activate.bat
+   # På Windows med PowerShell
+   virtual-environment\Scripts\activate.ps1
+   ```
 
 1. För att snabbt installera alla python-dependencies som behövs kan man köra följande:
     ```

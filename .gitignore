@@ -1,6 +1,8 @@
+# Project specific
 db.sqlite3
 .vscode
 .venv
+virtual-environment
 *.pyc
 internsidor/settings/local.py
 
