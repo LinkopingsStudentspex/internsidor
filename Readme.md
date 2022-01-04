@@ -39,23 +39,23 @@ Django har en inbyggd utvecklingsserver som man kan använda för lokal utveckli
    virtual-environment\Scripts\activate.ps1
    ```
 
-1. För att snabbt installera alla python-dependencies som behövs kan man köra följande:
+2. För att snabbt installera alla python-dependencies som behövs kan man köra följande:
     ```
     python3 -m pip install -r requirements.txt
     ```
 
-2. Initialisera en lokal databasfil med:
+3. Initialisera en lokal databasfil med:
     ```
     python manage.py migrate
     ```
     Filen "db.sqlite3" kommer skapas.
 
-3. För att kunna använda admingränssnittet behöver man skapa en superanvändare med:
+4. För att kunna använda admingränssnittet behöver man skapa en superanvändare med:
     ```
     python manage.py createsuperuser
     ```
 
-4. Starta utvecklingsservern med:
+5. Starta utvecklingsservern med:
     ```
     python manage.py runserver
     ```
