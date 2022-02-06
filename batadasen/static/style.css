@@ -180,8 +180,8 @@ main {
     max-height: 80px;
 }
 
-#admin-link, .logout{
-    margin-top: auto;
+.sidebar-nav > span.spacer {
+	flex-grow: 1;
 }
 
 .table {
