@@ -44,6 +44,7 @@
                 <a class="nav-link" href="https://old.studentspex.se/nominera/index.php">Nominera</a>
                 <a class="nav-link" href="https://old.studentspex.se/ansokan/index.php">Internansökan</a>
                 <a class="nav-link" href="https://old.studentspex.se/spexpay/index.php">Spexpay</a>
+                <span class="spacer"></span>
                 {% if request.user.is_authenticated %}
                 <form id="logout-form" action="{% url 'oidc_logout' %}" method="post">
                   {% csrf_token %}
