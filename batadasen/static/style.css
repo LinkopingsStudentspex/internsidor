@@ -21,7 +21,7 @@ For large screens, the presence of .toggled hides the sidebar.
 
 #sidebar-wrapper {
     z-index: 1000;
-    position: fixed;
+    position: absolute;
     left: 250px;
     width: 0;
     height: 100%;
