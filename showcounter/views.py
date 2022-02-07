@@ -60,19 +60,16 @@ def production(request, number):
                     Participation.objects.filter(performance__number=number, person=user.person).delete()
             return redirect('showcounter:overview')
 
-        performances = Performance.objects.filter(production=production).annotate(
-            participated=ExpressionWrapper(Count(
-                'participants', 
-                filter=Q(participants__person__member_number=user.person.member_number)
-            ), output_field=BooleanField())).order_by('date')
+        performances = Performance.objects.filter(production=production).order_by('date')
         initial = []
         for performance in performances:
+            current_user_participated = performance.participants.filter(person__member_number=user.person.member_number).exists()
             initial.append({
                 'number': performance.number,
                 'tag': performance.tag,
                 'date': performance.date,
                 'theatre': performance.theatre.name,
-                'participated': performance.participated,
+                'participated': current_user_participated,
             })
     
         context['performance_formset'] = PerformanceFormSet(initial=initial)
