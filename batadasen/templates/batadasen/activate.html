@@ -1,18 +1,42 @@
-{% extends 'base.html' %}
-{% load i18n %}
+<!doctype html>
+<html>
 
-{% block title %}Aktivera konto{% endblock %}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> {% load static %}
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-{% load crispy_forms_tags %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
-{% block body %}
+    <link rel="stylesheet" href="{% static 'style.css' %}" />
 
-<p>Här sätter du användarnamnet för ditt nya konto.</p>
+    <link rel="icon" href="/static/images/lisse-combined-256-to-16.ico" sizes="16x16 32x32 48x48 64x64 128x128" type="image/vnd.microsoft.icon">
 
-<div>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
 
-{% crispy form form.helper %}
 
-</div>
+    <title>Aktivera konto</title>
+</head>
 
-{% endblock %}
+<body>
+    {% load i18n %}
+    <div id="wrapper">
+        <div id="page-content-wrapper">
+            <main class="container-fluid">
+                {% load crispy_forms_tags %}
+                <p>Här sätter du användarnamnet för ditt nya konto.</p>
+                <div>
+                    {% crispy form form.helper %}
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+
+</html>
