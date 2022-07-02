@@ -98,11 +98,15 @@ class Person(models.Model):
     
     @property
     def currently_member(self):
-        current_standard_member = Q(year=get_current_assoc_year(), membership_type=AssociationMembership.MembershipType.STANDARD)
-        honorary_member = Q(year__lte=get_current_assoc_year(), membership_type=AssociationMembership.MembershipType.HONORARY)
-        lifetime_member = Q(year__lte=get_current_assoc_year(), membership_type=AssociationMembership.MembershipType.LIFETIME)
-        
-        return self.association_memberships.filter(current_standard_member | honorary_member | lifetime_member).exists()
+        current_assoc_year = get_current_assoc_year()
+        if current_assoc_year is not None:
+            current_standard_member = Q(year=current_assoc_year, membership_type=AssociationMembership.MembershipType.STANDARD)
+            honorary_member = Q(year__lte=current_assoc_year, membership_type=AssociationMembership.MembershipType.HONORARY)
+            lifetime_member = Q(year__lte=current_assoc_year, membership_type=AssociationMembership.MembershipType.LIFETIME)
+
+            return self.association_memberships.filter(current_standard_member | honorary_member | lifetime_member).exists()
+        else:
+            return False
     
     @property
     def display_email(self):
@@ -236,7 +240,10 @@ class AssociationYear(models.Model):
     
 
 def get_current_assoc_year():
-    return AssociationYear.objects.get(end_year=get_current_assoc_end_year())
+    try:
+        return AssociationYear.objects.get(end_year=get_current_assoc_end_year())
+    except AssociationYear.DoesNotExist:
+        return None
     
 
 class AssociationGroupType(models.Model):
@@ -467,21 +474,8 @@ class EmailList(models.Model):
             for person in valid_persons.filter(Q(production_memberships__title=title) | Q(association_activities__title=title)):
                 person_set.add(person)
         
-        current_assoc_year = get_current_assoc_year()
-
-        for group_type in self.active_association_groups.all():
-            for person in valid_persons.filter(association_activities__group__group_type=group_type, association_activities__group__year=current_assoc_year):
-                person_set.add(person)
-        
         # Additional includes for special lists
-        if self.alias == 'kallelse':
-            current_standard_member = Q(year=get_current_assoc_year(), membership_type=AssociationMembership.MembershipType.STANDARD)
-            honorary_member = Q(year__lte=get_current_assoc_year(), membership_type=AssociationMembership.MembershipType.HONORARY)
-            lifetime_member = Q(year__lte=get_current_assoc_year(), membership_type=AssociationMembership.MembershipType.LIFETIME)
-            for membership in AssociationMembership.objects.filter(current_standard_member | honorary_member | lifetime_member):
-                if membership.person.email is not None and re.fullmatch(pattern, membership.person.email) is not None:
-                    person_set.add(membership.person)
-        elif self.alias == 'spexinfo':
+        if self.alias == 'spexinfo':
             for person in valid_persons.filter(wants_spexinfo=True):
                 person_set.add(person)
         elif self.alias == 'blandat':
@@ -490,28 +484,44 @@ class EmailList(models.Model):
         elif self.alias == 'trams':
             for person in valid_persons.filter(wants_trams=True):
                 person_set.add(person)
-        elif self.alias == 'styrelse-kallelse':
-            # Active 'directions'
-            for person in valid_persons.filter(production_memberships__group__production__closed=False, production_memberships__title__in=DIRECTION_TITLES):
-                person_set.add(person)
-            # Auditors for active productions
-            for person in valid_persons.filter(production_memberships__group__production__closed=False, production_memberships__group__group_type__short_name='REV'):
-                person_set.add(person)
 
-            # Active association board and association auditors
-            for activity in AssociationActivity.objects.filter(group__in=current_assoc_year.groups.filter(Q(group_type__short_name='STYR') | Q(group_type__short_name='REV'))).all():
-                if activity.person.email is not None and re.fullmatch(pattern, activity.person.email) is not None:
-                    person_set.add(activity.person)
-        
-        # Direct title-specific emails to the currently active title holder.
-        # Currently only for board members.
-        try:
-            title = Title.objects.get(email_alias=self.alias)
-            for activity in current_assoc_year.groups.get(group_type__short_name='STYR').activities.filter(title=title):
-                if activity.person.email is not None and re.fullmatch(pattern, activity.person.email) is not None:
-                    person_set.add(activity.person)
-        except Title.DoesNotExist:
-            pass
+        current_assoc_year = get_current_assoc_year()
+
+        # Only makes sense to run the following if there is an actual association year active
+        if current_assoc_year is not None:
+            for group_type in self.active_association_groups.all():
+                for person in valid_persons.filter(association_activities__group__group_type=group_type, association_activities__group__year=current_assoc_year):
+                    person_set.add(person)
+
+            if self.alias == 'kallelse':
+                current_standard_member = Q(year=current_assoc_year, membership_type=AssociationMembership.MembershipType.STANDARD)
+                honorary_member = Q(year__lte=current_assoc_year, membership_type=AssociationMembership.MembershipType.HONORARY)
+                lifetime_member = Q(year__lte=current_assoc_year, membership_type=AssociationMembership.MembershipType.LIFETIME)
+                for membership in AssociationMembership.objects.filter(current_standard_member | honorary_member | lifetime_member):
+                    if membership.person.email is not None and re.fullmatch(pattern, membership.person.email) is not None:
+                        person_set.add(membership.person)
+            elif self.alias == 'styrelse-kallelse':
+                # Active 'directions'
+                for person in valid_persons.filter(production_memberships__group__production__closed=False, production_memberships__title__in=DIRECTION_TITLES):
+                    person_set.add(person)
+                # Auditors for active productions
+                for person in valid_persons.filter(production_memberships__group__production__closed=False, production_memberships__group__group_type__short_name='REV'):
+                    person_set.add(person)
+
+                # Active association board and association auditors
+                for activity in AssociationActivity.objects.filter(group__in=current_assoc_year.groups.filter(Q(group_type__short_name='STYR') | Q(group_type__short_name='REV'))).all():
+                    if activity.person.email is not None and re.fullmatch(pattern, activity.person.email) is not None:
+                        person_set.add(activity.person)
+
+            # Direct title-specific emails to the currently active title holder.
+            # Currently only for board members.
+            try:
+                title = Title.objects.get(email_alias=self.alias)
+                for activity in current_assoc_year.groups.get(group_type__short_name='STYR').activities.filter(title=title):
+                    if activity.person.email is not None and re.fullmatch(pattern, activity.person.email) is not None:
+                        person_set.add(activity.person)
+            except Title.DoesNotExist:
+                pass
 
         # Last of all, handle opt out requests
         for person in self.opt_out_members.all():
