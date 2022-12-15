@@ -42,11 +42,11 @@ class Person(models.Model):
         permissions = [
             ("view_private_info", "Kan se all personinfo oavsett personens inställningar")
         ]
-    
+
     class PrivacySetting(models.TextChoices):
         PRIVATE = 'PVT', 'Privat' # Invisible except for admins
         OPEN = 'OPN', 'Öppen' # Other members can see everything.
-    
+
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='användare', related_name='person')
 
     member_number = models.PositiveIntegerField('medlemsnummer', default=get_next_member_number, primary_key=True)
@@ -78,10 +78,10 @@ class Person(models.Model):
     mail_changed_date = models.DateTimeField('mail ändrad', null=True, blank=True)
     notes = models.TextField('övrigt', max_length=1000, null=True, blank=True)
     privacy_setting = models.CharField(
-        'sekretessnivå', 
-        max_length=3, 
-        choices=PrivacySetting.choices, 
-        default=PrivacySetting.OPEN, 
+        'sekretessnivå',
+        max_length=3,
+        choices=PrivacySetting.choices,
+        default=PrivacySetting.OPEN,
         help_text='Privat: endast administratörer kan se dina personuppgifter. '
                   'Öppen: andra inloggade kan se all din information. '
                   'Inga personuppgifter kommer någonsin vara synliga för icke-inloggade.')
@@ -95,7 +95,7 @@ class Person(models.Model):
 
     def __str__(self):
         return '({}) {}'.format(self.member_number, self.full_name)
-    
+
     @property
     def currently_member(self):
         current_assoc_year = get_current_assoc_year()
@@ -107,7 +107,7 @@ class Person(models.Model):
             return self.association_memberships.filter(current_standard_member | honorary_member | lifetime_member).exists()
         else:
             return False
-    
+
     @property
     def display_email(self):
         if self.address_list_email != '':
@@ -120,7 +120,7 @@ class Person(models.Model):
         if Person.objects.exclude(member_number=self.member_number).filter(email__iexact=self.email).exists():
             raise ValidationError({'email': 'En person med denna mailadress finns redan.'})
         super(Person, self).validate_unique(exclude)
-        
+
 
 def generate_activation_token():
     return crypto.get_random_string(length=50)
@@ -147,7 +147,7 @@ class ExtraEmail(models.Model):
         verbose_name_plural = 'extra mailadresser'
         unique_together = ['person', 'email']
         ordering = ['person']
-    
+
     person = models.ForeignKey(Person, models.CASCADE, verbose_name='person', related_name='extra_email')
     email = models.EmailField('mail')
 
@@ -200,19 +200,19 @@ class Title(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 
 class ProductionGroupType(models.Model):
     class Meta:
         verbose_name = 'uppsättningsgrupptyp'
         verbose_name_plural = 'uppsättningsgrupptyper'
         ordering = ['short_name']
-    
+
     short_name = models.CharField('kortnamn', max_length=50, primary_key=True)
     name = models.CharField('namn', max_length=50)
     priority = models.IntegerField('prioritet', default=0)
     exclude_from_production_email = models.BooleanField('uteslut från uppsättningslistor', default=False, help_text='Uteslut grupper av denna typ från att vara med på maillistor för hela uppsättningar?')
-    
+
     def __str__(self):
         return "{} ({})".format(self.name, self.short_name)
 
@@ -231,31 +231,31 @@ class AssociationYear(models.Model):
 
     def get_start_time(self):
         return datetime.datetime(self.end_year-1, 7, 1, 0, 0, 0)
-    
+
     def get_end_time(self):
         return datetime.datetime(self.end_year, 6, 30, 23, 59, 59)
 
     def __str__(self):
         return '{:02}/{:02}'.format((self.end_year - 1) % 100, self.end_year % 100)
-    
+
 
 def get_current_assoc_year():
     try:
         return AssociationYear.objects.get(end_year=get_current_assoc_end_year())
     except AssociationYear.DoesNotExist:
         return None
-    
+
 
 class AssociationGroupType(models.Model):
     class Meta:
         verbose_name = 'föreningsgrupptyp'
         verbose_name_plural = 'föreningsgrupptyper'
         ordering = ['short_name']
-    
+
     short_name = models.CharField('kortnamn', max_length=10, primary_key=True)
     name = models.CharField('namn', max_length=50)
     priority = models.IntegerField('prioritet', default=0)
-    
+
     def __str__(self):
         return self.name
 
@@ -266,7 +266,7 @@ class AssociationGroup(models.Model):
         verbose_name_plural = 'föreningsgrupp'
         unique_together = [['year', 'group_type']]
         ordering = ['group_type','year']
-    
+
     year = models.ForeignKey(AssociationYear, models.CASCADE, verbose_name='verksamhetsår', related_name='groups')
     group_type = models.ForeignKey(AssociationGroupType, models.CASCADE, verbose_name='grupptyp')
 
@@ -291,7 +291,7 @@ class AssociationActivity(models.Model):
             return '{}: {}'.format(self.person, self.group)
         else:
             return '{}: {} ({})'.format(self.person, self.group, self.title)
-    
+
 
 class ProductionGroup(models.Model):
     class Meta:
@@ -314,15 +314,15 @@ class ProductionGroup(models.Model):
                 return '{}-{:02}'.format(self.group_type.short_name, self.production.year % 100)
             else:
                 return '{}-{}'.format(self.group_type.short_name, self.production.short_name)
-    
+
     # Eftersom NULL-värden aldrig är lika med varandra så funkar inte ovanstående unique_together
-    # och vi måste validera fallet när man försöker skapa två uppsättningsgrupper utan grupptyp 
+    # och vi måste validera fallet när man försöker skapa två uppsättningsgrupper utan grupptyp
     # i samma uppsättning.
     def validate_unique(self, exclude=None):
         if self.group_type is None and ProductionGroup.objects.exclude(id=self.id).filter(production=self.production, group_type__isnull=True).exists():
             raise ValidationError("En uppsättningsgrupp utan grupptyp finns redan i denna uppsättning")
         super(ProductionGroup, self).validate_unique(exclude)
-    
+
 
 class ProductionMembership(models.Model):
     class Meta:
@@ -350,7 +350,7 @@ class ProductionMembership(models.Model):
     def __str__(self):
         return '{}: {}'.format(self.person.member_number, self.short_description())
 
-    
+
 class EmailList(models.Model):
     class Meta:
         verbose_name = 'maillista'
@@ -371,38 +371,38 @@ class EmailList(models.Model):
         help_text='Ska mail till denna lista skickas vidare till medlemmar i en annan lista?')
 
     opt_in_members = models.ManyToManyField(
-        Person, 
+        Person,
         verbose_name='enskilda personer',
-        related_name='opt_in_email_lists', 
+        related_name='opt_in_email_lists',
         blank=True,
         help_text='Vilka enskilda personer ska få mail från denna lista?')
     opt_out_members = models.ManyToManyField(
-        Person, 
-        verbose_name='opt-out-medlemmar', 
-        related_name='opt_out_email_lists', 
+        Person,
+        verbose_name='opt-out-medlemmar',
+        related_name='opt_out_email_lists',
         blank=True,
         help_text='Vilka personer ska inte få mail från denna lista, oavsett vilka grupper de är med i?')
 
     # Production lists
     all_groups = models.ManyToManyField(
-        ProductionGroupType, 
-        related_name='email_lists', 
-        verbose_name='grupper av dessa typer i alla uppsättningar', 
+        ProductionGroupType,
+        related_name='email_lists',
+        verbose_name='grupper av dessa typer i alla uppsättningar',
         blank=True,
         help_text='Denna lista kommer skicka mail till alla personer som någonsin har varit med i dessa grupper')
     production_groups = models.ManyToManyField(
-        ProductionGroup, 
-        related_name='email_lists', 
-        verbose_name='grupper från enskilda uppsättningar', 
+        ProductionGroup,
+        related_name='email_lists',
+        verbose_name='grupper från enskilda uppsättningar',
         blank=True,
         help_text='Denna lista kommer skicka mail till personer som är med i dessa uppsättningsgrupper')
     productions = models.ManyToManyField(
-        Production, 
-        related_name='email_lists', 
-        verbose_name='hela uppsättningar', 
+        Production,
+        related_name='email_lists',
+        verbose_name='hela uppsättningar',
         blank=True,
         help_text='Denna lista kommer skicka mail till följande HELA uppsättningar, förutom i de fall då listans namn slutar med \"gruppledare\".')
-    
+
     # Association lists
     active_association_groups = models.ManyToManyField(
         AssociationGroupType,
@@ -416,7 +416,7 @@ class EmailList(models.Model):
         verbose_name='föreningsgrupper från enskilda verksamhetsår',
         blank=True,
         help_text='Denna lista kommer skicka mail till personer som var med i dessa föreningsgrupper ett visst år')
-    
+
     # Title lists
     all_titles = models.ManyToManyField(
         Title,
@@ -427,7 +427,7 @@ class EmailList(models.Model):
 
     def __str__(self):
         return self.alias
-    
+
     @property
     def recipients(self):
         person_set = set()
@@ -439,22 +439,22 @@ class EmailList(models.Model):
 
         for person in self.opt_in_members.filter(valid_email):
             person_set.add(person)
-        
+
         if self.forward_to is not None:
             person_set.update(self.forward_to.recipients)
 
         for group_type in self.all_groups.all():
             for person in valid_persons.filter(production_memberships__group__group_type=group_type):
                 person_set.add(person)
-        
+
         for group in self.production_groups.all():
             for person in valid_persons.filter(production_memberships__group=group):
                 person_set.add(person)
-            
+
             # Add the current direction to the production group lists
             for person in valid_persons.filter(production_memberships__group__production=group.production, production_memberships__title__in=DIRECTION_TITLES):
                 person_set.add(person)
-        
+
         for production in self.productions.all():
             # Special handling of email lists to group leaders
             if self.alias.endswith('gruppledare'):
@@ -465,15 +465,15 @@ class EmailList(models.Model):
                     production_memberships__group__production=production,
                     production_memberships__group__group_type__exclude_from_production_email=False):
                     person_set.add(person)
-        
+
         for group in self.association_groups.all():
             for person in valid_persons.filter(association_activities__group=group):
                 person_set.add(person)
-        
+
         for title in self.all_titles.all():
             for person in valid_persons.filter(Q(production_memberships__title=title) | Q(association_activities__title=title)):
                 person_set.add(person)
-        
+
         # Additional includes for special lists
         if self.alias == 'spexinfo':
             for person in valid_persons.filter(wants_spexinfo=True):
@@ -566,5 +566,3 @@ class AssociationMembership(models.Model):
             return '{} blev livstidsmedlem {}'.format(self.person, self.year)
         else:
             return '{} var medlem {}'.format(self.person, self.year)
-
-
