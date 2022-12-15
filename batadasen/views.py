@@ -100,13 +100,6 @@ class EmailListDetailView(DetailView):
 class PersonDetailView(DetailView):
     model = models.Person
 
-    def get_object(self, queryset=None):
-        obj = super(PersonDetailView, self).get_object(queryset)
-        if (obj.privacy_setting == models.Person.PrivacySetting.PRIVATE
-            and not self.request.user.has_perm('batadasen.view_private_info')
-            and not self.request.user == obj.user):
-            raise Http404()
-        return obj
 
 @method_decorator(login_required, name='dispatch')
 class PersonSelfView(UpdateView):
