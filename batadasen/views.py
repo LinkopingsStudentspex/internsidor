@@ -153,10 +153,6 @@ class ProductionDetailView(DetailView):
         for group in context['object'].groups.all():
             memberships = group.memberships.order_by("-title")
 
-            # Exclude persons with private privacy setting for regular users
-            if not self.request.user.has_perm('batadasen.view_private_info'):
-                memberships = memberships.exclude(person__privacy_setting=models.Person.PrivacySetting.PRIVATE)
-
             if not memberships.exists():
                 continue
             result_group = dict()
