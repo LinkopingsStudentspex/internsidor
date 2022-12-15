@@ -37,10 +37,10 @@ def activation_view(request):
     else:
         if timezone.now() > activations.first().valid_until:
             bad_token = True
-    
+
     if bad_token:
         return HttpResponse("Du har nog följt en gammal länk eller så har den kopierats fel")
-    
+
     activation = activations.first()
     person = activation.person
 
