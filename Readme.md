@@ -18,7 +18,7 @@ I detta projekt finns för närvarande två appar:
   * `batadasen`: innehåller den mesta koden som har med medlemsregistret och e-postlistor att göra.
   * `assetmanager`: inventariesystemet för spexets prylar.
 
-Filer för frontend-utveckling finns i mappen `batadasen/templates/batadasen` och `batadasen/static/batadasen`. Html-filerna är Django-templates som återanvänder kod genom att `base.html` innehåller den grundläggande html-strukturen och sedan fyller varje templatefil sen på själva `content`-blocket med rätt innehåll. 
+Filer för frontend-utveckling finns i mappen `batadasen/templates/batadasen` och `batadasen/static/batadasen`. Html-filerna är Django-templates som återanvänder kod genom att `base.html` innehåller den grundläggande html-strukturen och sedan fyller varje templatefil sen på själva `content`-blocket med rätt innehåll.
 
 ## Utvecklingsmiljö
 Django har en inbyggd utvecklingsserver som man kan använda för lokal utveckling. Innan du kan komma igång behöver du ha installerat Python 3.6 eller högre. Det är också starkt rekommenderat att du sköter utveckilengen i en så kallad virtuella miljö, inte att förväxla med en virtuell maskin.
@@ -28,11 +28,11 @@ Django har en inbyggd utvecklingsserver som man kan använda för lokal utveckli
    python3 -m venv virtual-environment
    ```
    Vad det i praktiken gör är att det skapar en mapp `virtual-environment` som kommer innehålla en pythoninstallation separat från operativsystemets.
-   
+
    Var gång du sedan ska utveckla internsidorna ska du börja med att "aktivera" den här utvecklingsmiljön i ditt skal:
    ```
    # På Linux, Mac OS eller Windows POSIX-kompabilitetslager likt WSL och MingW
-   source virtual-environment/bin/activate 
+   source virtual-environment/bin/activate
    # På Windows med cmd
    virtual-environment\Scripts\activate.bat
    # På Windows med PowerShell
@@ -61,7 +61,7 @@ Django har en inbyggd utvecklingsserver som man kan använda för lokal utveckli
     ```
     Nu kommer du åt hemsidan via http://localhost:8000. Servern kommer automatiskt ladda om sig när man gör ändringar i filer.
 
-Något att tänka på när man använder lokala utvecklingsservern är att funktionen att skicka mail till personer så att de kan skapa en användare inte fungerar utan vidare. Man får då skapa en användare manuellt från admin-interfacet. 
+Något att tänka på när man använder lokala utvecklingsservern är att funktionen att skicka mail till personer så att de kan skapa en användare inte fungerar utan vidare. Man får då skapa en användare manuellt från admin-interfacet.
 
 ## Extern lookup mot databasen
 I projektet finns också några små python-skript som kan använda Djangos databas-koppling för att publicera grejer åt andra system som behöver information från databasen. Det ersätter direkt uppkoppling mot Postgres-databasen som gjorts tidigare.
