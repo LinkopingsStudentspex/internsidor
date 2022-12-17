@@ -25,7 +25,7 @@ class AssetModel(models.Model):
 
 class Owner(models.Model):
     name = models.CharField(_("Name"), max_length=100)
-    description = models.TextField(_("Description"), blank=True) 
+    description = models.TextField(_("Description"), blank=True)
 
     def __str__(self):
         return self.name
@@ -58,7 +58,7 @@ class Asset(models.Model):
         else:
             return dict(LogEntry.STATUS_CHOICES)[LogEntry.STATUS_UNKNOWN]
 
-    
+
 
     def __str__(self):
         return "Asset %s, %s" % (str(self.number), self.model)
@@ -68,7 +68,7 @@ class Asset(models.Model):
 class LogEntry(models.Model):
     asset = models.ForeignKey(Asset, on_delete=models.CASCADE, verbose_name=_("Asset"), related_name='log_entries')
     timestamp = models.DateTimeField(_("Timestamp"), default=datetime.datetime.now)
-    notes = models.TextField(_("Notes") ) 
+    notes = models.TextField(_("Notes") )
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name=_("User"), related_name='log_entries')
 
     STATUS_OK           = 'OK'           # Fully functional and ready for use
@@ -83,7 +83,7 @@ class LogEntry(models.Model):
         (STATUS_UNKNOWN,        _('Unknown')),
         (STATUS_HISTORICAL,     _('Historical'))
     )
-     
+
     new_status = models.CharField(_("New status"), max_length=20, choices=STATUS_CHOICES)
 
     def __str__(self):

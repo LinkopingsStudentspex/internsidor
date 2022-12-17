@@ -9,7 +9,7 @@ from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultip
 class CategoryForm(forms.Form):
     name = forms.CharField(label=_("Name"), max_length=100)
     name.widget.attrs['class'] = "form-control"
-    
+
 class AssetModelForm(forms.Form):
     manufacturer = forms.CharField(label=_("Manufacturer"), max_length=100)
     manufacturer.widget.attrs['class'] = "form-control"
@@ -33,7 +33,7 @@ class LogEntryForm(forms.Form):
 
     notes = forms.CharField(label=_("Notes"), widget=forms.Textarea)
     notes.widget.attrs['class'] = "form-control"
-    
+
 
 class AssetForm(forms.Form):
     number = forms.IntegerField(label=_("Number"), min_value=1, initial=get_next_asset_number)
@@ -73,7 +73,5 @@ class AssetForm(forms.Form):
             raise forms.ValidationError(_('number cannot be empty'))
         if Asset.objects.filter(number=data).exists():
             raise forms.ValidationError(_('Another asset already has this number: ') + str(data))
-        
+
         return data
-
-
