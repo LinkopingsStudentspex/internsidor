@@ -1,6 +1,6 @@
 from django import forms
 from .models import Category, LogEntry, Asset, AssetModel, Owner, get_next_asset_number
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 import datetime
 from django.contrib.admin import widgets
 
