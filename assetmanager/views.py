@@ -14,6 +14,7 @@ from .forms import LogEntryForm, AssetForm, AssetModelForm, CategoryForm
 
 from ajax_select import register, LookupChannel
 
+
 class AssetListView(LoginRequiredMixin, generic.ListView):
     model = Asset
 
@@ -34,7 +35,7 @@ def new_logentry_view(request, number):
     asset_inst = get_object_or_404(Asset, number=number)
 
     if request.method == 'POST':
-        form = LogEntryForm(request.POST) 
+        form = LogEntryForm(request.POST)
 
         if form.is_valid():
             logentry_inst = LogEntry(**form.cleaned_data)
@@ -43,16 +44,16 @@ def new_logentry_view(request, number):
             logentry_inst.save()
 
             return HttpResponseRedirect(reverse('assetmanager:asset_detail', kwargs={'number':asset_inst.number}))
-        
+
     else:
         form = LogEntryForm()
-        
+
         if asset_inst.log_entries.exists():
             latest_status = asset_inst.log_entries.latest('timestamp')
             form.fields['new_status'].initial = latest_status
         else:
             form.fields['new_status'].initial = LogEntry.STATUS_UNKNOWN
-    
+
     return render(request, 'assetmanager/logentry_form.html', {'form': form, 'asset_inst': asset_inst})
 
 # @permission_required('assetmanager.add_asset')
@@ -77,7 +78,7 @@ def new_asset_view(request):
         form = AssetForm()
 
     return render(request, 'assetmanager/asset_form.html', {'form': form})
-        
+
 # @permission_required('assetmanager.add_assetmodel')
 @login_required
 def new_assetmodel_view(request):
@@ -114,7 +115,7 @@ def new_category_view(request):
             return HttpResponseRedirect(reverse('assetmanager:assetmodel_add'))
     else:
         form = CategoryForm()
-    
+
     return render(request, 'assetmanager/category_form.html', {'form': form})
 
 @login_required
@@ -140,7 +141,7 @@ class AssetModelLookup(LookupChannel):
         return AssetModel.objects.filter(Q(model_name__icontains=q)|Q(manufacturer__icontains=q))
 
     def format_item_display(self, item):
-        return u'<span class="assetmodel">%s %s</span>' % (item.manufacturer, item.model_name) 
+        return u'<span class="assetmodel">%s %s</span>' % (item.manufacturer, item.model_name)
 
 
 @register('categories')
