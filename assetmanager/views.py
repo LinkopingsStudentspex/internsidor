@@ -1,13 +1,13 @@
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.views import generic
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.views.decorators.cache import never_cache
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from django.core.exceptions import PermissionDenied 
+from django.core.exceptions import PermissionDenied
 
 from .models import Asset, AssetModel, LogEntry, Category
 from .forms import LogEntryForm, AssetForm, AssetModelForm, CategoryForm
@@ -29,7 +29,6 @@ class AssetModelDetailView(LoginRequiredMixin, generic.DetailView):
     model = AssetModel
 
 
-# @permission_required('assetmanager.add_logentry')
 @login_required
 def new_logentry_view(request, number):
     asset_inst = get_object_or_404(Asset, number=number)
