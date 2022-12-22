@@ -18,6 +18,17 @@ from ajax_select import register, LookupChannel
 class AssetListView(LoginRequiredMixin, generic.ListView):
     model = Asset
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()
+        return context
+
+    def get_queryset(self):
+        if 'category' in self.request.GET:
+            return Asset.objects.filter(model__categories__name=self.request.GET.get('category'))
+        else:
+            return Asset.objects.all()
+
 
 class AssetDetailView(LoginRequiredMixin, generic.DetailView):
     model = Asset
