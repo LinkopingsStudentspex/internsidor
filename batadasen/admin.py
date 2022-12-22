@@ -5,7 +5,7 @@ from django.core import mail
 from django.db import models
 from django import forms
 from django.conf import settings
-from django.utils.safestring import mark_safe   
+from django.utils.safestring import mark_safe
 from django.utils.html import format_html
 from django.urls import reverse
 from django.template.loader import render_to_string
@@ -134,15 +134,15 @@ class PersonAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         ret_fields = []
         if not request.user.is_superuser:
-            # If anyone with edit-person permissions could change the connections between users and persons, 
+            # If anyone with edit-person permissions could change the connections between users and persons,
             # there is nothing that stops a less privileged user from reassigning a super user to their own person,
             # which could allow them to get a password reset link for the super user to their own email.
             ret_fields.append('user')
         if obj:
             ret_fields.append('member_number')
-        
+
         return ret_fields
-    
+
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
 
@@ -150,12 +150,12 @@ class PersonAdmin(admin.ModelAdmin):
             email = form.cleaned_data['email']
             if email is None or email == '':
                 return
-            
+
             existing_user_activations = UserActivation.objects.filter(person=obj)
             if existing_user_activations.exists():
                 print('Deleting existing user activations in progress')
                 existing_user_activations.delete()
-            
+
             activation = UserActivation(person=obj, provision_gsuite_account=form.cleaned_data['provision_gsuite_account'])
             activation.save()
 
@@ -288,7 +288,7 @@ class EmailListAdmin(admin.ModelAdmin):
 
 class TitleAdmin(admin.ModelAdmin):
     fields = ('name', 'email_alias')
-    
+
     def get_readonly_fields(self, request, obj=None):
         if obj:
             return ['name']
