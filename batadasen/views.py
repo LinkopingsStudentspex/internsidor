@@ -4,7 +4,8 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.db.models import Q
+from django.db.models import Q, F, Value
+from django.db.models.functions import Concat
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -20,6 +21,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework_api_key.permissions import HasAPIKey
 import django_filters
+
+import ajax_select as asel
 
 from . import forms, models, serializers
 if settings.PROVISION_GSUITE_ACCOUNTS:
@@ -223,3 +226,42 @@ def no_admin_view(request):
     return render(request, 'batadasen/no_admin.html')
 
 admin.site.login = login_required(staff_member_required(admin.site.login, login_url='batadasen:no_admin'))
+
+
+@method_decorator(login_required, name='dispatch')
+class EventView(DetailView):
+    model = models.Event
+    success_url = reverse_lazy('batadasen:event')
+
+
+@method_decorator(login_required, name='dispatch')
+class EventListView(ListView):
+    model = models.Event
+    success_url = reverse_lazy('batadasen:event_list')
+
+
+@method_decorator(login_required, name='dispatch')
+class CreateEventView(CreateView):
+    form_class = forms.EventForm
+    template_name = 'batadasen/event_add.html'
+    success_url = reverse_lazy('batadasen:person_settings')
+
+    def form_valid(self, form):
+        pass
+
+
+@asel.register('person')
+class PersonLookup(asel.LookupChannel):
+    model = models.Person
+
+    def check_auth(self, request):
+        if not request.user.is_authenticated:
+            raise PermissionDenied
+
+    def get_query(self, q, request):
+        return self.model.objects\
+                         .annotate(name=Concat(F("first_name"), Value(' '), F("spex_name"), Value(' '), F("last_name")))\
+                         .filter(name__icontains=q)
+
+    def format_item_display(self, item):
+        return f'<span class="person">{item.name}</span>'

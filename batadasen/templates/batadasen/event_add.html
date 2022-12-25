@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}Arrangera ett evenemang{% endblock %}
+
+{% block content %}
+
+<h2>Arrangera nått kul!</h2>
+
+<form method="post" class="">
+	{% csrf_token %}
+	{% crispy form %}
+  <input type="submit" value="Publicera!">
+</form>
+
+{% endblock %}

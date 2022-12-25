@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Row, Column
+import ajax_select.fields as af
 
 from . import models
 
@@ -96,3 +97,27 @@ class ExtraEmailForm(forms.ModelForm):
     class Meta:
         model = models.ExtraEmail
         fields = ('email',)
+
+
+datetime_input = forms.DateInput(attrs={'type': 'datetime-local'})
+
+
+class EventForm(forms.ModelForm):
+    class Meta:
+        model = models.Event
+        exclude = ('participants',)
+        widgets = {'datetime': datetime_input,
+                   'signup_deadline': datetime_input,
+                   'description': forms.Textarea(attrs={'rows': 5}),
+                   'payment_instructions': forms.Textarea(attrs={'rows': 2})}
+    # Jag har ingen jävla aning om varför jag inte kan inkludera den här saken ovan med övriga
+    # widgets eller varför dess verbose_name inte används.
+    administrators = af.AutoCompleteSelectMultipleField('person')
+
+    def __init__(self, *args, **kwargs):
+        super(EventForm, self).__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_class = 'form-vertical'
+        self.helper.layout = Layout('name', 'description',
+                                    Row(Column('datetime'), Column('signup_deadline')),
+                                    'payment_instructions', 'administrators')

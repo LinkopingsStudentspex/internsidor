@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}Tillställningar{% endblock %}
+
+{% block content %}
+<div class="row" id="toprow">
+	<h2 class="col-sm">Tillställningar</h2>
+	<div><a class="btn btn-primary" href="{% url 'batadasen:event_add' %}">Arrangera tillställning</a></div>
+</div>
+<table class="table table-sm">
+  <tr> <th>Datum</th> <th>Namn</th> <th>Sista anmälningsdag</th> </tr>
+  {% for event in object_list|dictsortreversed:"date" %}
+  <tr>
+    <td>{{ event.datetime }}</td>
+    <td><a href="{% url 'batadasen:production_detail' event.id %}">event.namn</a></td>
+		<td>{{ event.signup_deadline }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}
