@@ -8,10 +8,11 @@
 
 <h2>Arrangera nått kul!</h2>
 
+{{ form.errors }}
+{{ form.non_field_errors }}
 <form method="post" class="">
 	{% csrf_token %}
 	{% crispy form %}
-  <input type="submit" value="Publicera!">
 </form>
 
 {% endblock %}
