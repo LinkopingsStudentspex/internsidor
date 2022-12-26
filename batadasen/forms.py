@@ -121,5 +121,12 @@ class EventForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_class = 'form-vertical'
         self.helper.layout = Layout('name', 'description',
-                                    Row(Column('datetime'), Column('signup_deadline')),
-                                    'payment_instructions', 'administrators')
+                                    Row(Column('signup_deadline'), Column('datetime')),
+                                    'payment_instructions', 'administrators',
+                                    Submit('submit', 'Publicera!'))
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data.get('datetime').date() <= cleaned_data.get('signup_deadline'):
+            raise forms.ValidationError('Sista anmälningsdatum kan inte vara efter datumet för själva evenemanget.')
+        return cleaned_data
