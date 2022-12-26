@@ -17,6 +17,8 @@ django-crispy-forms==1.14.0
     # via -r requirements.in
 django-filter==22.1
     # via -r requirements.in
+django-shared-property==0.5.4
+    # via -r requirements.in
 djangorestframework==3.14.0
     # via -r requirements.in
 djangorestframework-api-key==2.2.0

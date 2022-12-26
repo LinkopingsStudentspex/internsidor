@@ -5,9 +5,11 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models.signals import post_save
-from django.db.models import Q
+from django.db.models import Q, Value, When, F, Case
+from django.db.models.functions import Concat
 from django.dispatch import receiver
 from django.utils import crypto, timezone
+from django_shared_property.decorator import shared_property
 
 
 def get_current_assoc_end_year():
@@ -86,12 +88,12 @@ class Person(models.Model):
                   'Öppen: andra inloggade kan se all din information. '
                   'Inga personuppgifter kommer någonsin vara synliga för icke-inloggade.')
 
-    @property
+    @shared_property
     def full_name(self):
-        if self.spex_name == '':
-            return '{} {}'.format(self.first_name, self.last_name)
-        else:
-            return '{} "{}" {}'.format(self.first_name, self.spex_name, self.last_name)
+        return Case(When(Q(spex_name__isnull=True),
+                         then=Concat(F('first_name'), Value(' '), F('last_name')) ),
+                    default=Concat(F('first_name'), Value(' "'), F('spex_name'), Value('" '), F('last_name')))
+
 
     def __str__(self):
         return '({}) {}'.format(self.member_number, self.full_name)

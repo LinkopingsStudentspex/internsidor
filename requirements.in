@@ -4,3 +4,4 @@ djangorestframework-api-key
 django-filter
 django-crispy-forms
 django-ajax-selects
+django_shared_property
