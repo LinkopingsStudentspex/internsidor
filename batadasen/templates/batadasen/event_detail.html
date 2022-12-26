@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}Tillställningen {{ object.name }}{% endblock %}
+
+{% block content %}
+<div class="col-xl-8">
+	<div class="row" id="toprow">
+	<h2 class="col-sm">{{ object.name }}</h2>
+	<div><a class="btn btn-primary" href="{% url 'batadasen:event_edit' object.id %}">Administrera tillställning</a></div>
+	</div>
+	<h5>{{ object.datetime }}</h5>
+	<p>{{ object.description}}<p>
+	<p>{{ object.description}}<p>
+
+
+
+
+
+</div>
+
+{% endblock %}
