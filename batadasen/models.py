@@ -570,6 +570,16 @@ class AssociationMembership(models.Model):
             return '{} var medlem {}'.format(self.person, self.year)
 
 
+def future_datetime(dt):
+    if dt < timezone.now():
+        raise ValidationError('Tidpunkten har redan passerat.', code='past_datetime')
+
+
+def future_date(d):
+    if d < date.today():
+        raise ValidationError('Tidpunkten har redan passerat.', code='past_datetime')
+
+
 class Event(models.Model):
     class Meta:
         verbose_name = 'tillställning'
@@ -578,12 +588,12 @@ class Event(models.Model):
 
     name                 = models.CharField('tillställningens namn', max_length=128)
     description          = models.CharField('beskrivning', max_length=80000)
-    datetime             = models.DateTimeField('tidpunkten för tillställningen')
-    signup_deadline      = models.DateTimeField('sista anmälningsdag')
+    datetime             = models.DateTimeField('starttid för tillställningen', validators=[future_datetime])
+    signup_deadline      = models.DateField('sista anmälningsdag', validators=[future_date])
     payment_instructions = models.CharField('betalinstruktioner', max_length=10000)
-    administrators       = models.ManyToManyField(Person, 'event_administrators', verbose_name='arrangörer', help_text='Extra personer som ska få fippla på arrangemanget.')
-    participants         = models.ManyToManyField(Person, through='EventRegistrations')
-    questions            = models.JSONField()
+    administrators       = models.ManyToManyField(Person, 'event_administrators', verbose_name='arrangörer', help_text='Extra personer som ska få fippla på arrangemanget.', blank=True)
+    participants         = models.ManyToManyField(Person, through='EventRegistrations', null=True)
+    questions            = models.JSONField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.name} {self.datetime.date()}'
