@@ -82,9 +82,10 @@ class Person(models.Model):
         max_length=3,
         choices=PrivacySetting.choices,
         default=PrivacySetting.OPEN,
-        help_text='Privat: endast administratörer kan se dina personuppgifter. '
+        help_text='Privat: endast administratörer kan se dina kontaktuppgifter. '
                   'Öppen: andra inloggade kan se all din information. '
-                  'Inga personuppgifter kommer någonsin vara synliga för icke-inloggade.')
+                  'Inga personuppgifter kommer någonsin vara synliga för icke-inloggade. '
+                  'Medlemsnummer och namn kommer alltid vara synligt för inloggade.')
 
     @property
     def full_name(self):
