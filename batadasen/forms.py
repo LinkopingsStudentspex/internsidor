@@ -93,13 +93,15 @@ class PersonForm(forms.ModelForm):
             Submit('submit', 'Uppdatera!')
         )
 
+
 class ExtraEmailForm(forms.ModelForm):
     class Meta:
         model = models.ExtraEmail
         fields = ('email',)
 
 
-datetime_input = forms.DateInput(attrs={'type': 'datetime-local'})
+date_input = forms.DateInput(attrs={'type': 'date'})
+datetime_input = forms.DateTimeInput(attrs={'type': 'datetime-local'})
 
 
 class EventForm(forms.ModelForm):
@@ -107,7 +109,7 @@ class EventForm(forms.ModelForm):
         model = models.Event
         exclude = ('participants',)
         widgets = {'datetime': datetime_input,
-                   'signup_deadline': datetime_input,
+                   'signup_deadline': date_input,
                    'description': forms.Textarea(attrs={'rows': 5}),
                    'payment_instructions': forms.Textarea(attrs={'rows': 2})}
     # Jag har ingen jävla aning om varför jag inte kan inkludera den här saken ovan med övriga
