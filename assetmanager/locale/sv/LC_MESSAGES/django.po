@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-26 16:17+0100\n"
+"POT-Creation-Date: 2022-12-26 16:30+0100\n"
 "Last-Translator: Karl Linderhed \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -169,6 +169,10 @@ msgstr "Inventarier"
 #: templates/assetmanager/asset_list.html:11
 msgid "Add asset"
 msgstr "Skapa inventarie"
+
+#: templates/assetmanager/asset_list.html:15
+msgid "Only show category:"
+msgstr "Visa endast kategori:"
 
 #: templates/assetmanager/asset_list.html:25
 msgid "ID"

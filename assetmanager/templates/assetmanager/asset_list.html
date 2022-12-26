@@ -12,7 +12,7 @@
     </div>
 </div>
 <div>
-	<h5 class="d-sm-inline-block">Visa endast kategori:</h5>
+	<h5 class="d-sm-inline-block">{% trans "Only show category:" %}</h5>
 	{% for category in categories %}
 	<a href="{% url 'assetmanager:asset_list' %}?category={{ category|urlencode }}">
 		<span>{{ category }}</span></a>
