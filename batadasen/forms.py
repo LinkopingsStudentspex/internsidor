@@ -114,7 +114,7 @@ class EventForm(forms.ModelForm):
                    'payment_instructions': forms.Textarea(attrs={'rows': 2})}
     # Jag har ingen jävla aning om varför jag inte kan inkludera den här saken ovan med övriga
     # widgets eller varför dess verbose_name inte används.
-    administrators = af.AutoCompleteSelectMultipleField('person')
+    administrators = af.AutoCompleteSelectMultipleField('person', label='Medarrangörer', required=False)
 
     def __init__(self, *args, **kwargs):
         super(EventForm, self).__init__(*args, **kwargs)
