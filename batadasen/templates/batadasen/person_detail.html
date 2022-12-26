@@ -21,7 +21,7 @@ Personen har inte betalat medlemsavgift och är för närvarande inte medlem i f
 {% elif object.privacy_setting == 'PVT' %}
 
 <div class="alert alert-danger" role="alert">
-    Personen har valt att dölja sina personuppgifter för andra medlemmar.
+    Personen har valt att dölja sina kontaktuppgifter för andra medlemmar.
 
     {% if perms.batadasen.view_private_info %}
     <br>Du kan bara se dess uppgifter för att du är administratör.
