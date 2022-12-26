@@ -231,23 +231,11 @@ admin.site.login = login_required(staff_member_required(admin.site.login, login_
 @method_decorator(login_required, name='dispatch')
 class EventView(DetailView):
     model = models.Event
-    success_url = reverse_lazy('batadasen:event')
 
 
 @method_decorator(login_required, name='dispatch')
 class EventListView(ListView):
     model = models.Event
-    success_url = reverse_lazy('batadasen:event_list')
-
-
-@method_decorator(login_required, name='dispatch')
-class CreateEventView(CreateView):
-    form_class = forms.EventForm
-    template_name = 'batadasen/event_add.html'
-    success_url = reverse_lazy('batadasen:person_settings')
-
-    def form_valid(self, form):
-        pass
 
 
 @asel.register('person')
@@ -259,9 +247,26 @@ class PersonLookup(asel.LookupChannel):
             raise PermissionDenied
 
     def get_query(self, q, request):
-        return self.model.objects\
-                         .annotate(name=Concat(F("first_name"), Value(' '), F("spex_name"), Value(' '), F("last_name")))\
-                         .filter(name__icontains=q)
+        return self.model.objects.filter(full_name__icontains=q)
 
     def format_item_display(self, item):
-        return f'<span class="person">{item.name}</span>'
+        return f'<span class="person">{item.full_name}</span>'
+
+
+@method_decorator(login_required, name='dispatch')
+class CreateEventView(CreateView):
+    form_class = forms.EventForm
+    template_name = 'batadasen/event_add.html'
+
+    def form_valid(self, form):
+        event = form.save()
+        event.administrators.add(self.request.user.person)
+        return redirect(url('batadasen:event_detail', form.id))
+
+
+@method_decorator(login_required, name='dispatch')
+class EditEventView(UpdateView):
+    model = models.Event
+    form_class = forms.EventForm
+    template_name = 'batadasen/event_add.html'
+    success_url = reverse_lazy('batadasen:event_list')
