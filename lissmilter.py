@@ -81,10 +81,8 @@ class LissMilter(Milter.Base):
         if not valid_sender:
             if '@studentspex.se' in self.envelope_from:
                 # https://pymilter.org/pymilter/namespacemilter.html#a4c8bad190cb7f54cea87f1182732ce83
-                subprocess.run(f"logger --tag lissmilter Invalid sender for this address. From: {self.envelope_from} to {to}. Message discarded instead of being sent to studentspex mail list.", shell = True)
                 return Milter.DISCARD
             else:
-                subprocess.run(f"logger --tag lissmilter Invalid sender for this address. From: {self.envelope_from} to {to}", shell = True)
                 self.setreply('554', '5.7.2', 'Sender <{}> not authorized for recipient ("{}"). Kontakta en ansvarig om du tycker det borde funka.'.format(self.envelope_from, to))
                 return Milter.REJECT
 
