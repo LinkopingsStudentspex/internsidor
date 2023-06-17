@@ -79,7 +79,7 @@ class LissMilter(Milter.Base):
 
         # Check if sender is valid before discarding @studentspex.se addresses. A user sending 'from' @studentspex.se addresses should add this as an extra email in the database.
         if not valid_sender:
-            if '@studentspex.se' in self.envelope_from:
+            if f'@{mail_domain}' in self.envelope_from:
                 # https://pymilter.org/pymilter/namespacemilter.html#a4c8bad190cb7f54cea87f1182732ce83
                 return Milter.DISCARD
             else:
