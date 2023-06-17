@@ -6,6 +6,8 @@ import os
 import django
 from django.db.models import Q
 
+import subprocess
+
 connection_string = sys.argv[1]
 mail_domain = sys.argv[2]
 
@@ -75,9 +77,16 @@ class LissMilter(Milter.Base):
                 # Should only happen if no AssociationGroup called 'STYR' has been created yet
                 pass
 
+        # Check if sender is valid before discarding @studentspex.se addresses. A user sending 'from' @studentspex.se addresses should add this as an extra email in the database.
         if not valid_sender:
-            self.setreply('554', '5.7.2', 'Sender <{}> not authorized for recipient ("{}"). Kontakta en ansvarig om du tycker det borde funka.'.format(self.envelope_from, to))
-            return Milter.REJECT
+            if '@studentspex.se' in self.envelope_from:
+                # https://pymilter.org/pymilter/namespacemilter.html#a4c8bad190cb7f54cea87f1182732ce83
+                subprocess.run(f"logger --tag lissmilter Invalid sender for this address. From: {self.envelope_from} to {to}. Message discarded instead of being sent to studentspex mail list.", shell = True)
+                return Milter.DISCARD
+            else:
+                subprocess.run(f"logger --tag lissmilter Invalid sender for this address. From: {self.envelope_from} to {to}", shell = True)
+                self.setreply('554', '5.7.2', 'Sender <{}> not authorized for recipient ("{}"). Kontakta en ansvarig om du tycker det borde funka.'.format(self.envelope_from, to))
+                return Milter.REJECT
 
         self.change_subject = is_production_list or is_mass_list or is_summons_list
 
