@@ -6,8 +6,6 @@ import os
 import django
 from django.db.models import Q
 
-import subprocess
-
 connection_string = sys.argv[1]
 mail_domain = sys.argv[2]
 
@@ -77,7 +75,7 @@ class LissMilter(Milter.Base):
                 # Should only happen if no AssociationGroup called 'STYR' has been created yet
                 pass
 
-        # Check if sender is valid before discarding @studentspex.se addresses. A user sending 'from' @studentspex.se addresses should add this as an extra email in the database.
+        # Check if sender is valid before discarding any emails. A user sending 'from' the current domain, to an internal list, should add this as an extra email in the database.
         if not valid_sender:
             if f'@{mail_domain}' in self.envelope_from:
                 # https://pymilter.org/pymilter/namespacemilter.html#a4c8bad190cb7f54cea87f1182732ce83
