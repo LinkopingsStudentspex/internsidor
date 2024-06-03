@@ -35,6 +35,12 @@ class LissMilter(Milter.Base):
         return Milter.CONTINUE
 
     def envrcpt(self, mail_to, *str):
+        # The server sends an initial "polling" mail from one of these addresses to see if the server accepts mail. Letting this mail through
+        # signals to the server that we accept email, and it will follow up by sending us the real email. All mail from these addresses must
+        # be let through, otherwise all mails to protected lists will be rejected by the milter and silently (to us) bounced by LiU's servers.
+        if self.envelope_from == "double-bounce@ekholmen.it.liu.se" or self.envelope_from == "double-bounce@hjulsbro.it.liu.se":
+            return Milter.CONTINUE
+
         to = mail_to.lstrip("<").rstrip(">")
 
         is_production_list = prod_list_patt.match(to) is not None
