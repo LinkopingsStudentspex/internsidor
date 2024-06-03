@@ -351,6 +351,12 @@ class ProductionMembership(models.Model):
     def __str__(self):
         return '{}: {}'.format(self.person.member_number, self.short_description())
 
+# Eftersom mailadresser inte är skiftlägeskänsliga ska vi inte kunna skapa dubletter. Den här klassen
+# extendar models.CharField och konverterar indatat till lowercase.
+class EmailField(models.CharField):
+    def get_prep_value(self, value):
+        value = super().get_prep_value(value)
+        return value if value is None else value.lower()
 
 class EmailList(models.Model):
     class Meta:
@@ -358,7 +364,7 @@ class EmailList(models.Model):
         verbose_name_plural = 'maillistor'
         ordering = ['alias']
 
-    alias = models.CharField('alias', max_length=50, primary_key=True, help_text='Namnet på listan, det som står framför @')
+    alias = EmailField('alias', max_length=50, primary_key=True, help_text='Namnet på listan, det som står framför @')
 
     is_internal = models.BooleanField('intern lista', default=True, help_text="Ska endast spexare få skicka till denna lista?")
 

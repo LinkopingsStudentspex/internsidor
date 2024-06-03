@@ -1,9 +1,14 @@
 """
 
 Det här är en enkel TCP-server som använder Django's databasapi för att
-servera lookups from Postfix av mottagarlistor för epostlistor. 
+servera lookups from Postfix av mottagarlistor för epostlistor.
 
 Karl Linderhed 2020-03-19
+
+======== Changelog ========
+* 2023-12-05: Kallelse, styrelse-kallelse och postspecifika listor filtrerar nu bort inaktiva mailadresser //Häggmyr
+* 2023-12-05: Lookup för mailadresser använder nu `alias__iexact` och är inte längre skiftlägeskänsligt // Häggmyr
+* 2024-03-14: Uppdateringar av format på mottagna netstrings i `handle` // Häggmyr
 
 """
 import django
@@ -83,7 +88,7 @@ class PostfixTCPHandler(socketserver.BaseRequestHandler):
 
         # We don't really care about the name of the request/lookup
         # lookup_name = parts[0]
-        
+
         email_parts = data_parts[1].split('@')
         if len(email_parts) == 1:
             # Postfix does various lookups, not just with the to-address of the
@@ -94,7 +99,7 @@ class PostfixTCPHandler(socketserver.BaseRequestHandler):
             # Either an empty key or several '@'... doesn't seem right.
             self.request.sendall(pynetstring.encode('PERM Invalid request'))
             return
-        
+
         alias = email_parts[0]
 
         # Ignore lookup requests for other domains than our own
@@ -109,7 +114,7 @@ class PostfixTCPHandler(socketserver.BaseRequestHandler):
         found = False
 
         try:
-            email_list = models.EmailList.objects.get(alias=alias)
+            email_list = models.EmailList.objects.get(alias__iexact=alias)
             found = True
         except models.EmailList.DoesNotExist:
             found = False
@@ -138,12 +143,12 @@ class PostfixTCPHandler(socketserver.BaseRequestHandler):
         if found == False:
             self.request.sendall(pynetstring.encode('NOTFOUND '))
             return
-        
+
         addresses = email_list.get_recipients_email()
         if len(addresses) == 0:
             self.request.sendall(pynetstring.encode('TEMP No recipients in list'))
             return
-        
+
         reply = 'OK {}'.format(','.join(addresses))
         self.request.sendall(pynetstring.encode(reply))
 
