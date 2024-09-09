@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}Verksamhetsår {{ object }}{% endblock %}
+
+{% block content %}
+<h2>Verksamhetsår {{ object }}</h2>
+<table class="table table-sm table-striped">
+{% for group in groups %}
+    <tr class="table-primary"> <th colspan="4">{{ group.group.group_type.name }} ({{ group.group.group_type.short_name }})</th></tr>
+{% for activity in group.activities %}
+    <tr>
+        <td><a href="{% url 'batadasen:person_detail' activity.person.member_number %}">{{ activity.person.member_number }}</a></td>
+        <td>{{ activity.person.first_name }} {% if activity.person.spex_name %}"{{ activity.person.spex_name }}" {% endif %}{{ activity.person.last_name }}</td>
+        <td>{% if activity.title %}{{ activity.title }}{% endif %}</td>
+        <td>{% if activity.comment %}{{ activity.comment }}{% endif %}</td>
+    </tr>
+{% endfor %}    
+{% endfor %}
+</table>
+{% endblock %}
