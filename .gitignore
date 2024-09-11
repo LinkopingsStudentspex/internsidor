@@ -1,10 +1,16 @@
 # Project specific
 db.sqlite3
-.vscode
+fixture.json
+internsidor/settings/local.py
+
+# Python
 .venv
 virtual-environment
 *.pyc
-internsidor/settings/local.py
+.python-version
+
+# IDE
+.vscode
 
 # Emacs
 *~
