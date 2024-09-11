@@ -179,6 +179,22 @@ class AssociationYearDetailView(DetailView):
             }
             groups.append(result_group)
         context['groups'] = groups
+        
+        previous_year = (
+            self.model.objects.filter(end_year__lt=context["object"].end_year)
+            .order_by("-end_year")
+            .only("end_year")
+            .first()
+        )
+        context["previous"] = previous_year.end_year if previous_year else None
+        next_year = (
+            self.model.objects.filter(end_year__gt=context["object"].end_year)
+            .only()
+            .order_by("end_year")
+            .only("end_year")
+            .first()
+        )
+        context["next"] = next_year.end_year if next_year else None
         return context
 
 

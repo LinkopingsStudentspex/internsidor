@@ -132,6 +132,11 @@ main {
     }
 }
 
+a.silent-link {
+    text-decoration: none;
+    color: inherit
+}
+
 .sidebar-nav {
     position: absolute;
     top: 0;
