@@ -132,6 +132,29 @@ main {
     }
 }
 
+.achievements {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 5px;
+    margin-bottom: 1rem;
+}
+
+.achievements div {
+    border-radius: 0.25rem;
+    height: 4rem;
+    width: 4rem;
+    padding: 5px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-origin: content-box;
+
+}
+
+.achievement-100 {
+    background:  #e0d975 url("/static/images/100-klocka.svg");
+}
+
+
 .sidebar-nav {
     position: absolute;
     top: 0;
