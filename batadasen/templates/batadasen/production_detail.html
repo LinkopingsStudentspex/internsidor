@@ -8,20 +8,12 @@
 <h2>{{ object.short_name }} - {{ object.main_title }}</h2>
 
 <p>Om bakgrunden är röd så är personen inte medlem i föreningen.</p>
-{% if perms.batadasen.view_private_info %}
-<p>
-Om bakgrunden är gul så har personen valt att dölja sina personuppgifter för vanliga medlemmmar.
-</p>
-{% endif %}
 
 <table class="table table-sm table-striped">
 {% for group in groups %}
 <tr class="table-primary"> <th colspan="4">{{ group.group.group_type.name }} ({{ group.group.group_type.short_name }})</th></tr>
 {% for membership in group.memberships.all %}
-
-{% if membership.person.privacy_setting == 'PVT' %}
-<tr class = "table-warning">
-{% elif not membership.person.currently_member %}
+{% if not membership.person.currently_member %}
 <tr class = "table-danger">
 {% else %}
 <tr>
