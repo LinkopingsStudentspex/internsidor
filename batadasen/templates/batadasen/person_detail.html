@@ -124,4 +124,20 @@ Personen har inte betalat medlemsavgift och är för närvarande inte medlem i f
     </tr>
     {% endfor %}
 </table>
+
+<h2>Sammanfattning</h2>
+<table class="table table-sm col-3">
+    <tr>
+        <th class="table-active">Aktiva spexår</th>
+        <td class="text-right"></td>
+    </tr>
+    <tr>
+        <th class="table-active">Antal uppsättningar</th>
+        <td class="text-right">{{ object.productions | length }}</td>
+    </tr>
+    <tr>
+        <th class="table-active">Antal föreställningar</th>
+        <td class="text-right">{{ object.performances.all | length }}</td>
+    </tr>
+</table>
 {% endblock %}

@@ -94,6 +94,12 @@ class Person(models.Model):
         else:
             return '{} "{}" {}'.format(self.first_name, self.spex_name, self.last_name)
 
+    @property
+    def productions(self):
+        memberships = self.production_memberships.select_related("group__production")
+        return {membership.group.production for membership in memberships}
+
+
     def __str__(self):
         return '({}) {}'.format(self.member_number, self.full_name)
 
