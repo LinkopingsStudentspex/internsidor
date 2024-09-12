@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}100-klubben{% endblock %}
+
+{% block content %}
+<h2>100-klubben</h2>
+<table class="table table-sm">
+    <tr>
+        <th>Medlemsnummer</th>
+        <th>Namn</th>
+    </tr>
+    {% for person in object_list|dictsort:"member_number" %}
+        {% if person.hundred_club %}
+    <tr>
+        <td><a href="{% url 'batadasen:person_detail' person.member_number %}">{{ person.member_number }}</a></td>
+        <td>{{ person.first_name }} {% if person.spex_name %}"{{ person.spex_name }}" {% endif %}{{ person.last_name }}</td>
+    </tr>
+        {% endif %}
+    {% endfor %}
+</table>
+{% if perms.batadasen.view_performances %}
+<h2>Kandidater</h2>
+<table class="table table-sm">
+    <tr>
+        <th>Medlemsnummer</th>
+        <th>Namn</th>
+        <th>Rapporterade föreställningar</th>
+    </tr>
+    {% for person in object_list|dictsort:"member_number" %}
+        {% if not person.hundred_club %}
+    <tr>
+        <td><a href="{% url 'batadasen:person_detail' person.member_number %}">{{ person.member_number }}</a></td>
+        <td>{{ person.first_name }} {% if person.spex_name %}"{{ person.spex_name }}" {% endif %}{{ person.last_name }}</td>
+        <td>{{ person.performances_count }}</td>
+    </tr>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+{% endblock %}

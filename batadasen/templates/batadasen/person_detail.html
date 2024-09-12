@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load i18n %}
 
 {% block title %}Persondetaljer{% endblock %}
@@ -67,6 +68,13 @@ Personen har inte betalat medlemsavgift och är för närvarande inte medlem i f
 {% endif %}
 </table>
 
+<div class="achievements">
+    {% if object.medal_2 %}<div class="achievement-2 shimmer"></div>{% endif %}
+    {% if object.medal_4 %}<div class="achievement-4 shimmer"></div>{% endif %}
+    {% if object.medal_6 %}<div class="achievement-6 shimmer"></div>{% endif %}
+    {% if object.hundred_club %}<div class="achievement-100 tick"></div>{% endif %}
+</div>
+
 <h2>Uppsättningshistorik</h2>
 <table class="table table-sm table-striped">
 <tr>
@@ -120,5 +128,29 @@ Personen har inte betalat medlemsavgift och är för närvarande inte medlem i f
         <td>{{ membership.get_membership_type_display }}</td>
     </tr>
     {% endfor %}
+</table>
+
+<h2>Sammanfattning</h2>
+<table class="table table-sm table-striped">
+    <tr>
+        <th>Kategori</th>
+        <th>Antal</th>
+        <th>Förklaring</th>
+    </tr>
+    <tr>
+        <td>Spexår</td>
+        <td>{{ object.active_years | length }}</td>
+        <td>Antal verksamhetsår med medlemsskap i minst en uppsättningsgrupp eller föreningsgrupp.</td>
+    </tr>
+    <tr>
+        <td>Uppsättningar</td>
+        <td>{{ object.productions | length }}</td>
+        <td>Antalet uppsättningar med medlemsskap i minst en uppsättningsgrupp.</td>
+    </tr>
+    <tr>
+        <td>Föreställningar</td>
+        <td>{{ object.performances.all | length }}</td>
+        <td>Självrapporterat antal föreställniingar.</td>
+    </tr>
 </table>
 {% endblock %}
