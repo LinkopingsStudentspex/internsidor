@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}Verksamhetsår{% endblock %}
+
+{% block content %}
+<h2>Verksamhetsår</h2>
+<table class="table table-sm">
+    <tr>
+        <th>År</th>
+    </tr>
+    {% for year in object_list %}
+    <tr>
+        <td><a href="{% url 'batadasen:associationyear_detail' year.end_year %}"></ahref>{{ year }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

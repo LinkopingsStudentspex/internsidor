@@ -154,6 +154,49 @@ class ProductionDetailView(DetailView):
             groups.append(result_group)
         context['groups'] = groups
         return context
+    
+
+method_decorator(login_required, name='dispatch')
+class AssociationYearListView(ListView):
+    model = models.AssociationYear
+
+
+@method_decorator(login_required, name='dispatch')
+class AssociationYearDetailView(DetailView):
+    model = models.AssociationYear
+
+    # This dance is done to order the activities in each group by title
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        groups = []
+        for group in context['object'].groups.all():
+            activities = group.activities.order_by("-title")
+            if not activities.exists():
+                continue
+            result_group = {
+                'group': group,
+                'activities': activities,
+            }
+            groups.append(result_group)
+        context['groups'] = groups
+        
+        previous_year = (
+            self.model.objects.filter(end_year__lt=context["object"].end_year)
+            .order_by("-end_year")
+            .only("end_year")
+            .first()
+        )
+        context["previous"] = previous_year.end_year if previous_year else None
+        next_year = (
+            self.model.objects.filter(end_year__gt=context["object"].end_year)
+            .only()
+            .order_by("end_year")
+            .only("end_year")
+            .first()
+        )
+        context["next"] = next_year.end_year if next_year else None
+        return context
+
 
 @login_required
 def index_view(request):
