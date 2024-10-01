@@ -154,6 +154,17 @@ class ProductionDetailView(DetailView):
             groups.append(result_group)
         context['groups'] = groups
         return context
+    
+from django.db.models import Count
+
+@method_decorator(login_required, name='dispatch')
+class Club100(ListView):
+    model = models.Person
+    annotated = model.objects.annotate(
+    performances_count=Count('performances')
+)
+    queryset = annotated.filter(Q(hundred_club=True) | Q(performances_count__gte=3))
+    template_name = 'batadasen/hundraklubben_list.html'
 
 @login_required
 def index_view(request):

@@ -40,7 +40,8 @@ class Person(models.Model):
         verbose_name_plural = 'personer'
         ordering = ['member_number']
         permissions = [
-            ("view_private_info", "Kan se all personinfo oavsett personens inställningar")
+            ("view_private_info", "Kan se all personinfo oavsett personens inställningar"),
+            ("view_performances", "Kan se loggade föreställnigar"),
         ]
 
     class PrivacySetting(models.TextChoices):

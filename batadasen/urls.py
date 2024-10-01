@@ -11,6 +11,7 @@ urlpatterns = [
     path('settings/', views.PersonSelfView.as_view(), name='person_settings'),
     path('settings/extra_email/', views.ExtraEmailView.as_view(), name='person_extra_email'),
     path('persons/<int:pk>/', views.PersonDetailView.as_view(), name='person_detail'),
+    path('hundraklubben/', views.Club100.as_view(), name='hundraklubben'),
     path('productions/', views.ProductionListView.as_view(), name='production_list'),
     path('productions/<int:pk>/', views.ProductionDetailView.as_view(), name='production_detail'),
     path('api/users', views.UserList.as_view()),
