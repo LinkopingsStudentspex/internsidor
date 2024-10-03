@@ -74,6 +74,9 @@ class Person(models.Model):
         help_text='Är personens mailadress aktiv och fungerande? '
                   'Om denna ruta kryssas ur kommer personen inte längre få några brev från spexets maillistor.')
     hundred_club = models.BooleanField('hundraklubben', default=False)
+    medal_2 = models.BooleanField('medalj 2', default=False)
+    medal_4 = models.BooleanField('medalj 4', default=False)
+    medal_6 = models.BooleanField('medalj 6', default=False)
     deceased = models.BooleanField('avliden', default=False)
     address_changed_date = models.DateTimeField('adress ändrad', null=True, blank=True)
     mail_changed_date = models.DateTimeField('mail ändrad', null=True, blank=True)
