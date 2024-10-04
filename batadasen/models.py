@@ -102,6 +102,18 @@ class Person(models.Model):
     def productions(self):
         memberships = self.production_memberships.select_related("group__production")
         return {membership.group.production for membership in memberships}
+    
+    @property
+    def association_years(self):
+        activities = self.association_activities.select_related("group__year")
+        return { activity.group.year for activity in activities }
+
+
+    @property
+    def active_years(self):
+        production_years = { production.year + production.autumn for production in self.productions}
+        association_years = { association_year.end_year for association_year in self.association_years}
+        return production_years | association_years
 
 
     def __str__(self):

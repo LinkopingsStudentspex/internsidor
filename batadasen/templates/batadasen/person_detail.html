@@ -129,18 +129,26 @@ Personen har inte betalat medlemsavgift och är för närvarande inte medlem i f
 </table>
 
 <h2>Sammanfattning</h2>
-<table class="table table-sm col-3">
+<table class="table table-sm table-striped">
     <tr>
-        <th class="table-active">Aktiva spexår</th>
-        <td class="text-right"></td>
+        <th>Kategori</th>
+        <th>Antal</th>
+        <th>Förklaring</th>
     </tr>
     <tr>
-        <th class="table-active">Antal uppsättningar</th>
-        <td class="text-right">{{ object.productions | length }}</td>
+        <td>Spexår</td>
+        <td>{{ object.active_years | length }}</td>
+        <td>Antal verksamhetsår med medlemsskap i minst en uppsättningsgrupp eller föreningsgrupp.</td>
     </tr>
     <tr>
-        <th class="table-active">Antal föreställningar</th>
-        <td class="text-right">{{ object.performances.all | length }}</td>
+        <td>Uppsättningar</td>
+        <td>{{ object.productions | length }}</td>
+        <td>Antalet uppsättningar med medlemsskap i minst en uppsättningsgrupp.</td>
+    </tr>
+    <tr>
+        <td>Föreställningar</td>
+        <td>{{ object.performances.all | length }}</td>
+        <td>Självrapporterat antal föreställniingar.</td>
     </tr>
 </table>
 {% endblock %}
