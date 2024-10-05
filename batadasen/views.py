@@ -4,15 +4,14 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
-from django.views.generic import DetailView, ListView, UpdateView, CreateView
-
+from django.views.generic import DetailView, ListView, UpdateView, CreateView, TemplateView
 from django_filters.filterset import FilterSet
 
 from rest_framework import generics, filters
@@ -155,16 +154,45 @@ class ProductionDetailView(DetailView):
         context['groups'] = groups
         return context
     
-from django.db.models import Count
+
 
 @method_decorator(login_required, name='dispatch')
 class Club100(ListView):
     model = models.Person
     annotated = model.objects.annotate(
-    performances_count=Count('performances')
-)
+        performances_count=Count('performances')
+    )
     queryset = annotated.filter(Q(hundred_club=True) | Q(performances_count__gte=3))
     template_name = 'batadasen/hundraklubben_list.html'
+
+@method_decorator(login_required, name='dispatch')
+class Medals(TemplateView):
+    template_name = 'batadasen/medals_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['medal_2'] = []
+        context['medal_2_candidates'] = []
+        context['medal_4'] = []
+        context['medal_4_candidates'] = []
+        context['medal_6'] = []
+        context['medal_6_candidates'] = []
+        for person in models.Person.objects.all():
+            if person.medal_6:
+                context['medal_6'].append(person)
+            elif person.currently_active and len(person.active_years) >= 6:
+                context['medal_6_candidates'].append(person)
+
+            if person.medal_4:
+                context['medal_4'].append(person)
+            elif person.currently_active and len(person.active_years) >= 4:
+                context['medal_4_candidates'].append(person)
+
+            if person.medal_2:
+                context['medal_2'].append(person)
+            elif person.currently_active and len(person.active_years) >= 2:
+                context['medal_2_candidates'].append(person)
+        return context
 
 @login_required
 def index_view(request):

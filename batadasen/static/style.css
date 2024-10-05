@@ -151,7 +151,7 @@ main {
 }
 
 .achievement-2 {
-    background:  #b08d57 url("/static/images/2-medalj.svg");
+    background:  #b08657 url("/static/images/2-medalj.svg");
 }
 
 .achievement-4 {
@@ -159,7 +159,7 @@ main {
 }
 
 .achievement-6 {
-    background:  #d4af37 url("/static/images/6-medalj.svg");
+    background:  #f2c43a url("/static/images/6-medalj.svg");
 }
 
 .achievement-100 {
@@ -184,15 +184,34 @@ main {
     }
 }
 
-@keyframes tick {
+@keyframes tick2 {
+    0% {
+        transform: scale(1.0);
+    }
     49% {
-        translate: scale(1);
+        transform: scale(1.0);
     }
     50% {
         transform: scale(1.03);
     }
     99% {
-        transform: rotate(1.03);
+        transform: scale(1.03);
+    }
+}
+
+
+@keyframes tick {
+    0% {
+        transform: rotate(0deg);
+    }
+    49% {
+        transform: rotate(0deg);
+    }
+    50% {
+        transform: rotate(2deg);
+    }
+    99% {
+        transform: rotate(2deg);
     }
 }
 
