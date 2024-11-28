@@ -63,6 +63,17 @@ Django har en inbyggd utvecklingsserver som man kan använda för lokal utveckli
 
 Något att tänka på när man använder lokala utvecklingsservern är att funktionen att skicka mail till personer så att de kan skapa en användare inte fungerar utan vidare. Man får då skapa en användare manuellt från admin-interfacet.
 
+### Generera hittepådata
+För att slippa skapa upp alla modeller från scratch när man testar kan man använda skriptet `generate_fixture.py`:
+```
+python scripts/generate_fixture.py
+```
+Detta skapar filen fixture.json som sedan kan importeras till databasen:
+```
+python manage.py loaddata --format json fixture.json
+```
+
+
 ## Extern lookup mot databasen
 I projektet finns också några små python-skript som kan använda Djangos databas-koppling för att publicera grejer åt andra system som behöver information från databasen. Det ersätter direkt uppkoppling mot Postgres-databasen som gjorts tidigare.
 
