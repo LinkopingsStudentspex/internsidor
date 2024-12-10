@@ -41,7 +41,7 @@ Django har en inbyggd utvecklingsserver som man kan använda för lokal utveckli
 
 2. För att snabbt installera alla python-dependencies som behövs kan man köra följande:
     ```
-    python3 -m pip install -r requirements.txt
+    python3 -m pip install -r requirements-dev.txt
     ```
 
 3. Initialisera en lokal databasfil med:
