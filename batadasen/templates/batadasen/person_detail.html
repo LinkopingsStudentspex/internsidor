@@ -90,12 +90,14 @@ Personen har inte betalat medlemsavgift och är för närvarande inte medlem i f
 <h2>Föreningsuppdrag</h2>
 <table class="table table-sm table-striped">
 <tr>
+    <th>Verksamhetsår</th>
     <th>Grupp</th>
     <th>Titel</th>
 </tr>
 {% for activity in object.association_activities.all %}
 <tr>
-    <td>{{ activity.group }}</td>
+    <td><a href="{% url 'batadasen:associationyear_detail' activity.group.year.end_year %}">{{ activity.group.year }}</a></td>
+    <td>{{ activity.group.group_type.name }}</td>
     <td>{% if activity.title %}{{ activity.title }}{% endif %}</td>
 </tr>
 {% endfor %}
