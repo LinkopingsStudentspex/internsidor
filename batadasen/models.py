@@ -118,7 +118,7 @@ class Person(models.Model):
 
     # Validates case-insensitive email address uniqueness
     def validate_unique(self, exclude=None):
-        if Person.objects.exclude(member_number=self.member_number).filter(email__iexact=self.email).exists():
+        if self.email and Person.objects.exclude(member_number=self.member_number).filter(email__iexact=self.email).exists():
             raise ValidationError({'email': 'En person med denna mailadress finns redan.'})
         super(Person, self).validate_unique(exclude)
 
