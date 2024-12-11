@@ -25,6 +25,8 @@ LOGIN_URL = 'login'
 
 EMAIL_DOMAIN = 'localhost'
 
+MEDIA_ROOT = 'uploads/'
+
 try: 
     from .local import *
 except ImportError:

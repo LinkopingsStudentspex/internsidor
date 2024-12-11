@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path, include, reverse
@@ -36,6 +37,7 @@ if 'mozilla_django_oidc' in settings.INSTALLED_APPS:
         path('batadasen/', include('batadasen.urls')),
         path('lissinv/', include('assetmanager.urls')),
         path('showcounter/', include('showcounter.urls')),
+        path('spexflix/', include('spexflix.urls')),
         path('ajax_select/', include(ajax_select_urls)),
         path('oidc/', include('mozilla_django_oidc.urls')),
         path('', batadasen.views.index_view)
@@ -46,6 +48,7 @@ else:
         path('batadasen/', include('batadasen.urls')),
         path('lissinv/', include('assetmanager.urls')),
         path('showcounter/', include('showcounter.urls')),
+        path('spexflix/', include('spexflix.urls')),
         path('ajax_select/', include(ajax_select_urls)),
 
         # A simple login view for dev setups that don't have keycloak available
@@ -55,6 +58,10 @@ else:
         path('logout/', auth_views.LogoutView.as_view(), name='oidc_logout'),
         path('', batadasen.views.index_view)
     ]
+
+    # Used to serve uploaded files during development, NOT FOR PRODUCTION USE
+    if settings.DEBUG:
+        urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
 

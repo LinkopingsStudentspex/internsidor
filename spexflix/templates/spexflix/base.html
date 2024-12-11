@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    {% block head %} {% endblock %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'spexflix/style.css' %}" />
+    <script src="{% static 'spexflix/script.js' %}"></script>
+
+    <title>{% block title %} {% endblock %}</title>
+</head>
+
+<body style="background-image: url({% static 'spexflix/background.png' %});">
+    <!--Navigation bar-->
+    <div id="navbar" class="bg-dark">
+        <a href="{% url 'spexflix:index' %}"><img class="navbar-element" src="../../static/spexflix/spexflix-logo.png"
+                alt="spexflix" style="width: 130px;" /></a>
+        <a href="{% url 'admin:index' %}"><span class="glyphicon glyphicon-lock navbar-element"
+                style="float: right; color:gray"></span></a>
+        <br style="clear: both;">
+    </div>
+
+    <!--Content-->
+    {% load i18n %}
+    <div style="width: 90%; margin: auto;">
+        {% block content %} {% endblock %}
+    </div>
+</body>
+
+</html>

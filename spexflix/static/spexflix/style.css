@@ -1,0 +1,183 @@
+body {
+    background-color: rgb(37, 37, 37);
+    color: white;
+    background-size: 100px;
+    background-repeat: repeat;
+}
+
+a:hover,
+:active {
+    text-decoration: none;
+    color: white;
+}
+
+#navbar {
+    background-color: black;
+    position: sticky;
+    height: fit-content;
+
+}
+
+.navbar-element {
+    font-size: 22px;
+    padding: 19px;
+    color: white;
+}
+
+/*Production list*/
+.MultiCarousel {
+    float: left;
+    overflow: hidden;
+    padding: 15px;
+    width: 100%;
+    position: relative;
+}
+
+.MultiCarousel .MultiCarousel-inner {
+    transition: 0.1s ease all;
+    float: left;
+}
+
+.MultiCarousel .MultiCarousel-inner .item {
+    float: left;
+}
+
+.MultiCarousel .MultiCarousel-inner .item>div {
+    text-align: center;
+    margin: 10px;
+    color: white;
+}
+
+.MultiCarousel .leftLst,
+.MultiCarousel .rightLst {
+    position: absolute;
+    top: calc(50% - 20px);
+    border: none;
+    background-color: transparent;
+    font-size: 5rem;
+    outline: none !important;
+}
+
+.MultiCarousel .leftLst,
+.MultiCarousel .rightLst:active {
+    position: absolute;
+    top: calc(50% - 20px);
+    border: none;
+    background-color: transparent;
+    font-size: 5rem;
+}
+
+.MultiCarousel .leftLst {
+    left: 0;
+}
+
+.MultiCarousel .rightLst {
+    right: 0;
+}
+
+.MultiCarousel .leftLst.over,
+.MultiCarousel .rightLst.over {
+    pointer-events: none;
+    color: rgb(151, 151, 151);
+}
+
+.pad15 {
+    height: 60vh;
+}
+
+.poster {
+    height: 60vh;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: contain !important;
+    display: block;
+    color: white;
+}
+
+.poster:hover {
+    opacity: 0.8;
+    text-decoration: none;
+    color: white;
+}
+
+.pad15:hover {
+    height: 60vh;
+}
+
+.poster-text {
+    text-align: center;
+    color: white;
+    position: sticky;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black, 0px 0px 4px #000000, 0 0 4px #000000;
+    bottom: 10%;
+}
+
+/*Video*/
+#video-container {
+    background-color: #0000007a;
+    margin-top: 1%;
+}
+
+.production-title {
+    color: #83D0F0;
+}
+
+#my-video {
+    width: 100%;
+    margin: auto;
+    outline: none;
+}
+
+.video-tooltip {
+    width: 100%;
+    display: block;
+    margin: auto;
+    padding: 5px 15px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-height: 5rem;
+    white-space: nowrap;
+}
+
+.video-tooltip:hover {
+    text-decoration: none;
+    color: white;
+    background-color: #4a4a4a8c;
+}
+
+.is-showing {
+    background-color: #4a4a4a8c;
+}
+
+.video-info-text {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.back-arrow {
+    float: right;
+    margin: 10px 10px 0 0;
+    font-size: 1.5rem;
+}
+
+.back-arrow:hover {
+    color: rgb(218, 218, 218);
+}
+
+h6 {
+    color: rgb(206, 206, 206);
+    font-style: italic;
+}
+
+@media (max-width: 1000px) {
+    .w3-twothird {
+        width: 100%;
+    }
+
+    .w3-third {
+        width: 100%;
+    }
+
+}

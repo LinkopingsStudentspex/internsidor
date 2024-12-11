@@ -1,0 +1,50 @@
+{% extends 'spexflix/base.html' %}
+{% load i18n %}
+{% block head %}
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+{% endblock %}
+
+{% block title %}Spexflix{% endblock %}
+
+{% block content %}
+<h2>Uppsättningar</h2>
+<div class="row" style="margin-top: 7vh;">
+  <div class="MultiCarousel" data-items="1,2,3,4" data-slide="1" id="MultiCarousel" data-interval="1000">
+    <div class="MultiCarousel-inner">
+      {% for production in production_list %}{%if production.videos.first%}
+      <div class="item">
+        <div class="pad15">
+          {%if production.main_show%}
+          {%if production.poster_image%}
+          <a class="poster" href="{% url 'spexflix:video-detail' production.main_show.pk %}"
+            style="background-image: url({{ production.poster_image.url }});">
+          </a>
+          {%else%}
+          <a class="poster" href="{% url 'spexflix:video-detail' production.main_show.pk %}"
+            style="background-color: black;">
+          </a>
+          {%endif%}
+          {%else%}
+          {%if production.poster_image%}
+          <a class="poster" href="{% url 'spexflix:video-detail' production.videos.first.pk %}"
+            style="background-image: url({{ production.poster_image.url }});">
+          </a>
+          {%else%}
+          <a class="poster" href="{% url 'spexflix:video-detail' production.videos.first.pk %}"
+            style="background-color: black;">
+          </a>
+          {%endif%}
+          {%endif%}
+          <h2 class="poster-text">{{ production.short_name}}</h2>
+        </div>
+      </div>
+      {%endif%}{% endfor %}
+    </div>
+    <button class="leftLst"><span class="glyphicon glyphicon-menu-left"></span></button>
+    <button class="rightLst"><span class="glyphicon glyphicon-menu-right"></span></button>
+  </div>
+</div>
+
+{% endblock %}

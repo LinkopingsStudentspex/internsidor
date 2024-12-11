@@ -1,0 +1,21 @@
+{% extends 'spexflix/base.html' %}
+{% load i18n %}
+
+{% block title %}Spexflix - {{ production }}{% endblock %}
+
+{% block content %}
+
+<h1>{{ production }}</h1>
+<a href="{% url 'spexflix:index' %}">Tillbaka till uppsättningar</a>
+
+<h2>Videos:</h2>
+
+<ul>
+    {% for video in production.videos.all %}
+    <li>
+        <a href="{% url 'spexflix:video-detail' video.pk %}">{{ video.title }}</a>
+    </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

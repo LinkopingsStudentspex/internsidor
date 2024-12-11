@@ -69,6 +69,8 @@ oauthlib==3.2.2
     # via requests-oauthlib
 packaging==24.2
     # via djangorestframework-api-key
+pillow==11.0.0
+    # via -r requirements-base.in
 proto-plus==1.25.0
     # via google-api-core
 protobuf==5.29.1

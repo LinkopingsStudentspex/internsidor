@@ -1,0 +1,86 @@
+{% extends 'spexflix/base.html' %}
+{% load i18n %}
+{% block head %}
+<link href="https://vjs.zencdn.net/7.7.5/video-js.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+{% endblock %}
+
+{% block title %}Spexflix - {{ production }}{% endblock %}
+
+{% block content %}
+<div id="video-container">
+    <a href="{% url 'spexflix:index' %}" class="glyphicon glyphicon-remove back-arrow"></a>
+    <!--Video-->
+    <div class="w3-twothird" style="padding: 20px 20px 5px 20px;">
+        <video id="my-video" class="video-js" controls preload="auto" data-setup="{}">
+            <source src="{{ video.video_file.url }}" type="video/mp4" />
+
+            {% for subtitle in video.subtitles.all %}
+            <track kind="captions" src="{{ subtitle.subtitle_file.url }}" srclang="sv" label="{{ subtitle.name }}"
+                default>
+            {% endfor %}
+
+            <p class="vjs-no-js">
+                To view this video please enable JavaScript, and consider upgrading to a
+                web browser that
+                <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+            </p>
+        </video>
+        <h5>{{ video.title }}</h5>
+        <h6 style="width: 90%;">
+            {{ video.information|linebreaks }}
+        </h6>
+    </div>
+    <!--Information-->
+    <div class="w3-third" style="padding: 0 20px 0 20px; ">
+        <h1 class="production-title">{{ video.production.title }}</h1>
+        {%if video.production.subtitle %}
+        <h3 class="production-title">eller {{ video.production.subtitle }}</h3>
+        {%endif%}
+        {%if video.production.information %}
+        <h6 id="production-information">{{ video.production.information|linebreaks }}</h6>
+        {%endif%}
+        <hr>
+        <div style="background-color: rgba(0, 0, 0, 0.5);">
+            {% for vid in video.production.videos.all %}
+            {% if vid.video_type == 'SHOW' %}
+            {%if vid == video%}
+            <a href="{% url 'spexflix:video-detail' vid.pk %}" class="video-tooltip is-showing">
+                <h5>{{ vid.title }}</h5>
+                <h6 class="video-info-text">{{ vid.information }}</h6>
+            </a>
+            {%else%}
+            <a href="{% url 'spexflix:video-detail' vid.pk %}" class="video-tooltip">
+                <h5>{{ vid.title }}</h5>
+                <h6 class="video-info-text">{{ vid.information }}</h6>
+            </a>
+            {%endif%}
+            {% endif %}
+            {% endfor %}
+
+            {% for vid in video.production.videos.all %}
+            {% if vid.video_type != 'SHOW' %}
+            {%if vid == video%}
+            <a href="{% url 'spexflix:video-detail' vid.pk %}" class=" video-tooltip is-showing">
+                <h5>{{ vid.title }}</h5>
+                <h6 class="video-info-text">{{ vid.information }}</h6>
+            </a>
+            {%else%}
+            <a href="{% url 'spexflix:video-detail' vid.pk %}" class="video-tooltip">
+                <h5>{{ vid.title }}</h5>
+                <h6 class="video-info-text">{{ vid.information }}</h6>
+            </a>
+            {%endif%}
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <br style="clear: both;">
+</div>
+
+
+
+
+
+
+{% endblock %}

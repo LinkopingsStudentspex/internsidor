@@ -12,7 +12,7 @@
     <li><a href="{% url 'batadasen:person_settings' %}">Redigera dina uppgifter och inställningar</a></li>
     <li><a href="{% url 'assetmanager:asset_list' %}">Se och uppdatera info om spexets inventarier</a></li>
     <li><a href="{% url 'showcounter:overview' %}">Räkna hur många föreställningar du varit med på!</a></li>
-    <li><a href="https://spexflix.studentspex.se">Spexflix - Kolla på gamla spex!</a></li>
+    <li><a href="{% url 'spexflix:index' %}">Spexflix - Kolla på gamla spex!</a></li>
     <li><a href="https://old.studentspex.se">Gamla sidor som inte flyttats ännu</a></li>
 </ul>
 {% endblock %}

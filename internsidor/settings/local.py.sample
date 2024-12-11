@@ -25,6 +25,8 @@
 
 # ALLOWED_HOSTS = []
 
+# MEDIA_ROOT = '/var/www/internsidor/media'
+
 # This will be used to construct email list addresses
 # EMAIL_DOMAIN = 'example.com'
 

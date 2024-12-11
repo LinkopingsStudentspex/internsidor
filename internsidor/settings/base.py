@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'assetmanager',
     'showcounter',
+    'spexflix',
     'ajax_select',
 ]
 
@@ -105,6 +106,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+MEDIA_URL = '/uploads/'
 
 PROVISION_GSUITE_ACCOUNTS = False
 

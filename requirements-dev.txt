@@ -25,5 +25,7 @@ djangorestframework-api-key==3.0.0
     # via -r requirements-base.in
 packaging==24.2
     # via djangorestframework-api-key
+pillow==11.0.0
+    # via -r requirements-base.in
 sqlparse==0.5.3
     # via django

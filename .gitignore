@@ -2,6 +2,7 @@
 db.sqlite3
 fixture.json
 internsidor/settings/local.py
+uploads/
 
 # Python
 .venv
