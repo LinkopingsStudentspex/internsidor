@@ -5,8 +5,13 @@
 
 {% block content %}
 <div class="col-xl-8">
-<h2>{{ object.short_name }} - {{ object.main_title }}</h2>
-
+    <div class="container-fluid">
+        <div class="row h2">
+            <div class="col-2 text-left">{% if previous %}<a class="btn btn-outline-secondary bi bi-caret-left-fill" href="{% url 'batadasen:production_detail' previous %}" class="silent-link"></a>{% endif %}</div>
+            <div class="col-8 text-center">{{ object.short_name }} - {{ object.main_title }}</div>
+            <div class="col-2 text-right">{% if next %}<a class="btn  btn-outline-secondary bi bi-caret-right-fill" href="{% url 'batadasen:production_detail' next %}" class="silent-link"></a>{% endif %}</div>
+        </div>
+    </div>
 <p>Om bakgrunden är röd så är personen inte medlem i föreningen.</p>
 
 <table class="table table-sm table-striped">
