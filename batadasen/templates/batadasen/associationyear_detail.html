@@ -20,7 +20,7 @@
             <td><a href="{% url 'batadasen:person_detail' activity.person.member_number %}">{{ activity.person.member_number }}</a></td>
             <td>{{ activity.person.first_name }} {% if activity.person.spex_name %}"{{ activity.person.spex_name }}" {% endif %}{{ activity.person.last_name }}</td>
             <td>{% if activity.title %}{{ activity.title }}{% endif %}</td>
-            <td>{% if activity.comment %}{{ activity.comment }}{% endif %}</td>
+            <td>{% if activity.to_date %}T.o.m. {{ activity.to_date }}{% endif %}</td>
         </tr>
         {% endfor %}    
         {% endfor %}
