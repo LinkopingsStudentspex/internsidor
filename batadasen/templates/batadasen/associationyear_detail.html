@@ -4,18 +4,26 @@
 {% block title %}Verksamhetsåret {{ object }}{% endblock %}
 
 {% block content %}
-<h2>{% if previous %}<a href="{% url 'batadasen:associationyear_detail' previous %}" class="silent-link">❮</a> {% endif %}Verksamhetsåret {{ object }}{% if next %} <a href="{% url 'batadasen:associationyear_detail' next %}" class="silent-link">❯</a>{% endif %}</h2>
-<table class="table table-sm table-striped">
-{% for group in groups %}
-    <tr class="table-primary"> <th colspan="4">{{ group.group.group_type.name }} ({{ group.group.group_type.short_name }})</th></tr>
-{% for activity in group.activities %}
-    <tr>
-        <td><a href="{% url 'batadasen:person_detail' activity.person.member_number %}">{{ activity.person.member_number }}</a></td>
-        <td>{{ activity.person.first_name }} {% if activity.person.spex_name %}"{{ activity.person.spex_name }}" {% endif %}{{ activity.person.last_name }}</td>
-        <td>{% if activity.title %}{{ activity.title }}{% endif %}</td>
-        <td>{% if activity.comment %}{{ activity.comment }}{% endif %}</td>
-    </tr>
-{% endfor %}    
-{% endfor %}
-</table>
+<div class="col-xl-8">
+    <div class="container-fluid">
+        <div class="row h2">
+            <div class="col-2 text-left">{% if previous %}<a class="btn btn-outline-secondary bi bi-caret-left-fill" href="{% url 'batadasen:associationyear_detail' previous %}" class="silent-link"></a>{% endif %}</div>
+            <div class="col-8 text-center">Verksamhetsåret {{ object }}</div>
+            <div class="col-2 text-right">{% if next %}<a class="btn  btn-outline-secondary bi bi-caret-right-fill" href="{% url 'batadasen:associationyear_detail' next %}" class="silent-link"></a>{% endif %}</div>
+        </div>
+    </div>
+    <table class="table table-sm table-striped">
+        {% for group in groups %}
+        <tr class="table-primary"> <th colspan="4">{{ group.group.group_type.name }} ({{ group.group.group_type.short_name }})</th></tr>
+        {% for activity in group.activities %}
+        <tr>
+            <td><a href="{% url 'batadasen:person_detail' activity.person.member_number %}">{{ activity.person.member_number }}</a></td>
+            <td>{{ activity.person.first_name }} {% if activity.person.spex_name %}"{{ activity.person.spex_name }}" {% endif %}{{ activity.person.last_name }}</td>
+            <td>{% if activity.title %}{{ activity.title }}{% endif %}</td>
+            <td>{% if activity.comment %}{{ activity.comment }}{% endif %}</td>
+        </tr>
+        {% endfor %}    
+        {% endfor %}
+    </table>
+</div>
 {% endblock %}
