@@ -226,7 +226,7 @@ class AssociationYear(models.Model):
     class Meta:
         verbose_name = 'verksamhetsår'
         verbose_name_plural = 'verksamhetsår'
-        ordering = ['end_year']
+        ordering = ['-end_year']
 
     end_year = models.PositiveIntegerField('slutår', default=get_current_assoc_end_year, validators=[validate_association_year], primary_key=True)
 
@@ -266,7 +266,7 @@ class AssociationGroup(models.Model):
         verbose_name = 'föreningsgrupp'
         verbose_name_plural = 'föreningsgrupp'
         unique_together = [['year', 'group_type']]
-        ordering = ['group_type','year']
+        ordering = ['year', 'group_type']
 
     year = models.ForeignKey(AssociationYear, models.CASCADE, verbose_name='verksamhetsår', related_name='groups')
     group_type = models.ForeignKey(AssociationGroupType, models.CASCADE, verbose_name='grupptyp')
@@ -280,7 +280,7 @@ class AssociationActivity(models.Model):
         verbose_name = 'föreningsuppdrag'
         verbose_name_plural = 'föreningsuppdrag'
         unique_together = [['person', 'group']]
-        ordering = ['person', 'group']
+        ordering = ['person', '-group']
 
     person = models.ForeignKey(Person, models.CASCADE, verbose_name='person', related_name='association_activities')
     group = models.ForeignKey(AssociationGroup, models.CASCADE, verbose_name='grupp', related_name='activities')

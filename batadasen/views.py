@@ -153,6 +153,24 @@ class ProductionDetailView(DetailView):
             result_group['memberships'] = memberships
             groups.append(result_group)
         context['groups'] = groups
+
+        previous_production = (
+            self.model.objects.filter(number__lt=context["object"].number)
+            .order_by("-number")
+            .only("number")
+            .first()
+        )
+        context["previous"] = previous_production.number if previous_production else None
+
+        next_production = (
+            self.model.objects.filter(number__gt=context["object"].number)
+            .only()
+            .order_by("number")
+            .only("number")
+            .first()
+        )
+        context["next"] = next_production.number if next_production else None
+
         return context
     
 
