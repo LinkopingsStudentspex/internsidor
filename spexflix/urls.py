@@ -11,5 +11,4 @@ urlpatterns = [
     path('', views.ProductionList.as_view(), name='index'),
     path('productions/<int:pk>', views.ProductionDetail.as_view(), name='production-detail'),
     path('video/<int:pk>', views.VideoDetail.as_view(), name='video-detail'),
-    path('auth_check', views.auth_check, name='auth-check'),
 ]

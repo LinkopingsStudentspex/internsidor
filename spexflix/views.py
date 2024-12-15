@@ -25,15 +25,6 @@ class VideoDetail(DetailView):
     context_object_name = 'video'
     template_name = 'spexflix/video_detail.html'
 
-def auth_check(request):
-    """
-    Empty response for use with Nginx auth_request
-    """
-    if request.user.is_authenticated:
-        return HttpResponse(status=204)
-    else:
-        return HttpResponse(status=401, headers={'WWW-Authenticate': 'Bearer'})
-
 class ProductionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Production.objects.all()
     permission_classes = (permissions.IsAuthenticated,)

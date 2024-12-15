@@ -18,13 +18,22 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path, include, reverse
-from django.http import HttpResponseRedirect
-from django.views.generic.base import View, TemplateView
+from django.http import HttpResponse
+from django.views.generic.base import TemplateView
 
 from ajax_select import urls as ajax_select_urls
 
 import batadasen
 import assetmanager
+
+def auth_check(request):
+    """
+    Empty response view for use with Nginx auth_request
+    """
+    if request.user.is_authenticated:
+        return HttpResponse(status=204)
+    else:
+        return HttpResponse(status=401, headers={'WWW-Authenticate': 'Bearer'})
 
 if 'mozilla_django_oidc' in settings.INSTALLED_APPS:
     urlpatterns = [
@@ -40,6 +49,7 @@ if 'mozilla_django_oidc' in settings.INSTALLED_APPS:
         path('spexflix/', include('spexflix.urls')),
         path('ajax_select/', include(ajax_select_urls)),
         path('oidc/', include('mozilla_django_oidc.urls')),
+        path('auth_check', auth_check, name='auth-check'),
         path('', batadasen.views.index_view)
     ]
 else:
