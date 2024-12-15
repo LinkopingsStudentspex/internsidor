@@ -1,4 +1,4 @@
-django>=4.1.0,<4.2.0
+django>=4.2.17,<5.0.0
 djangorestframework
 djangorestframework-api-key
 django-filter

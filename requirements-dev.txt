@@ -10,7 +10,7 @@ backports-zoneinfo==0.2.1
     # via
     #   django
     #   djangorestframework
-django==4.1.13
+django==4.2.17
     # via
     #   -r requirements-base.in
     #   django-crispy-forms

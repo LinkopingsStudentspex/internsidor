@@ -23,7 +23,7 @@ cryptography==44.0.0
     #   josepy
     #   mozilla-django-oidc
     #   pyopenssl
-django==4.1.13
+django==4.2.17
     # via
     #   -r requirements-base.in
     #   django-crispy-forms
