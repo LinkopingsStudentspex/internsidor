@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView, DetailView
 from rest_framework import viewsets, permissions
@@ -24,6 +25,14 @@ class VideoDetail(DetailView):
     context_object_name = 'video'
     template_name = 'spexflix/video_detail.html'
 
+def auth_check(request):
+    """
+    Empty response for use with Nginx auth_request
+    """
+    if request.user.is_authenticated:
+        return HttpResponse(status=204)
+    else:
+        return HttpResponse(status=401, headers={'WWW-Authenticate': 'Bearer'})
 
 class ProductionViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Production.objects.all()
