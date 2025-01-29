@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'batadasen',
     'django_filters',
     'crispy_forms',
+    'crispy_bootstrap4',
     'assetmanager',
     'showcounter',
     'spexflix',
@@ -100,6 +101,7 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
+CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap4'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Static files (CSS, JavaScript, Images)
