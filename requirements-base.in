@@ -3,6 +3,7 @@ djangorestframework>=3.15.2
 djangorestframework-api-key
 django-filter
 django-crispy-forms==2.3
+django-tables2==2.7.0
 crispy-bootstrap4==2024.10
 django-ajax-selects
 pillow

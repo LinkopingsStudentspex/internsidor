@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_tables2',
     'rest_framework',
     'rest_framework_api_key',
     'batadasen',
@@ -114,3 +115,7 @@ PROVISION_GSUITE_ACCOUNTS = False
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+DJANGO_TABLES2_TABLE_ATTRS = {
+    'class': 'table table-sm table-striped',
+}

@@ -31,6 +31,7 @@ django==4.2.17
     #   crispy-bootstrap4
     #   django-crispy-forms
     #   django-filter
+    #   django-tables2
     #   djangorestframework
     #   mozilla-django-oidc
 django-ajax-selects==2.2.1
@@ -40,6 +41,8 @@ django-crispy-forms==2.3
     #   -r requirements-base.in
     #   crispy-bootstrap4
 django-filter==23.5
+    # via -r requirements-base.in
+django-tables2==2.7.0
     # via -r requirements-base.in
 djangorestframework==3.15.2
     # via -r requirements-base.in
