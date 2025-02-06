@@ -10,10 +10,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.utils.html import format_html
 from django.utils.http import urlencode
 from django.views.generic import DetailView, ListView, UpdateView, CreateView
 
 from django_filters.filterset import FilterSet
+import django_tables2 as tables
 
 from rest_framework import generics, filters
 from rest_framework.decorators import api_view, permission_classes
@@ -94,6 +96,33 @@ class EmailListDetailView(DetailView):
         if context['object'].alias.endswith('gruppledare'):
             context['gruppledare'] = True
         return context
+
+
+class MemberColumn(tables.Column):
+    def render(self, record: models.Person):
+        return format_html("<i class='bi bi-check-circle-fill text-success'></i>" if record.currently_member else "")
+
+class PersonTable(tables.Table):
+    currently_member = MemberColumn(verbose_name="", attrs={"td": {"class": "text-center"}})
+    member_number = tables.URLColumn(verbose_name="Medlem")
+    spex_name = tables.Column(default="")
+
+    class Meta:
+        model = models.Person
+        template_name = "django_tables2/bootstrap4-responsive.html"
+        fields = ("currently_member", "member_number", "first_name", "last_name", "spex_name")
+        row_attrs = {
+            "class": lambda record: "text-muted font-italic" if record.deceased else ""
+        }
+
+
+@method_decorator(login_required, name='dispatch')
+class PersonListView(tables.SingleTableView):
+    table_class = PersonTable
+    queryset = models.Person.objects.all()
+    template_name = "person_list.html"
+    table_pagination = False
+
 
 
 @method_decorator(login_required, name='dispatch')

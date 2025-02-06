@@ -10,6 +10,7 @@ urlpatterns = [
     path('email_lists/<str:alias>/', views.EmailListDetailView.as_view(), name='emaillist_detail'),
     path('settings/', views.PersonSelfView.as_view(), name='person_settings'),
     path('settings/extra_email/', views.ExtraEmailView.as_view(), name='person_extra_email'),
+    path('persons/', views.PersonListView.as_view(), name='person_list'),
     path('persons/<int:pk>/', views.PersonDetailView.as_view(), name='person_detail'),
     path('productions/', views.ProductionListView.as_view(), name='production_list'),
     path('productions/<int:pk>/', views.ProductionDetailView.as_view(), name='production_detail'),
