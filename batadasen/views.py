@@ -119,7 +119,7 @@ class PersonTable(tables.Table):
 @method_decorator(login_required, name='dispatch')
 class PersonListView(tables.SingleTableView):
     table_class = PersonTable
-    queryset = models.Person.objects.all()
+    queryset = models.Person.objects.filter(member_number__lt=5000).all()
     template_name = "person_list.html"
     table_pagination = False
 
