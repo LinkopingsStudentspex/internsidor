@@ -98,19 +98,14 @@ class EmailListDetailView(DetailView):
         return context
 
 
-class MemberColumn(tables.Column):
-    def render(self, record: models.Person):
-        return format_html("<i class='bi bi-check-circle-fill text-success'></i>" if record.currently_member else "")
-
 class PersonTable(tables.Table):
-    currently_member = MemberColumn(verbose_name="", attrs={"td": {"class": "text-center"}})
     member_number = tables.URLColumn(verbose_name="Medlem")
     spex_name = tables.Column(default="")
 
     class Meta:
         model = models.Person
         template_name = "django_tables2/bootstrap4-responsive.html"
-        fields = ("currently_member", "member_number", "first_name", "last_name", "spex_name")
+        fields = ("member_number", "first_name", "last_name", "spex_name")
         row_attrs = {
             "class": lambda record: "text-muted font-italic" if record.deceased else ""
         }
