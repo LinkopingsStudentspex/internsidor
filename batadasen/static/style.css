@@ -137,6 +137,89 @@ a.silent-link {
     color: inherit
 }
 
+.achievements {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 5px;
+    margin-bottom: 1rem;
+}
+
+.achievements div {
+    border-radius: 0.25rem;
+    height: 4rem;
+    width: 4rem;
+    padding: 5px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-origin: content-box;
+
+}
+
+.achievement-2 {
+    background:  #b08657 url("/static/images/2-medalj.svg");
+}
+
+.achievement-4 {
+    background:  #aaa9ad url("/static/images/4-medalj.svg");
+}
+
+.achievement-6 {
+    background:  #f2c43a url("/static/images/6-medalj.svg");
+}
+
+.achievement-100 {
+    background:  #83d0f0 url("/static/images/100-klocka.svg");
+}
+
+.shimmer {
+    mask: linear-gradient(-60deg, #000 30%, #0005, #000 70%) right/400% 100%;
+    animation: shimmer 5s infinite;
+}
+
+.tick {
+    animation: tick 2s infinite;
+}
+
+@keyframes shimmer {
+    90% {
+       mask-position: right;
+    }
+    100% {
+        mask-position: left;
+    }
+}
+
+@keyframes tick2 {
+    0% {
+        transform: scale(1.0);
+    }
+    49% {
+        transform: scale(1.0);
+    }
+    50% {
+        transform: scale(1.03);
+    }
+    99% {
+        transform: scale(1.03);
+    }
+}
+
+
+@keyframes tick {
+    0% {
+        transform: rotate(0deg);
+    }
+    49% {
+        transform: rotate(0deg);
+    }
+    50% {
+        transform: rotate(2deg);
+    }
+    99% {
+        transform: rotate(2deg);
+    }
+}
+
 .sidebar-nav {
     position: absolute;
     top: 0;

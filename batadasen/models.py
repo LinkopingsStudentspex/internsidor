@@ -40,7 +40,9 @@ class Person(models.Model):
         verbose_name_plural = 'personer'
         ordering = ['member_number']
         permissions = [
-            ("view_private_info", "Kan se all personinfo oavsett personens inställningar")
+            ("view_private_info", "Kan se all personinfo oavsett personens inställningar"),
+            ("view_performances", "Kan se loggade föreställnigar"),
+            ("view_medal_candidates", "Kan lista personer som är berättigade en årsmedalj")
         ]
 
     class PrivacySetting(models.TextChoices):
@@ -73,6 +75,9 @@ class Person(models.Model):
         help_text='Är personens mailadress aktiv och fungerande? '
                   'Om denna ruta kryssas ur kommer personen inte längre få några brev från spexets maillistor.')
     hundred_club = models.BooleanField('hundraklubben', default=False)
+    medal_2 = models.BooleanField('medalj 2', default=False)
+    medal_4 = models.BooleanField('medalj 4', default=False)
+    medal_6 = models.BooleanField('medalj 6', default=False)
     deceased = models.BooleanField('avliden', default=False)
     address_changed_date = models.DateTimeField('adress ändrad', null=True, blank=True)
     mail_changed_date = models.DateTimeField('mail ändrad', null=True, blank=True)
@@ -93,6 +98,30 @@ class Person(models.Model):
             return '{} {}'.format(self.first_name, self.last_name)
         else:
             return '{} "{}" {}'.format(self.first_name, self.spex_name, self.last_name)
+
+    @property
+    def productions(self):
+        memberships = self.production_memberships.select_related("group__production")
+        return {membership.group.production for membership in memberships}
+    
+    @property
+    def association_years(self):
+        activities = self.association_activities.select_related("group__year")
+        return { activity.group.year for activity in activities }
+
+    @property
+    def active_years(self):
+        production_years = { production.year + production.autumn for production in self.productions}
+        association_years = { association_year.end_year for association_year in self.association_years}
+        return production_years | association_years
+
+    @property
+    def currently_active(self):
+        now = datetime.now()
+        current_association_year = now.year + (now.month > 6)
+        active_years = self.active_years
+        return active_years and max(active_years) >= current_association_year
+
 
     def __str__(self):
         return '({}) {}'.format(self.member_number, self.full_name)

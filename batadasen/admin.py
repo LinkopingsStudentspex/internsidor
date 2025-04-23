@@ -72,7 +72,7 @@ class PersonAdmin(admin.ModelAdmin):
         ('phone_home', 'phone_work', 'phone_extra'),
         'address_list_email',
         ('user', 'send_activation_link', 'provision_gsuite_account'),
-        'hundred_club',
+        ('medal_2', 'medal_4', 'medal_6', 'hundred_club'),
         'deceased',
         ('wants_spexinfo', 'wants_blandat', 'wants_trams'),
         'email_active',

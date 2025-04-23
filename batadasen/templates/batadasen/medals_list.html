@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}Medaljer{% endblock %}
+
+{% block content %}
+<h1>Utdelade årsmedaljer</h1>
+<div class="achievements"><div class="achievement-6 shimmer"></div></div>
+<table class="table table-sm table-striped">
+    <tr>
+        <th colspan="2">Spexare</th>
+        <th>Aktiva år</th>
+    </tr>
+{% for person in medal_6|dictsort:"member_number" %}
+    <tr>
+        <td><a href="{% url 'batadasen:person_detail' person.member_number %}">{{ person.member_number }}</a></td>
+        <td>{{ person.first_name }} {% if person.spex_name %}"{{ person.spex_name }}" {% endif %}{{ person.last_name }}</td>
+        <td>{{ person.active_years | length }}</td>
+    </tr>
+{% endfor %}
+{% if perms.batadasen.view_medal_candidates and medal_6_candidates %}
+    <tr class="table-info text-center">
+        <th colspan="3">Kandidater</th>
+    </tr>
+    {% for person in medal_6_candidates|dictsort:"member_number" %}
+    <tr>
+        <td><a href="{% url 'batadasen:person_detail' person.member_number %}">{{ person.member_number }}</a></td>
+        <td>{{ person.first_name }} {% if person.spex_name %}"{{ person.spex_name }}" {% endif %}{{ person.last_name }}</td>
+        <td>{{ person.active_years | length }}</td>
+    </tr>
+    {% endfor %}
+{% endif %}
+</table>
+
+<div class="achievements"><div class="achievement-4 shimmer"></div></div>
+<table class="table table-sm table-striped">
+    <tr>
+        <th colspan="2">Spexare</th>
+        <th>Aktiva år</th>
+    </tr>
+{% for person in medal_4|dictsort:"member_number" %}
+    <tr>
+        <td><a href="{% url 'batadasen:person_detail' person.member_number %}">{{ person.member_number }}</a></td>
+        <td>{{ person.first_name }} {% if person.spex_name %}"{{ person.spex_name }}" {% endif %}{{ person.last_name }}</td>
+        <td>{{ person.active_years | length }}</td>
+    </tr>
+{% endfor %}
+{% if perms.batadasen.view_medal_candidates and medal_4_candidates %}
+    <tr class="table-info text-center">
+        <th colspan="3">Kandidater</th>
+    </tr>
+    {% for person in medal_4_candidates|dictsort:"member_number" %}
+    <tr>
+        <td><a href="{% url 'batadasen:person_detail' person.member_number %}">{{ person.member_number }}</a></td>
+        <td>{{ person.first_name }} {% if person.spex_name %}"{{ person.spex_name }}" {% endif %}{{ person.last_name }}</td>
+        <td>{{ person.active_years | length }}</td>
+    </tr>
+    {% endfor %}
+{% endif %}
+</table>
+
+<div class="achievements"><div class="achievement-2 shimmer"></div></div>
+<table class="table table-sm table-striped">
+    <tr>
+        <th colspan="2">Spexare</th>
+        <th>Aktiva år</th>
+    </tr>
+{% for person in medal_2|dictsort:"member_number" %}
+    <tr>
+        <td><a href="{% url 'batadasen:person_detail' person.member_number %}">{{ person.member_number }}</a></td>
+        <td>{{ person.first_name }} {% if person.spex_name %}"{{ person.spex_name }}" {% endif %}{{ person.last_name }}</td>
+        <td>{{ person.active_years | length }}</td>
+    </tr>
+{% endfor %}
+{% if perms.batadasen.view_medal_candidates and medal_2_candidates %}
+    <tr class="table-info text-center">
+        <th colspan="3">Kandidater</th>
+    </tr>
+    {% for person in medal_2_candidates|dictsort:"member_number" %}
+    <tr>
+        <td><a href="{% url 'batadasen:person_detail' person.member_number %}">{{ person.member_number }}</a></td>
+        <td>{{ person.first_name }} {% if person.spex_name %}"{{ person.spex_name }}" {% endif %}{{ person.last_name }}</td>
+        <td>{{ person.active_years | length }}</td>
+    </tr>
+    {% endfor %}
+{% endif %}
+</table>
+{% endblock %}
