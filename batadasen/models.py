@@ -41,7 +41,7 @@ class Person(models.Model):
         ordering = ['member_number']
         permissions = [
             ("view_private_info", "Kan se all personinfo oavsett personens inställningar"),
-            ("view_performances", "Kan se loggade föreställnigar"),
+            ("view_performances", "Kan se loggade föreställningar"),
             ("view_medal_candidates", "Kan lista personer som är berättigade en årsmedalj")
         ]
 
