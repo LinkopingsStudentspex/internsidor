@@ -245,7 +245,7 @@ class Club100(ListView):
     annotated = model.objects.annotate(
         performances_count=Count('performances')
     )
-    queryset = annotated.filter(Q(hundred_club=True) | Q(performances_count__gte=3))
+    queryset = annotated.filter(Q(hundred_club=True) | Q(performances_count__gte=90))
     template_name = 'batadasen/hundraklubben_list.html'
 
 @method_decorator(login_required, name='dispatch')
