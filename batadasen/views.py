@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
@@ -23,6 +25,8 @@ from rest_framework_api_key.permissions import HasAPIKey
 import django_filters
 
 from . import forms, models, serializers
+from showcounter.models import Performance
+
 if settings.PROVISION_GSUITE_ACCOUNTS:
     from . import gsuite
 
@@ -275,6 +279,72 @@ class Medals(TemplateView):
                 context['medal_2'].append(person)
             elif person.currently_active and len(person.active_years) >= 2:
                 context['medal_2_candidates'].append(person)
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class StatisticsView(TemplateView):
+    template_name = 'batadasen/statistics.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        now = datetime.now()
+        current_association_year = now.year + (now.month > 6)
+        print(now)
+        context['years_since_start'] = now.year - 1980 + (now > datetime(now.year, 11, 28))
+
+        honorary = (
+            models.AssociationMembership.objects
+            .filter(membership_type='HON', person__deceased=False)
+            .values_list('person', flat=True)
+        )
+        
+        lifetime = (
+            models.AssociationMembership.objects
+            .filter(membership_type='LIF', person__deceased=False)
+            .exclude(person__in=honorary)
+            .values_list('person', flat=True)
+        )
+
+        standard = (
+            models.AssociationMembership.objects
+            .filter(year=current_association_year, membership_type='STD', person__deceased=False)
+            .exclude(person__in=honorary)
+            .exclude(person__in=lifetime)
+            .values_list('person', flat=True)
+        )
+
+        honorary = len(honorary)
+        lifetime = len(lifetime)
+        standard = len(standard)
+
+        context['members'] = {
+            'standard': standard,
+            'lifetime': lifetime,
+            'honorary': honorary,
+            'all': standard + lifetime + honorary,
+            'ever': models.Person.objects.count()
+        }
+
+        not_really_productions = {
+            32,  # Jubel-25: fest
+            33,  # Jubel-25: prylar
+            42,  # Gyckel
+            55,  # Jubel-40
+            57,  # Covid
+        }
+
+        regular_productions = models.Production.objects.filter(regular=True).exclude(number__in=not_really_productions).count()
+        extra_productions = models.Production.objects.filter(regular=False).exclude(number__in=not_really_productions).count()
+        context['productions'] = {
+            'regular': regular_productions,
+            'extra': extra_productions,
+            'all': regular_productions + extra_productions
+        }
+
+        context["performances"] = Performance.objects.filter(date__lte=now).count()
+
         return context
 
 @login_required

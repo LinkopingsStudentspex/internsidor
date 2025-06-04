@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% block title %}Statistik{% endblock %}
+
+{% block content %}
+<div class="mx-auto mt-5 p-4 rounded shadow bg-light" style="width: 40rem;">
+    <div>
+        <p>
+            Linköpings Studentspex har under sina <strong>{{ years_since_start }} år</strong> satt upp
+            <strong>{{ productions.all }} spex</strong> varav {{ productions.regular }} ordinarie och
+            {{ productions.extra }} andra. Allt som allt har det blivit <strong>{{ performances }}
+            föreställningar</strong>.
+        </p>
+        
+        <p>Detta har varit möjligt genom det arbete som <strong>totalt {{ members.ever }} spexare</strong> lagt ner.</p>
+        
+        <p>
+            Idag finns det <strong>{{ members.all }} medlemmar</strong> fördelat på {{ members.standard }} ordinarie medlemmar,
+            {{ members.lifetime }} livstids&shy;medlemmar och {{ members.honorary }} heders&shy;medlemmar.
+        </p>
+    </div>
+    <div class="text-center">
+        <img src="{% static 'images/lisse.png' %}" alt="Lisse">
+    </div>
+</div>
+{% endblock %}
