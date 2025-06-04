@@ -18,6 +18,7 @@ urlpatterns = [
     path('productions/<int:pk>/', views.ProductionDetailView.as_view(), name='production_detail'),
     path('association/', views.AssociationYearListView.as_view(), name='associationyear_list'),
     path('association/<int:pk>/', views.AssociationYearDetailView.as_view(), name='associationyear_detail'),
+    path('statistics/', views.StatisticsView.as_view(), name='statistics'),
     path('api/users', views.UserList.as_view()),
     path('api/users_count', views.user_count),
     path('no_admin/', views.no_admin_view, name='no_admin'),
