@@ -6,7 +6,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Min
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -171,7 +171,11 @@ class ProductionDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         groups = []
         for group in context['object'].groups.all():
-            memberships = group.memberships.order_by("-title")
+            memberships = (
+                group.memberships
+                .annotate(first_production_id=Min('person__production_memberships__group__production__pk'))
+                .order_by("-title")
+            )
 
             if not memberships.exists():
                 continue
