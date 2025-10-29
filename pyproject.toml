@@ -25,3 +25,9 @@ production = [
     "google-auth-httplib2==0.2.0",
     "google-auth-oauthlib==1.2.1",
 ]
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.3.0",
+    "ruff>=0.14.2",
+]
