@@ -37,6 +37,11 @@ urlpatterns = [
         views.AssociationYearDetailView.as_view(),
         name="associationyear_detail",
     ),
+    path(
+        "association/<int:pk>/<str:group_shortname>/",
+        views.AssociationYearGroupDetailView.as_view(),
+        name="associationyear_group_detail",
+    ),
     path("statistics/", views.StatisticsView.as_view(), name="statistics"),
     path("api/users", views.UserList.as_view()),
     path("api/users_count", views.user_count),

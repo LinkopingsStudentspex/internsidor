@@ -265,6 +265,39 @@ class AssociationYearDetailView(DetailView):
 
 
 @method_decorator(login_required, name="dispatch")
+class AssociationYearGroupDetailView(DetailView):
+    model = models.AssociationYear
+    template_name = (
+        "batadasen/associationyear_group_detail.html"  # skapa ev ny template
+    )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        group_shortname = self.kwargs["group_shortname"]
+        group = context["object"].groups.filter(group_type_id=group_shortname).first()
+        activities = group.activities.order_by("-title")
+        context["group"] = group
+        context["activities"] = activities
+
+        previous_year = (
+            self.model.objects.filter(end_year__lt=context["object"].end_year)
+            .order_by("-end_year")
+            .only("end_year")
+            .first()
+        )
+        context["previous"] = previous_year.end_year if previous_year else None
+        next_year = (
+            self.model.objects.filter(end_year__gt=context["object"].end_year)
+            .only()
+            .order_by("end_year")
+            .only("end_year")
+            .first()
+        )
+        context["next"] = next_year.end_year if next_year else None
+        return context
+
+
+@method_decorator(login_required, name="dispatch")
 class Club100(ListView):
     model = models.Person
     annotated = model.objects.annotate(performances_count=Count("performances"))
