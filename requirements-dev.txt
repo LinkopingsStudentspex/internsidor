@@ -2,8 +2,12 @@
 #    uv export --no-hashes -o requirements-dev.txt
 asgiref==3.10.0
     # via django
+cfgv==3.4.0
+    # via pre-commit
 crispy-bootstrap4==2024.10
     # via internsidor
+distlib==0.4.0
+    # via virtualenv
 django==4.2.17
     # via
     #   crispy-bootstrap4
@@ -26,13 +30,29 @@ djangorestframework==3.15.2
     # via internsidor
 djangorestframework-api-key==3.0.0
     # via internsidor
+filelock==3.20.0
+    # via virtualenv
+identify==2.6.15
+    # via pre-commit
+nodeenv==1.9.1
+    # via pre-commit
 packaging==25.0
     # via djangorestframework-api-key
 pillow==10.4.0
     # via internsidor
+platformdirs==4.5.0
+    # via virtualenv
+pre-commit==4.3.0
+pyyaml==6.0.3
+    # via pre-commit
+ruff==0.14.2
 sqlparse==0.5.3
     # via django
 typing-extensions==4.15.0
-    # via asgiref
+    # via
+    #   asgiref
+    #   virtualenv
 tzdata==2025.2 ; sys_platform == 'win32'
     # via django
+virtualenv==20.35.4
+    # via pre-commit

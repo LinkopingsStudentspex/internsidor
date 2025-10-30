@@ -7,16 +7,15 @@
 <div class="col-xl-8">
     <div class="container-fluid">
         <div class="row h2">
-            <div class="col-2 text-left">{% if previous %}<a class="btn btn-outline-secondary bi bi-caret-left-fill" href="{% url 'batadasen:production_detail' previous %}" class="silent-link"></a>{% endif %}</div>
-            <div class="col-8 text-center">{{ object.short_name }} - {{ object.main_title }}</div>
-            <div class="col-2 text-right">{% if next %}<a class="btn  btn-outline-secondary bi bi-caret-right-fill" href="{% url 'batadasen:production_detail' next %}" class="silent-link"></a>{% endif %}</div>
+            <div class="col-2 text-left">{% if previous %}<a class="btn btn-outline-secondary bi bi-caret-left-fill" href="{% url 'batadasen:production_group_detail' previous group.group_type.short_name %}" class="silent-link"></a>{% endif %}</div>
+            <div class="col-8 text-center">{{ group.group_type.name }}: <a href="{% url 'batadasen:production_detail' object.number %}">{{ object.short_name }} - {{ object.main_title }}</a></div>
+            <div class="col-2 text-right">{% if next %}<a class="btn  btn-outline-secondary bi bi-caret-right-fill" href="{% url 'batadasen:production_group_detail' next group.group_type.short_name %}" class="silent-link"></a>{% endif %}</div>
         </div>
     </div>
 <p>Om bakgrunden är röd så är personen inte medlem i föreningen.</p>
 
 <table class="table table-sm table-striped">
-{% for group in groups %}
-<tr class="table-primary"> <th colspan="4"><a href="{% url 'batadasen:production_group_detail' object.number group.group.group_type.short_name %}">{{ group.group.group_type.name }} ({{ group.group.group_type.short_name }})</a></th></tr>
+<tr class="table-primary"> <th colspan="4">{{ group.group_type.name }} ({{ group.group_type.short_name }})</th></tr>
 {% for membership in group.memberships.all %}
 {% if not membership.person.currently_member %}
 <tr class = "table-danger">
@@ -30,7 +29,6 @@
     <td>{% if membership.title %}{{ membership.title }}{% endif %}</td>
     <td>{% if membership.comment %}{{ membership.comment }}{% endif %}</td>
 </tr>
-{% endfor %}
 {% endfor %}
 </table>
 <p>* Personens första uppsättning. </p>

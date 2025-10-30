@@ -220,9 +220,48 @@ class ProductionDetailView(DetailView):
         return context
 
 
-method_decorator(login_required, name="dispatch")
+@method_decorator(login_required, name="dispatch")
+class ProductionGroupDetailView(DetailView):
+    model = models.Production
+    template_name = "batadasen/production_group_detail.html"  # skapa ev ny template
+
+    # This dance is done to order the memberships in each group by title
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        group_shortname = self.kwargs["group_shortname"]
+        group = context["object"].groups.filter(group_type_id=group_shortname).first()
+
+        memberships = group.memberships.annotate(
+            first_production_id=Min(
+                "person__production_memberships__group__production__pk"
+            )
+        ).order_by("-title")
+
+        context["group"] = group
+        context["memberships"] = memberships
+
+        previous_production = (
+            self.model.objects.filter(number__lt=context["object"].number)
+            .order_by("-number")
+            .only("number")
+            .first()
+        )
+        context["previous"] = (
+            previous_production.number if previous_production else None
+        )
+
+        next_production = (
+            self.model.objects.filter(number__gt=context["object"].number)
+            .only()
+            .order_by("number")
+            .only("number")
+            .first()
+        )
+        context["next"] = next_production.number if next_production else None
+        return context
 
 
+@method_decorator(login_required, name="dispatch")
 class AssociationYearListView(ListView):
     model = models.AssociationYear
 
@@ -245,6 +284,39 @@ class AssociationYearDetailView(DetailView):
             }
             groups.append(result_group)
         context["groups"] = groups
+
+        previous_year = (
+            self.model.objects.filter(end_year__lt=context["object"].end_year)
+            .order_by("-end_year")
+            .only("end_year")
+            .first()
+        )
+        context["previous"] = previous_year.end_year if previous_year else None
+        next_year = (
+            self.model.objects.filter(end_year__gt=context["object"].end_year)
+            .only()
+            .order_by("end_year")
+            .only("end_year")
+            .first()
+        )
+        context["next"] = next_year.end_year if next_year else None
+        return context
+
+
+@method_decorator(login_required, name="dispatch")
+class AssociationYearGroupDetailView(DetailView):
+    model = models.AssociationYear
+    template_name = (
+        "batadasen/associationyear_group_detail.html"  # skapa ev ny template
+    )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        group_shortname = self.kwargs["group_shortname"]
+        group = context["object"].groups.filter(group_type_id=group_shortname).first()
+        activities = group.activities.order_by("-title")
+        context["group"] = group
+        context["activities"] = activities
 
         previous_year = (
             self.model.objects.filter(end_year__lt=context["object"].end_year)
