@@ -6,15 +6,20 @@ import spexflix.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('spexflix', '0003_production_information'),
+        ("spexflix", "0003_production_information"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='video',
-            name='video_file',
-            field=models.FileField(upload_to=spexflix.models.get_video_upload_path, validators=[django.core.validators.FileExtensionValidator(['mp4', 'm4v'])], verbose_name='Fil'),
+            model_name="video",
+            name="video_file",
+            field=models.FileField(
+                upload_to=spexflix.models.get_video_upload_path,
+                validators=[
+                    django.core.validators.FileExtensionValidator(["mp4", "m4v"])
+                ],
+                verbose_name="Fil",
+            ),
         ),
     ]

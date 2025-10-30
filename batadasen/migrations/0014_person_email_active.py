@@ -4,15 +4,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('batadasen', '0013_useractivation_provision_gsuite_account'),
+        ("batadasen", "0013_useractivation_provision_gsuite_account"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='person',
-            name='email_active',
-            field=models.BooleanField(default=True, help_text='Är personens mailadress aktiv och fungerande? Om denna ruta kryssas ur kommer personen inte längre få några brev från spexets maillistor.', verbose_name='mailadress aktiv'),
+            model_name="person",
+            name="email_active",
+            field=models.BooleanField(
+                default=True,
+                help_text="Är personens mailadress aktiv och fungerande? Om denna ruta kryssas ur kommer personen inte längre få några brev från spexets maillistor.",
+                verbose_name="mailadress aktiv",
+            ),
         ),
     ]

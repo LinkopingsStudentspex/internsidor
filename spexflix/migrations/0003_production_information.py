@@ -4,15 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('spexflix', '0002_video_video_type'),
+        ("spexflix", "0002_video_video_type"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='production',
-            name='information',
-            field=models.TextField(blank=True, help_text='Beskriv spexets handling eller annat som kan vara intressant.', max_length=2000, verbose_name='Information'),
+            model_name="production",
+            name="information",
+            field=models.TextField(
+                blank=True,
+                help_text="Beskriv spexets handling eller annat som kan vara intressant.",
+                max_length=2000,
+                verbose_name="Information",
+            ),
         ),
     ]

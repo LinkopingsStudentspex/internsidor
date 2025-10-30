@@ -4,15 +4,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('batadasen', '0009_productiongrouptype_exclude_from_production_email'),
+        ("batadasen", "0009_productiongrouptype_exclude_from_production_email"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='emaillist',
-            name='is_internal',
-            field=models.BooleanField(default=True, help_text='Ska endast spexare få skicka till denna lista?', verbose_name='intern lista'),
+            model_name="emaillist",
+            name="is_internal",
+            field=models.BooleanField(
+                default=True,
+                help_text="Ska endast spexare få skicka till denna lista?",
+                verbose_name="intern lista",
+            ),
         ),
     ]

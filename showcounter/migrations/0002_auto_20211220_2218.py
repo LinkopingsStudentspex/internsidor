@@ -4,25 +4,34 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('showcounter', '0001_initial'),
+        ("showcounter", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='performance',
-            name='notes',
-            field=models.CharField(blank=True, help_text='Allmäna övriga anmärkningar om föreställningen', max_length=400, verbose_name='övrigt'),
+            model_name="performance",
+            name="notes",
+            field=models.CharField(
+                blank=True,
+                help_text="Allmäna övriga anmärkningar om föreställningen",
+                max_length=400,
+                verbose_name="övrigt",
+            ),
         ),
         migrations.AlterField(
-            model_name='performance',
-            name='tag',
-            field=models.CharField(blank=True, help_text='Vilken typ av föreställning, t.ex. Premiär, Genrep, Extra', max_length=20, verbose_name='tag'),
+            model_name="performance",
+            name="tag",
+            field=models.CharField(
+                blank=True,
+                help_text="Vilken typ av föreställning, t.ex. Premiär, Genrep, Extra",
+                max_length=20,
+                verbose_name="tag",
+            ),
         ),
         migrations.AlterField(
-            model_name='performance',
-            name='time',
-            field=models.TimeField(blank=True, null=True, verbose_name='time'),
+            model_name="performance",
+            name="time",
+            field=models.TimeField(blank=True, null=True, verbose_name="time"),
         ),
     ]

@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('showcounter', '0003_auto_20211225_2056'),
+        ("showcounter", "0003_auto_20211225_2056"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='performance',
-            name='start_time',
-            field=models.TimeField(blank=True, null=True, verbose_name='starttid'),
+            model_name="performance",
+            name="start_time",
+            field=models.TimeField(blank=True, null=True, verbose_name="starttid"),
         ),
     ]

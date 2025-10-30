@@ -1,10 +1,9 @@
-
-from django.urls import path, include, reverse
+from django.urls import path
 
 from showcounter import views
 
-app_name= 'showcounter'
+app_name = "showcounter"
 urlpatterns = [
-    path('production/<int:number>', views.production, name='production'),
-    path('', views.overview, name='overview'),
+    path("production/<int:number>", views.production, name="production"),
+    path("", views.overview, name="overview"),
 ]

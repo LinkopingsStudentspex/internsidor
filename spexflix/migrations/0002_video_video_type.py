@@ -4,15 +4,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('spexflix', '0001_initial'),
+        ("spexflix", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='video',
-            name='video_type',
-            field=models.CharField(choices=[('SHOW', 'Föreställning'), ('EXTRA', 'Extramaterial'), ('OTHER', 'Övrigt')], default='SHOW', max_length=10, verbose_name='Videotyp'),
+            model_name="video",
+            name="video_type",
+            field=models.CharField(
+                choices=[
+                    ("SHOW", "Föreställning"),
+                    ("EXTRA", "Extramaterial"),
+                    ("OTHER", "Övrigt"),
+                ],
+                default="SHOW",
+                max_length=10,
+                verbose_name="Videotyp",
+            ),
         ),
     ]

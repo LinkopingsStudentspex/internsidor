@@ -4,15 +4,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('batadasen', '0011_auto_20200714_1602'),
+        ("batadasen", "0011_auto_20200714_1602"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='person',
-            name='privacy_setting',
-            field=models.CharField(choices=[('PVT', 'Privat'), ('OPN', 'Öppen')], default='OPN', help_text='Privat: endast administratörer kan se dina personuppgifter. Öppen: andra inloggade kan se all din information. Inga personuppgifter kommer någonsin vara synliga för icke-inloggade.', max_length=3, verbose_name='sekretessnivå'),
+            model_name="person",
+            name="privacy_setting",
+            field=models.CharField(
+                choices=[("PVT", "Privat"), ("OPN", "Öppen")],
+                default="OPN",
+                help_text="Privat: endast administratörer kan se dina personuppgifter. Öppen: andra inloggade kan se all din information. Inga personuppgifter kommer någonsin vara synliga för icke-inloggade.",
+                max_length=3,
+                verbose_name="sekretessnivå",
+            ),
         ),
     ]
