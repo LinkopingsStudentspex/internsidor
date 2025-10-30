@@ -4,20 +4,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('showcounter', '0002_auto_20211220_2218'),
+        ("showcounter", "0002_auto_20211220_2218"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='performance',
-            old_name='time',
-            new_name='start_time',
+            model_name="performance",
+            old_name="time",
+            new_name="start_time",
         ),
         migrations.AlterField(
-            model_name='performance',
-            name='notes',
-            field=models.TextField(blank=True, help_text='Allmäna övriga anmärkningar om föreställningen', verbose_name='övrigt'),
+            model_name="performance",
+            name="notes",
+            field=models.TextField(
+                blank=True,
+                help_text="Allmäna övriga anmärkningar om föreställningen",
+                verbose_name="övrigt",
+            ),
         ),
     ]

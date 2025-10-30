@@ -4,30 +4,36 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('batadasen', '0006_auto_20200630_2331'),
+        ("batadasen", "0006_auto_20200630_2331"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='emaillist',
-            name='alias',
-            field=models.CharField(max_length=50, primary_key=True, serialize=False, verbose_name='alias'),
+            model_name="emaillist",
+            name="alias",
+            field=models.CharField(
+                max_length=50, primary_key=True, serialize=False, verbose_name="alias"
+            ),
         ),
         migrations.AlterField(
-            model_name='production',
-            name='short_name',
-            field=models.CharField(blank=True, max_length=50, verbose_name='kort namn'),
+            model_name="production",
+            name="short_name",
+            field=models.CharField(blank=True, max_length=50, verbose_name="kort namn"),
         ),
         migrations.AlterField(
-            model_name='productiongrouptype',
-            name='short_name',
-            field=models.CharField(max_length=50, primary_key=True, serialize=False, verbose_name='kortnamn'),
+            model_name="productiongrouptype",
+            name="short_name",
+            field=models.CharField(
+                max_length=50,
+                primary_key=True,
+                serialize=False,
+                verbose_name="kortnamn",
+            ),
         ),
         migrations.AlterField(
-            model_name='title',
-            name='email_alias',
-            field=models.CharField(blank=True, max_length=50, verbose_name='mailalias'),
+            model_name="title",
+            name="email_alias",
+            field=models.CharField(blank=True, max_length=50, verbose_name="mailalias"),
         ),
     ]

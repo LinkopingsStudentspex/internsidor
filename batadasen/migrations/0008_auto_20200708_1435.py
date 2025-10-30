@@ -5,25 +5,44 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('batadasen', '0007_auto_20200630_2339'),
+        ("batadasen", "0007_auto_20200630_2339"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='emaillist',
-            name='forward_to',
-            field=models.ForeignKey(blank=True, help_text='Ska mail till denna lista skickas vidare till medlemmar i en annan lista?', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='list_forwardings', to='batadasen.EmailList', verbose_name='vidarebefordring till annan lista'),
+            model_name="emaillist",
+            name="forward_to",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="Ska mail till denna lista skickas vidare till medlemmar i en annan lista?",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="list_forwardings",
+                to="batadasen.EmailList",
+                verbose_name="vidarebefordring till annan lista",
+            ),
         ),
         migrations.AlterField(
-            model_name='emaillist',
-            name='alias',
-            field=models.CharField(help_text='Namnet på listan, det som står framför @', max_length=50, primary_key=True, serialize=False, verbose_name='alias'),
+            model_name="emaillist",
+            name="alias",
+            field=models.CharField(
+                help_text="Namnet på listan, det som står framför @",
+                max_length=50,
+                primary_key=True,
+                serialize=False,
+                verbose_name="alias",
+            ),
         ),
         migrations.AlterField(
-            model_name='emaillist',
-            name='opt_in_members',
-            field=models.ManyToManyField(blank=True, help_text='Vilka enskilda personer ska få mail från denna lista?', related_name='opt_in_email_lists', to='batadasen.Person', verbose_name='enskilda personer'),
+            model_name="emaillist",
+            name="opt_in_members",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="Vilka enskilda personer ska få mail från denna lista?",
+                related_name="opt_in_email_lists",
+                to="batadasen.Person",
+                verbose_name="enskilda personer",
+            ),
         ),
     ]

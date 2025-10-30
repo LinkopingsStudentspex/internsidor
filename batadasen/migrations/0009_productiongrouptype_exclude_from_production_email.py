@@ -4,15 +4,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('batadasen', '0008_auto_20200708_1435'),
+        ("batadasen", "0008_auto_20200708_1435"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='productiongrouptype',
-            name='exclude_from_production_email',
-            field=models.BooleanField(default=False, help_text='Uteslut grupper av denna typ från att vara med på maillistor för hela uppsättningar?', verbose_name='uteslut från uppsättningslistor'),
+            model_name="productiongrouptype",
+            name="exclude_from_production_email",
+            field=models.BooleanField(
+                default=False,
+                help_text="Uteslut grupper av denna typ från att vara med på maillistor för hela uppsättningar?",
+                verbose_name="uteslut från uppsättningslistor",
+            ),
         ),
     ]

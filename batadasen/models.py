@@ -3,10 +3,8 @@ import re
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.db import models, transaction
-from django.db.models.signals import post_save
+from django.db import models
 from django.db.models import Q
-from django.dispatch import receiver
 from django.utils import crypto, timezone
 
 
@@ -17,6 +15,7 @@ def get_current_assoc_end_year():
     else:
         return today.year
 
+
 def get_next_member_number():
     # Gamla databasen använde speciella värden i medlemsnumret
     # 0-4999: riktiga medlemmar och livstidsmedlemmar
@@ -26,7 +25,9 @@ def get_next_member_number():
     # För att inte förvirra någon i migreringen kommer alla behålla sina gamla nummer men vi kommer
     # fortsätta föreslå att fylla på från slutet på de vanliga (i skrivande stund nr 1086, det lär räcka ett tag)
     suggested_num = 1
-    last_regular_member = Person.objects.filter(member_number__lt=5000).order_by('member_number').last()
+    last_regular_member = (
+        Person.objects.filter(member_number__lt=5000).order_by("member_number").last()
+    )
     if last_regular_member is not None:
         suggested_num = last_regular_member.member_number + 1
         while Person.objects.filter(member_number=suggested_num).exists():
@@ -36,66 +37,93 @@ def get_next_member_number():
 
 class Person(models.Model):
     class Meta:
-        verbose_name = 'person'
-        verbose_name_plural = 'personer'
-        ordering = ['member_number']
+        verbose_name = "person"
+        verbose_name_plural = "personer"
+        ordering = ["member_number"]
         permissions = [
-            ("view_private_info", "Kan se all personinfo oavsett personens inställningar"),
+            (
+                "view_private_info",
+                "Kan se all personinfo oavsett personens inställningar",
+            ),
             ("view_performances", "Kan se loggade föreställningar"),
-            ("view_medal_candidates", "Kan lista personer som är berättigade en årsmedalj")
+            (
+                "view_medal_candidates",
+                "Kan lista personer som är berättigade en årsmedalj",
+            ),
         ]
 
     class PrivacySetting(models.TextChoices):
-        PRIVATE = 'PVT', 'Privat' # Invisible except for admins
-        OPEN = 'OPN', 'Öppen' # Other members can see everything.
+        PRIVATE = "PVT", "Privat"  # Invisible except for admins
+        OPEN = "OPN", "Öppen"  # Other members can see everything.
 
-    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='användare', related_name='person')
+    user = models.OneToOneField(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="användare",
+        related_name="person",
+    )
 
-    member_number = models.PositiveIntegerField('medlemsnummer', default=get_next_member_number, primary_key=True)
-    first_name = models.CharField('förnamn', max_length=50)
-    spex_name = models.CharField('spexnamn', max_length=50, blank=True)
-    last_name = models.CharField('efternamn', max_length=50)
-    street_address = models.CharField('gatuadress', max_length=100, blank=True)
-    postal_locality = models.CharField('postort', max_length=50, blank=True)
-    postal_code = models.CharField('postnummer', max_length=50, blank=True)
-    country = models.CharField('land', max_length=50, blank=True)
-    phone_home = models.CharField('hemtelefon', max_length=50, blank=True)
-    phone_work = models.CharField('jobbtelefon', max_length=50, blank=True)
-    phone_mobile = models.CharField('mobiltelefon', max_length=50, blank=True)
-    phone_extra = models.CharField('extra telefon', max_length=50, blank=True)
-    email = models.EmailField('mail', null=True, blank=True, unique=True, help_text='Hit kommer mail från spexets maillistor skickas.')
-    address_list_email = models.EmailField('visningsmail', blank=True, help_text='Alternativ mailadress som ska visas istället i medlemslistor och liknande.')
-    wants_spexpressen = models.BooleanField('vill få spexpressen', default=False)
-    wants_spexinfo = models.BooleanField('vill få spexinfo-mail', default=True)
-    wants_trams = models.BooleanField('vill få trams-mail', default=False)
-    wants_blandat = models.BooleanField('vill få blandat-mail', default=True)
+    member_number = models.PositiveIntegerField(
+        "medlemsnummer", default=get_next_member_number, primary_key=True
+    )
+    first_name = models.CharField("förnamn", max_length=50)
+    spex_name = models.CharField("spexnamn", max_length=50, blank=True)
+    last_name = models.CharField("efternamn", max_length=50)
+    street_address = models.CharField("gatuadress", max_length=100, blank=True)
+    postal_locality = models.CharField("postort", max_length=50, blank=True)
+    postal_code = models.CharField("postnummer", max_length=50, blank=True)
+    country = models.CharField("land", max_length=50, blank=True)
+    phone_home = models.CharField("hemtelefon", max_length=50, blank=True)
+    phone_work = models.CharField("jobbtelefon", max_length=50, blank=True)
+    phone_mobile = models.CharField("mobiltelefon", max_length=50, blank=True)
+    phone_extra = models.CharField("extra telefon", max_length=50, blank=True)
+    email = models.EmailField(
+        "mail",
+        null=True,
+        blank=True,
+        unique=True,
+        help_text="Hit kommer mail från spexets maillistor skickas.",
+    )
+    address_list_email = models.EmailField(
+        "visningsmail",
+        blank=True,
+        help_text="Alternativ mailadress som ska visas istället i medlemslistor och liknande.",
+    )
+    wants_spexpressen = models.BooleanField("vill få spexpressen", default=False)
+    wants_spexinfo = models.BooleanField("vill få spexinfo-mail", default=True)
+    wants_trams = models.BooleanField("vill få trams-mail", default=False)
+    wants_blandat = models.BooleanField("vill få blandat-mail", default=True)
     email_active = models.BooleanField(
-        'mailadress aktiv',
+        "mailadress aktiv",
         default=True,
-        help_text='Är personens mailadress aktiv och fungerande? '
-                  'Om denna ruta kryssas ur kommer personen inte längre få några brev från spexets maillistor.')
-    hundred_club = models.BooleanField('hundraklubben', default=False)
-    medal_2 = models.BooleanField('medalj 2', default=False)
-    medal_4 = models.BooleanField('medalj 4', default=False)
-    medal_6 = models.BooleanField('medalj 6', default=False)
-    deceased = models.BooleanField('avliden', default=False)
-    address_changed_date = models.DateTimeField('adress ändrad', null=True, blank=True)
-    mail_changed_date = models.DateTimeField('mail ändrad', null=True, blank=True)
-    notes = models.TextField('övrigt', max_length=1000, null=True, blank=True)
+        help_text="Är personens mailadress aktiv och fungerande? "
+        "Om denna ruta kryssas ur kommer personen inte längre få några brev från spexets maillistor.",
+    )
+    hundred_club = models.BooleanField("hundraklubben", default=False)
+    medal_2 = models.BooleanField("medalj 2", default=False)
+    medal_4 = models.BooleanField("medalj 4", default=False)
+    medal_6 = models.BooleanField("medalj 6", default=False)
+    deceased = models.BooleanField("avliden", default=False)
+    address_changed_date = models.DateTimeField("adress ändrad", null=True, blank=True)
+    mail_changed_date = models.DateTimeField("mail ändrad", null=True, blank=True)
+    notes = models.TextField("övrigt", max_length=1000, null=True, blank=True)
     privacy_setting = models.CharField(
-        'sekretessnivå',
+        "sekretessnivå",
         max_length=3,
         choices=PrivacySetting.choices,
         default=PrivacySetting.OPEN,
-        help_text='Privat: endast administratörer kan se dina kontaktuppgifter. '
-                  'Öppen: andra inloggade kan se all din information. '
-                  'Inga personuppgifter kommer någonsin vara synliga för icke-inloggade. '
-                  'Medlemsnummer och namn kommer alltid vara synligt för inloggade.')
+        help_text="Privat: endast administratörer kan se dina kontaktuppgifter. "
+        "Öppen: andra inloggade kan se all din information. "
+        "Inga personuppgifter kommer någonsin vara synliga för icke-inloggade. "
+        "Medlemsnummer och namn kommer alltid vara synligt för inloggade.",
+    )
 
     @property
     def full_name(self):
-        if self.spex_name == '':
-            return '{} {}'.format(self.first_name, self.last_name)
+        if self.spex_name == "":
+            return "{} {}".format(self.first_name, self.last_name)
         else:
             return '{} "{}" {}'.format(self.first_name, self.spex_name, self.last_name)
 
@@ -103,16 +131,20 @@ class Person(models.Model):
     def productions(self):
         memberships = self.production_memberships.select_related("group__production")
         return {membership.group.production for membership in memberships}
-    
+
     @property
     def association_years(self):
         activities = self.association_activities.select_related("group__year")
-        return { activity.group.year for activity in activities }
+        return {activity.group.year for activity in activities}
 
     @property
     def active_years(self):
-        production_years = { production.year + production.autumn for production in self.productions}
-        association_years = { association_year.end_year for association_year in self.association_years}
+        production_years = {
+            production.year + production.autumn for production in self.productions
+        }
+        association_years = {
+            association_year.end_year for association_year in self.association_years
+        }
         return production_years | association_years
 
     @property
@@ -122,111 +154,141 @@ class Person(models.Model):
         active_years = self.active_years
         return active_years and max(active_years) >= current_association_year
 
-
     def __str__(self):
-        return '({}) {}'.format(self.member_number, self.full_name)
+        return "({}) {}".format(self.member_number, self.full_name)
 
     @property
     def currently_member(self):
         current_assoc_year = get_current_assoc_year()
         if current_assoc_year is not None:
-            current_standard_member = Q(year=current_assoc_year, membership_type=AssociationMembership.MembershipType.STANDARD)
-            honorary_member = Q(year__lte=current_assoc_year, membership_type=AssociationMembership.MembershipType.HONORARY)
-            lifetime_member = Q(year__lte=current_assoc_year, membership_type=AssociationMembership.MembershipType.LIFETIME)
+            current_standard_member = Q(
+                year=current_assoc_year,
+                membership_type=AssociationMembership.MembershipType.STANDARD,
+            )
+            honorary_member = Q(
+                year__lte=current_assoc_year,
+                membership_type=AssociationMembership.MembershipType.HONORARY,
+            )
+            lifetime_member = Q(
+                year__lte=current_assoc_year,
+                membership_type=AssociationMembership.MembershipType.LIFETIME,
+            )
 
-            return self.association_memberships.filter(current_standard_member | honorary_member | lifetime_member).exists()
+            return self.association_memberships.filter(
+                current_standard_member | honorary_member | lifetime_member
+            ).exists()
         else:
             return False
 
     @property
     def display_email(self):
-        if self.address_list_email != '':
+        if self.address_list_email != "":
             return self.address_list_email
         else:
             return self.email
 
     # Validates case-insensitive email address uniqueness
     def validate_unique(self, exclude=None):
-        if self.email and Person.objects.exclude(member_number=self.member_number).filter(email__iexact=self.email).exists():
-            raise ValidationError({'email': 'En person med denna mailadress finns redan.'})
+        if (
+            self.email
+            and Person.objects.exclude(member_number=self.member_number)
+            .filter(email__iexact=self.email)
+            .exists()
+        ):
+            raise ValidationError(
+                {"email": "En person med denna mailadress finns redan."}
+            )
         super(Person, self).validate_unique(exclude)
 
 
 def generate_activation_token():
     return crypto.get_random_string(length=50)
 
+
 def calculate_expiration_time():
     return timezone.now() + timedelta(days=7)
 
+
 class UserActivation(models.Model):
     class Meta:
-        verbose_name = 'användaraktivering'
-        verbose_name_plural = 'användaraktiveringar'
-        ordering = ['person']
-    person = models.ForeignKey(Person, models.CASCADE, verbose_name='person')
-    valid_until = models.DateTimeField('giltig tills', default=calculate_expiration_time)
-    token = models.CharField('token', max_length=50, default=generate_activation_token)
-    provision_gsuite_account = models.BooleanField('aktivera Google-konto', default=False)
+        verbose_name = "användaraktivering"
+        verbose_name_plural = "användaraktiveringar"
+        ordering = ["person"]
+
+    person = models.ForeignKey(Person, models.CASCADE, verbose_name="person")
+    valid_until = models.DateTimeField(
+        "giltig tills", default=calculate_expiration_time
+    )
+    token = models.CharField("token", max_length=50, default=generate_activation_token)
+    provision_gsuite_account = models.BooleanField(
+        "aktivera Google-konto", default=False
+    )
 
     def __str__(self):
-        return 'User activation for {}, valid until {}'.format(self.person, self.valid_until)
+        return "User activation for {}, valid until {}".format(
+            self.person, self.valid_until
+        )
+
 
 class ExtraEmail(models.Model):
     class Meta:
-        verbose_name = 'extra mailadress'
-        verbose_name_plural = 'extra mailadresser'
-        unique_together = ['person', 'email']
-        ordering = ['person']
+        verbose_name = "extra mailadress"
+        verbose_name_plural = "extra mailadresser"
+        unique_together = ["person", "email"]
+        ordering = ["person"]
 
-    person = models.ForeignKey(Person, models.CASCADE, verbose_name='person', related_name='extra_email')
-    email = models.EmailField('mail')
+    person = models.ForeignKey(
+        Person, models.CASCADE, verbose_name="person", related_name="extra_email"
+    )
+    email = models.EmailField("mail")
 
     def __str__(self):
-        return '{}: {}'.format(self.person, self.email)
+        return "{}: {}".format(self.person, self.email)
 
 
 def validate_production_year(year):
     if year < 1981:
-        raise ValidationError('%(year)s är inte ett giltigt spexår, första spexet sattes upp 1981', params={'year': year})
+        raise ValidationError(
+            "%(year)s är inte ett giltigt spexår, första spexet sattes upp 1981",
+            params={"year": year},
+        )
+
 
 class Production(models.Model):
     class Meta:
-        verbose_name = 'uppsättning'
-        verbose_name_plural = 'uppsättningar'
-        ordering = ['number']
+        verbose_name = "uppsättning"
+        verbose_name_plural = "uppsättningar"
+        ordering = ["number"]
 
-    number = models.IntegerField('nummer', primary_key=True, editable=True)
-    main_title = models.CharField('huvudtitel', max_length=100)
-    subtitle = models.CharField('undertitel', max_length=100, blank=True)
-    short_name = models.CharField('kort namn', max_length=50, blank=True)
-    year = models.PositiveIntegerField('år', validators=[validate_production_year])
-    plot = models.TextField('handling', max_length=1000, blank=True)
-    closed = models.BooleanField('avslutad', default=False)
-    regular = models.BooleanField('ordinarie', default=True)
-    autumn = models.BooleanField('höstspex', default=False)
+    number = models.IntegerField("nummer", primary_key=True, editable=True)
+    main_title = models.CharField("huvudtitel", max_length=100)
+    subtitle = models.CharField("undertitel", max_length=100, blank=True)
+    short_name = models.CharField("kort namn", max_length=50, blank=True)
+    year = models.PositiveIntegerField("år", validators=[validate_production_year])
+    plot = models.TextField("handling", max_length=1000, blank=True)
+    closed = models.BooleanField("avslutad", default=False)
+    regular = models.BooleanField("ordinarie", default=True)
+    autumn = models.BooleanField("höstspex", default=False)
 
     def __str__(self):
-        if self.short_name == '':
-            return '{} - {} ({})'.format(self.number, self.main_title, self.year)
+        if self.short_name == "":
+            return "{} - {} ({})".format(self.number, self.main_title, self.year)
         else:
-            return '{} - {} ({})'.format(self.number, self.main_title, self.short_name)
+            return "{} - {} ({})".format(self.number, self.main_title, self.short_name)
 
-DIRECTION_TITLES = [
-    'Directeur',
-    'Direktör',
-    'Ekonomichef',
-    'Producent'
-]
+
+DIRECTION_TITLES = ["Directeur", "Direktör", "Ekonomichef", "Producent"]
+
 
 class Title(models.Model):
     class Meta:
-        verbose_name = 'titel'
-        verbose_name_plural = 'titlar'
-        ordering = ['name']
+        verbose_name = "titel"
+        verbose_name_plural = "titlar"
+        ordering = ["name"]
 
-    name = models.CharField('namn', max_length=50, primary_key=True)
-    email_alias = models.CharField('mailalias', max_length=50, blank=True)
-    priority = models.IntegerField('prioritet', default=0)
+    name = models.CharField("namn", max_length=50, primary_key=True)
+    email_alias = models.CharField("mailalias", max_length=50, blank=True)
+    priority = models.IntegerField("prioritet", default=0)
 
     def __str__(self):
         return self.name
@@ -234,14 +296,18 @@ class Title(models.Model):
 
 class ProductionGroupType(models.Model):
     class Meta:
-        verbose_name = 'uppsättningsgrupptyp'
-        verbose_name_plural = 'uppsättningsgrupptyper'
-        ordering = ['short_name']
+        verbose_name = "uppsättningsgrupptyp"
+        verbose_name_plural = "uppsättningsgrupptyper"
+        ordering = ["short_name"]
 
-    short_name = models.CharField('kortnamn', max_length=50, primary_key=True)
-    name = models.CharField('namn', max_length=50)
-    priority = models.IntegerField('prioritet', default=0)
-    exclude_from_production_email = models.BooleanField('uteslut från uppsättningslistor', default=False, help_text='Uteslut grupper av denna typ från att vara med på maillistor för hela uppsättningar?')
+    short_name = models.CharField("kortnamn", max_length=50, primary_key=True)
+    name = models.CharField("namn", max_length=50)
+    priority = models.IntegerField("prioritet", default=0)
+    exclude_from_production_email = models.BooleanField(
+        "uteslut från uppsättningslistor",
+        default=False,
+        help_text="Uteslut grupper av denna typ från att vara med på maillistor för hela uppsättningar?",
+    )
 
     def __str__(self):
         return "{} ({})".format(self.name, self.short_name)
@@ -249,24 +315,33 @@ class ProductionGroupType(models.Model):
 
 def validate_association_year(year):
     if year <= 1978:
-        raise ValidationError('%(year)s är inte ett giltigt verksamhetsår, föreningen bildades 1978', params={'year': '{}/{}'.format(year-1, year)})
+        raise ValidationError(
+            "%(year)s är inte ett giltigt verksamhetsår, föreningen bildades 1978",
+            params={"year": "{}/{}".format(year - 1, year)},
+        )
+
 
 class AssociationYear(models.Model):
     class Meta:
-        verbose_name = 'verksamhetsår'
-        verbose_name_plural = 'verksamhetsår'
-        ordering = ['-end_year']
+        verbose_name = "verksamhetsår"
+        verbose_name_plural = "verksamhetsår"
+        ordering = ["-end_year"]
 
-    end_year = models.PositiveIntegerField('slutår', default=get_current_assoc_end_year, validators=[validate_association_year], primary_key=True)
+    end_year = models.PositiveIntegerField(
+        "slutår",
+        default=get_current_assoc_end_year,
+        validators=[validate_association_year],
+        primary_key=True,
+    )
 
     def get_start_time(self):
-        return datetime.datetime(self.end_year-1, 7, 1, 0, 0, 0)
+        return datetime.datetime(self.end_year - 1, 7, 1, 0, 0, 0)
 
     def get_end_time(self):
         return datetime.datetime(self.end_year, 6, 30, 23, 59, 59)
 
     def __str__(self):
-        return '{:02}/{:02}'.format((self.end_year - 1) % 100, self.end_year % 100)
+        return "{:02}/{:02}".format((self.end_year - 1) % 100, self.end_year % 100)
 
 
 def get_current_assoc_year():
@@ -278,13 +353,13 @@ def get_current_assoc_year():
 
 class AssociationGroupType(models.Model):
     class Meta:
-        verbose_name = 'föreningsgrupptyp'
-        verbose_name_plural = 'föreningsgrupptyper'
-        ordering = ['short_name']
+        verbose_name = "föreningsgrupptyp"
+        verbose_name_plural = "föreningsgrupptyper"
+        ordering = ["short_name"]
 
-    short_name = models.CharField('kortnamn', max_length=10, primary_key=True)
-    name = models.CharField('namn', max_length=50)
-    priority = models.IntegerField('prioritet', default=0)
+    short_name = models.CharField("kortnamn", max_length=10, primary_key=True)
+    name = models.CharField("namn", max_length=50)
+    priority = models.IntegerField("prioritet", default=0)
 
     def __str__(self):
         return self.name
@@ -292,79 +367,137 @@ class AssociationGroupType(models.Model):
 
 class AssociationGroup(models.Model):
     class Meta:
-        verbose_name = 'föreningsgrupp'
-        verbose_name_plural = 'föreningsgrupp'
-        unique_together = [['year', 'group_type']]
-        ordering = ['year', 'group_type']
+        verbose_name = "föreningsgrupp"
+        verbose_name_plural = "föreningsgrupp"
+        unique_together = [["year", "group_type"]]
+        ordering = ["year", "group_type"]
 
-    year = models.ForeignKey(AssociationYear, models.CASCADE, verbose_name='verksamhetsår', related_name='groups')
-    group_type = models.ForeignKey(AssociationGroupType, models.CASCADE, verbose_name='grupptyp')
+    year = models.ForeignKey(
+        AssociationYear,
+        models.CASCADE,
+        verbose_name="verksamhetsår",
+        related_name="groups",
+    )
+    group_type = models.ForeignKey(
+        AssociationGroupType, models.CASCADE, verbose_name="grupptyp"
+    )
 
     def __str__(self):
-        return '{} {}'.format(self.group_type.short_name, self.year)
+        return "{} {}".format(self.group_type.short_name, self.year)
 
 
 class AssociationActivity(models.Model):
     class Meta:
-        verbose_name = 'föreningsuppdrag'
-        verbose_name_plural = 'föreningsuppdrag'
-        unique_together = [['person', 'group']]
-        ordering = ['person', '-group']
+        verbose_name = "föreningsuppdrag"
+        verbose_name_plural = "föreningsuppdrag"
+        unique_together = [["person", "group"]]
+        ordering = ["person", "-group"]
 
-    person = models.ForeignKey(Person, models.CASCADE, verbose_name='person', related_name='association_activities')
-    group = models.ForeignKey(AssociationGroup, models.CASCADE, verbose_name='grupp', related_name='activities')
-    title = models.ForeignKey(Title, models.SET_NULL, null=True, blank=True, verbose_name='titel')
-    to_date = models.DateField('till och med datum', null=True, blank=True)
+    person = models.ForeignKey(
+        Person,
+        models.CASCADE,
+        verbose_name="person",
+        related_name="association_activities",
+    )
+    group = models.ForeignKey(
+        AssociationGroup,
+        models.CASCADE,
+        verbose_name="grupp",
+        related_name="activities",
+    )
+    title = models.ForeignKey(
+        Title, models.SET_NULL, null=True, blank=True, verbose_name="titel"
+    )
+    to_date = models.DateField("till och med datum", null=True, blank=True)
 
     def __str__(self):
         if self.title is None:
-            return '{}: {}'.format(self.person, self.group)
+            return "{}: {}".format(self.person, self.group)
         else:
-            return '{}: {} ({})'.format(self.person, self.group, self.title)
+            return "{}: {} ({})".format(self.person, self.group, self.title)
 
 
 class ProductionGroup(models.Model):
     class Meta:
-        verbose_name = 'uppsättningsgrupp'
-        verbose_name_plural = 'uppsättningsgrupper'
-        unique_together = ['production', 'group_type']
-        ordering = ['group_type','production']
+        verbose_name = "uppsättningsgrupp"
+        verbose_name_plural = "uppsättningsgrupper"
+        unique_together = ["production", "group_type"]
+        ordering = ["group_type", "production"]
 
-    production = models.ForeignKey(Production, models.CASCADE, verbose_name='uppsättning', related_name='groups')
-    group_type = models.ForeignKey(ProductionGroupType, models.CASCADE, verbose_name='grupptyp', null=True, blank=True, help_text='lämna tomt om den här gruppen ska räknas som att vara med i en uppsättning utan att tillhöra en specifik grupp', related_name='group_instances')
+    production = models.ForeignKey(
+        Production, models.CASCADE, verbose_name="uppsättning", related_name="groups"
+    )
+    group_type = models.ForeignKey(
+        ProductionGroupType,
+        models.CASCADE,
+        verbose_name="grupptyp",
+        null=True,
+        blank=True,
+        help_text="lämna tomt om den här gruppen ska räknas som att vara med i en uppsättning utan att tillhöra en specifik grupp",
+        related_name="group_instances",
+    )
 
     def __str__(self):
         if self.group_type is None:
-            if self.production.short_name == '':
-                return '{} (ingen grupp)'.format( self.production.year)
+            if self.production.short_name == "":
+                return "{} (ingen grupp)".format(self.production.year)
             else:
-                return '{} (ingen grupp)'.format( self.production.short_name)
+                return "{} (ingen grupp)".format(self.production.short_name)
         else:
             if self.production.regular:
-                return '{}-{:02}'.format(self.group_type.short_name, self.production.year % 100)
+                return "{}-{:02}".format(
+                    self.group_type.short_name, self.production.year % 100
+                )
             else:
-                return '{}-{}'.format(self.group_type.short_name, self.production.short_name)
+                return "{}-{}".format(
+                    self.group_type.short_name, self.production.short_name
+                )
 
     # Eftersom NULL-värden aldrig är lika med varandra så funkar inte ovanstående unique_together
     # och vi måste validera fallet när man försöker skapa två uppsättningsgrupper utan grupptyp
     # i samma uppsättning.
     def validate_unique(self, exclude=None):
-        if self.group_type is None and ProductionGroup.objects.exclude(id=self.id).filter(production=self.production, group_type__isnull=True).exists():
-            raise ValidationError("En uppsättningsgrupp utan grupptyp finns redan i denna uppsättning")
+        if (
+            self.group_type is None
+            and ProductionGroup.objects.exclude(id=self.id)
+            .filter(production=self.production, group_type__isnull=True)
+            .exists()
+        ):
+            raise ValidationError(
+                "En uppsättningsgrupp utan grupptyp finns redan i denna uppsättning"
+            )
         super(ProductionGroup, self).validate_unique(exclude)
 
 
 class ProductionMembership(models.Model):
     class Meta:
-        verbose_name = 'uppsättningsmedlemskap'
-        verbose_name_plural = 'uppsättningsmedlemskap'
-        unique_together = [['person', 'group', 'title']]
-        ordering = ['person', 'group__production']
+        verbose_name = "uppsättningsmedlemskap"
+        verbose_name_plural = "uppsättningsmedlemskap"
+        unique_together = [["person", "group", "title"]]
+        ordering = ["person", "group__production"]
 
-    person = models.ForeignKey(Person, models.CASCADE, verbose_name='uppsättningsmedlemsskap', related_name='production_memberships', editable=False)
-    group = models.ForeignKey(ProductionGroup, models.CASCADE, verbose_name='Grupp', related_name='memberships')
-    title = models.ForeignKey(Title, models.SET_NULL, null=True, blank=True, verbose_name='Titel')
-    comment = models.CharField(max_length=100, blank=True, verbose_name='kommentar', help_text='Här kan man skriva t.ex. vilket instrument en orkestermedlem spelar')
+    person = models.ForeignKey(
+        Person,
+        models.CASCADE,
+        verbose_name="uppsättningsmedlemsskap",
+        related_name="production_memberships",
+        editable=False,
+    )
+    group = models.ForeignKey(
+        ProductionGroup,
+        models.CASCADE,
+        verbose_name="Grupp",
+        related_name="memberships",
+    )
+    title = models.ForeignKey(
+        Title, models.SET_NULL, null=True, blank=True, verbose_name="Titel"
+    )
+    comment = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="kommentar",
+        help_text="Här kan man skriva t.ex. vilket instrument en orkestermedlem spelar",
+    )
 
     def short_description(self):
         titles = []
@@ -372,13 +505,14 @@ class ProductionMembership(models.Model):
             titles.append(self.title.name)
 
         if len(titles) > 0:
-            title_str = ', '.join(titles)
-            return '{} ({})'.format(self.group, title_str)
+            title_str = ", ".join(titles)
+            return "{} ({})".format(self.group, title_str)
         else:
             return str(self.group)
 
     def __str__(self):
-        return '{}: {}'.format(self.person.member_number, self.short_description())
+        return "{}: {}".format(self.person.member_number, self.short_description())
+
 
 # Eftersom mailadresser inte är skiftlägeskänsliga ska vi inte kunna skapa dubletter. Den här klassen
 # extendar models.CharField och konverterar indatat till lowercase.
@@ -387,79 +521,98 @@ class EmailField(models.CharField):
         value = super().get_prep_value(value)
         return value if value is None else value.lower()
 
+
 class EmailList(models.Model):
     class Meta:
-        verbose_name = 'maillista'
-        verbose_name_plural = 'maillistor'
-        ordering = ['alias']
+        verbose_name = "maillista"
+        verbose_name_plural = "maillistor"
+        ordering = ["alias"]
 
-    alias = EmailField('alias', max_length=50, primary_key=True, help_text='Namnet på listan, det som står framför @')
+    alias = EmailField(
+        "alias",
+        max_length=50,
+        primary_key=True,
+        help_text="Namnet på listan, det som står framför @",
+    )
 
-    is_internal = models.BooleanField('intern lista', default=True, help_text="Ska endast spexare få skicka till denna lista?")
+    is_internal = models.BooleanField(
+        "intern lista",
+        default=True,
+        help_text="Ska endast spexare få skicka till denna lista?",
+    )
 
     forward_to = models.ForeignKey(
-        'self',
+        "self",
         models.SET_NULL,
-        verbose_name='vidarebefordring till annan lista',
-        related_name='list_forwardings',
+        verbose_name="vidarebefordring till annan lista",
+        related_name="list_forwardings",
         null=True,
         blank=True,
-        help_text='Ska mail till denna lista skickas vidare till medlemmar i en annan lista?')
+        help_text="Ska mail till denna lista skickas vidare till medlemmar i en annan lista?",
+    )
 
     opt_in_members = models.ManyToManyField(
         Person,
-        verbose_name='enskilda personer',
-        related_name='opt_in_email_lists',
+        verbose_name="enskilda personer",
+        related_name="opt_in_email_lists",
         blank=True,
-        help_text='Vilka enskilda personer ska få mail från denna lista?')
+        help_text="Vilka enskilda personer ska få mail från denna lista?",
+    )
     opt_out_members = models.ManyToManyField(
         Person,
-        verbose_name='opt-out-medlemmar',
-        related_name='opt_out_email_lists',
+        verbose_name="opt-out-medlemmar",
+        related_name="opt_out_email_lists",
         blank=True,
-        help_text='Vilka personer ska inte få mail från denna lista, oavsett vilka grupper de är med i?')
+        help_text="Vilka personer ska inte få mail från denna lista, oavsett vilka grupper de är med i?",
+    )
 
     # Production lists
     all_groups = models.ManyToManyField(
         ProductionGroupType,
-        related_name='email_lists',
-        verbose_name='grupper av dessa typer i alla uppsättningar',
+        related_name="email_lists",
+        verbose_name="grupper av dessa typer i alla uppsättningar",
         blank=True,
-        help_text='Denna lista kommer skicka mail till alla personer som någonsin har varit med i dessa grupper')
+        help_text="Denna lista kommer skicka mail till alla personer som någonsin har varit med i dessa grupper",
+    )
     production_groups = models.ManyToManyField(
         ProductionGroup,
-        related_name='email_lists',
-        verbose_name='grupper från enskilda uppsättningar',
+        related_name="email_lists",
+        verbose_name="grupper från enskilda uppsättningar",
         blank=True,
-        help_text='Denna lista kommer skicka mail till personer som är med i dessa uppsättningsgrupper')
+        help_text="Denna lista kommer skicka mail till personer som är med i dessa uppsättningsgrupper",
+    )
     productions = models.ManyToManyField(
         Production,
-        related_name='email_lists',
-        verbose_name='hela uppsättningar',
+        related_name="email_lists",
+        verbose_name="hela uppsättningar",
         blank=True,
-        help_text='Denna lista kommer skicka mail till följande HELA uppsättningar, förutom i de fall då listans namn slutar med \"gruppledare\".')
+        help_text='Denna lista kommer skicka mail till följande HELA uppsättningar, förutom i de fall då listans namn slutar med "gruppledare".',
+    )
 
     # Association lists
     active_association_groups = models.ManyToManyField(
         AssociationGroupType,
-        related_name='email_lists',
-        verbose_name='föreningsgrupper för aktivt verksamhetsår',
+        related_name="email_lists",
+        verbose_name="föreningsgrupper för aktivt verksamhetsår",
         blank=True,
-        help_text='Denna lista kommer skicka mail till dessa aktiva föreningsgrupper')
+        help_text="Denna lista kommer skicka mail till dessa aktiva föreningsgrupper",
+    )
     association_groups = models.ManyToManyField(
         AssociationGroup,
-        related_name='email_lists',
-        verbose_name='föreningsgrupper från enskilda verksamhetsår',
+        related_name="email_lists",
+        verbose_name="föreningsgrupper från enskilda verksamhetsår",
         blank=True,
-        help_text='Denna lista kommer skicka mail till personer som var med i dessa föreningsgrupper ett visst år')
+        help_text="Denna lista kommer skicka mail till personer som var med i dessa föreningsgrupper ett visst år",
+    )
 
     # Title lists
     all_titles = models.ManyToManyField(
         Title,
-        related_name='email_lists',
-        verbose_name='alla personer med denna titel',
+        related_name="email_lists",
+        verbose_name="alla personer med denna titel",
         blank=True,
-        help_text='Denna lista kommer skicka mail till personer som någonsin har haft dessa titlar')
+        help_text="Denna lista kommer skicka mail till personer som någonsin har haft dessa titlar",
+    )
 
     def __str__(self):
         return self.alias
@@ -468,7 +621,7 @@ class EmailList(models.Model):
     def recipients(self):
         person_set = set()
 
-        valid_email_regex = r'^[^@]+@[^@]+$'
+        valid_email_regex = r"^[^@]+@[^@]+$"
         pattern = re.compile(valid_email_regex)
         valid_email = Q(email__regex=valid_email_regex) & Q(email_active=True)
         valid_persons = Person.objects.filter(valid_email)
@@ -480,7 +633,9 @@ class EmailList(models.Model):
             person_set.update(self.forward_to.recipients)
 
         for group_type in self.all_groups.all():
-            for person in valid_persons.filter(production_memberships__group__group_type=group_type):
+            for person in valid_persons.filter(
+                production_memberships__group__group_type=group_type
+            ):
                 person_set.add(person)
 
         for group in self.production_groups.all():
@@ -488,18 +643,25 @@ class EmailList(models.Model):
                 person_set.add(person)
 
             # Add the current direction to the production group lists
-            for person in valid_persons.filter(production_memberships__group__production=group.production, production_memberships__title__in=DIRECTION_TITLES):
+            for person in valid_persons.filter(
+                production_memberships__group__production=group.production,
+                production_memberships__title__in=DIRECTION_TITLES,
+            ):
                 person_set.add(person)
 
         for production in self.productions.all():
             # Special handling of email lists to group leaders
-            if self.alias.endswith('gruppledare'):
-                for person in valid_persons.filter(production_memberships__group__production=production, production_memberships__title='Gruppledare'):
+            if self.alias.endswith("gruppledare"):
+                for person in valid_persons.filter(
+                    production_memberships__group__production=production,
+                    production_memberships__title="Gruppledare",
+                ):
                     person_set.add(person)
             else:
                 for person in valid_persons.filter(
                     production_memberships__group__production=production,
-                    production_memberships__group__group_type__exclude_from_production_email=False):
+                    production_memberships__group__group_type__exclude_from_production_email=False,
+                ):
                     person_set.add(person)
 
         for group in self.association_groups.all():
@@ -507,17 +669,20 @@ class EmailList(models.Model):
                 person_set.add(person)
 
         for title in self.all_titles.all():
-            for person in valid_persons.filter(Q(production_memberships__title=title) | Q(association_activities__title=title)):
+            for person in valid_persons.filter(
+                Q(production_memberships__title=title)
+                | Q(association_activities__title=title)
+            ):
                 person_set.add(person)
 
         # Additional includes for special lists
-        if self.alias == 'spexinfo':
+        if self.alias == "spexinfo":
             for person in valid_persons.filter(wants_spexinfo=True):
                 person_set.add(person)
-        elif self.alias == 'blandat':
+        elif self.alias == "blandat":
             for person in valid_persons.filter(wants_blandat=True):
                 person_set.add(person)
-        elif self.alias == 'trams':
+        elif self.alias == "trams":
             for person in valid_persons.filter(wants_trams=True):
                 person_set.add(person)
 
@@ -526,35 +691,71 @@ class EmailList(models.Model):
         # Only makes sense to run the following if there is an actual association year active
         if current_assoc_year is not None:
             for group_type in self.active_association_groups.all():
-                for person in valid_persons.filter(association_activities__group__group_type=group_type, association_activities__group__year=current_assoc_year):
+                for person in valid_persons.filter(
+                    association_activities__group__group_type=group_type,
+                    association_activities__group__year=current_assoc_year,
+                ):
                     person_set.add(person)
 
-            if self.alias == 'kallelse':
-                current_standard_member = Q(year=current_assoc_year, membership_type=AssociationMembership.MembershipType.STANDARD)
-                honorary_member = Q(year__lte=current_assoc_year, membership_type=AssociationMembership.MembershipType.HONORARY)
-                lifetime_member = Q(year__lte=current_assoc_year, membership_type=AssociationMembership.MembershipType.LIFETIME)
-                for membership in AssociationMembership.objects.filter(current_standard_member | honorary_member | lifetime_member):
-                    if membership.person.email is not None and re.fullmatch(pattern, membership.person.email) is not None:
+            if self.alias == "kallelse":
+                current_standard_member = Q(
+                    year=current_assoc_year,
+                    membership_type=AssociationMembership.MembershipType.STANDARD,
+                )
+                honorary_member = Q(
+                    year__lte=current_assoc_year,
+                    membership_type=AssociationMembership.MembershipType.HONORARY,
+                )
+                lifetime_member = Q(
+                    year__lte=current_assoc_year,
+                    membership_type=AssociationMembership.MembershipType.LIFETIME,
+                )
+                for membership in AssociationMembership.objects.filter(
+                    current_standard_member | honorary_member | lifetime_member
+                ):
+                    if (
+                        membership.person.email is not None
+                        and re.fullmatch(pattern, membership.person.email) is not None
+                    ):
                         person_set.add(membership.person)
-            elif self.alias == 'styrelse-kallelse':
+            elif self.alias == "styrelse-kallelse":
                 # Active 'directions'
-                for person in valid_persons.filter(production_memberships__group__production__closed=False, production_memberships__title__in=DIRECTION_TITLES):
+                for person in valid_persons.filter(
+                    production_memberships__group__production__closed=False,
+                    production_memberships__title__in=DIRECTION_TITLES,
+                ):
                     person_set.add(person)
                 # Auditors for active productions
-                for person in valid_persons.filter(production_memberships__group__production__closed=False, production_memberships__group__group_type__short_name='REV'):
+                for person in valid_persons.filter(
+                    production_memberships__group__production__closed=False,
+                    production_memberships__group__group_type__short_name="REV",
+                ):
                     person_set.add(person)
 
                 # Active association board and association auditors
-                for activity in AssociationActivity.objects.filter(group__in=current_assoc_year.groups.filter(Q(group_type__short_name='STYR') | Q(group_type__short_name='REV'))).all():
-                    if activity.person.email is not None and re.fullmatch(pattern, activity.person.email) is not None:
+                for activity in AssociationActivity.objects.filter(
+                    group__in=current_assoc_year.groups.filter(
+                        Q(group_type__short_name="STYR")
+                        | Q(group_type__short_name="REV")
+                    )
+                ).all():
+                    if (
+                        activity.person.email is not None
+                        and re.fullmatch(pattern, activity.person.email) is not None
+                    ):
                         person_set.add(activity.person)
 
             # Direct title-specific emails to the currently active title holder.
             # Currently only for board members.
             try:
                 title = Title.objects.get(email_alias=self.alias)
-                for activity in current_assoc_year.groups.get(group_type__short_name='STYR').activities.filter(title=title):
-                    if activity.person.email is not None and re.fullmatch(pattern, activity.person.email) is not None:
+                for activity in current_assoc_year.groups.get(
+                    group_type__short_name="STYR"
+                ).activities.filter(title=title):
+                    if (
+                        activity.person.email is not None
+                        and re.fullmatch(pattern, activity.person.email) is not None
+                    ):
                         person_set.add(activity.person)
             except Title.DoesNotExist:
                 pass
@@ -570,35 +771,50 @@ class EmailList(models.Model):
 
     def clean_fields(self, exclude=None):
         super(EmailList, self).clean_fields(exclude=exclude)
-        if 'forward_to' not in exclude and self.forward_to == self:
-            raise ValidationError({'forward_to': 'Kan inte vidarebefordra en lista till sig själv'})
+        if "forward_to" not in exclude and self.forward_to == self:
+            raise ValidationError(
+                {"forward_to": "Kan inte vidarebefordra en lista till sig själv"}
+            )
+
 
 class AssociationMembership(models.Model):
     class Meta:
-        verbose_name = 'föreningsmedlemskap'
-        verbose_name_plural = 'föreningsmedlemskap'
+        verbose_name = "föreningsmedlemskap"
+        verbose_name_plural = "föreningsmedlemskap"
 
-        unique_together = ['person', 'year', 'membership_type']
-        ordering = ['person', 'year']
+        unique_together = ["person", "year", "membership_type"]
+        ordering = ["person", "year"]
 
     class MembershipType(models.TextChoices):
-        STANDARD = 'STD', 'Vanlig medlem'
-        HONORARY = 'HON', 'Hedersmedlem'
-        LIFETIME = 'LIF', 'Livstidsmedlem'
+        STANDARD = "STD", "Vanlig medlem"
+        HONORARY = "HON", "Hedersmedlem"
+        LIFETIME = "LIF", "Livstidsmedlem"
 
-    person = models.ForeignKey(Person, models.CASCADE, verbose_name='person', related_name='association_memberships')
-    year = models.ForeignKey(AssociationYear, models.CASCADE, verbose_name='verksamhetsår', related_name='memberships')
-    membership_type = models.CharField('medlemskapstyp',
+    person = models.ForeignKey(
+        Person,
+        models.CASCADE,
+        verbose_name="person",
+        related_name="association_memberships",
+    )
+    year = models.ForeignKey(
+        AssociationYear,
+        models.CASCADE,
+        verbose_name="verksamhetsår",
+        related_name="memberships",
+    )
+    membership_type = models.CharField(
+        "medlemskapstyp",
         max_length=3,
         choices=MembershipType.choices,
         default=MembershipType.STANDARD,
-        help_text='För vanligt medlemskap, lägg till nytt medlemskap för varje år.'
-                  'För livstidsmedlemskap och hedersmedlemskap, lägg in det året de blev livstid- eller hedersmedlemmar.')
+        help_text="För vanligt medlemskap, lägg till nytt medlemskap för varje år."
+        "För livstidsmedlemskap och hedersmedlemskap, lägg in det året de blev livstid- eller hedersmedlemmar.",
+    )
 
     def __str__(self):
         if self.membership_type == AssociationMembership.MembershipType.HONORARY:
-            return '{} blev hedersmedlem {}'.format(self.person, self.year)
+            return "{} blev hedersmedlem {}".format(self.person, self.year)
         elif self.membership_type == AssociationMembership.MembershipType.LIFETIME:
-            return '{} blev livstidsmedlem {}'.format(self.person, self.year)
+            return "{} blev livstidsmedlem {}".format(self.person, self.year)
         else:
-            return '{} var medlem {}'.format(self.person, self.year)
+            return "{} var medlem {}".format(self.person, self.year)

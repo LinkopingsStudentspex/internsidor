@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class ShowcounterConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'showcounter'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "showcounter"

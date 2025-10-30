@@ -4,28 +4,52 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('batadasen', '0004_auto_20200613_1820'),
+        ("batadasen", "0004_auto_20200613_1820"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='person',
-            options={'ordering': ['member_number'], 'permissions': [('view_private_info', 'Kan se all personinfo oavsett personens inställningar')], 'verbose_name': 'person', 'verbose_name_plural': 'personer'},
+            name="person",
+            options={
+                "ordering": ["member_number"],
+                "permissions": [
+                    (
+                        "view_private_info",
+                        "Kan se all personinfo oavsett personens inställningar",
+                    )
+                ],
+                "verbose_name": "person",
+                "verbose_name_plural": "personer",
+            },
         ),
         migrations.AlterModelOptions(
-            name='useractivation',
-            options={'ordering': ['person'], 'verbose_name': 'användaraktivering', 'verbose_name_plural': 'användaraktiveringar'},
+            name="useractivation",
+            options={
+                "ordering": ["person"],
+                "verbose_name": "användaraktivering",
+                "verbose_name_plural": "användaraktiveringar",
+            },
         ),
         migrations.AddField(
-            model_name='person',
-            name='privacy_setting',
-            field=models.CharField(choices=[('PVT', 'Privat'), ('LIM', 'Begränsad'), ('OPN', 'Öppen')], default='LIM', help_text='Privat: endast administratörer kan se dina personuppgifter. Begränsad: andra inloggade kan se namn och epostadress. Öppen: andra inloggade kan se all din information. Inga personuppgifter kommer någonsin vara synliga för icke-inloggade.', max_length=3, verbose_name='sekretessnivå'),
+            model_name="person",
+            name="privacy_setting",
+            field=models.CharField(
+                choices=[("PVT", "Privat"), ("LIM", "Begränsad"), ("OPN", "Öppen")],
+                default="LIM",
+                help_text="Privat: endast administratörer kan se dina personuppgifter. Begränsad: andra inloggade kan se namn och epostadress. Öppen: andra inloggade kan se all din information. Inga personuppgifter kommer någonsin vara synliga för icke-inloggade.",
+                max_length=3,
+                verbose_name="sekretessnivå",
+            ),
         ),
         migrations.AlterField(
-            model_name='person',
-            name='address_list_email',
-            field=models.EmailField(blank=True, help_text='Alternativ mailadress som ska visas istället i medlemslistor och liknande.', max_length=254, verbose_name='visningsmail'),
+            model_name="person",
+            name="address_list_email",
+            field=models.EmailField(
+                blank=True,
+                help_text="Alternativ mailadress som ska visas istället i medlemslistor och liknande.",
+                max_length=254,
+                verbose_name="visningsmail",
+            ),
         ),
     ]

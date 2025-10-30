@@ -1,13 +1,14 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
 from batadasen.models import Person
+
 
 class PersonSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField()
+
     class Meta:
         model = Person
-        fields = ['username', 'first_name', 'last_name', 'email', 'member_number']
-    
+        fields = ["username", "first_name", "last_name", "email", "member_number"]
+
     def get_username(self, obj):
         if obj.user is None:
             return None

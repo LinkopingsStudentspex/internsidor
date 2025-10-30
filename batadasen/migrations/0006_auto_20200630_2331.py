@@ -4,30 +4,37 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('batadasen', '0005_auto_20200613_2219'),
+        ("batadasen", "0005_auto_20200613_2219"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='person',
-            name='phone_extra',
-            field=models.CharField(blank=True, max_length=50, verbose_name='extra telefon'),
+            model_name="person",
+            name="phone_extra",
+            field=models.CharField(
+                blank=True, max_length=50, verbose_name="extra telefon"
+            ),
         ),
         migrations.AlterField(
-            model_name='person',
-            name='phone_home',
-            field=models.CharField(blank=True, max_length=50, verbose_name='hemtelefon'),
+            model_name="person",
+            name="phone_home",
+            field=models.CharField(
+                blank=True, max_length=50, verbose_name="hemtelefon"
+            ),
         ),
         migrations.AlterField(
-            model_name='person',
-            name='phone_mobile',
-            field=models.CharField(blank=True, max_length=50, verbose_name='mobiltelefon'),
+            model_name="person",
+            name="phone_mobile",
+            field=models.CharField(
+                blank=True, max_length=50, verbose_name="mobiltelefon"
+            ),
         ),
         migrations.AlterField(
-            model_name='person',
-            name='phone_work',
-            field=models.CharField(blank=True, max_length=50, verbose_name='jobbtelefon'),
+            model_name="person",
+            name="phone_work",
+            field=models.CharField(
+                blank=True, max_length=50, verbose_name="jobbtelefon"
+            ),
         ),
     ]

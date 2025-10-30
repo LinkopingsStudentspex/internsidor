@@ -5,51 +5,89 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('batadasen', '0014_person_email_active'),
+        ("batadasen", "0014_person_email_active"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='associationactivity',
-            options={'ordering': ['person', '-group'], 'verbose_name': 'föreningsuppdrag', 'verbose_name_plural': 'föreningsuppdrag'},
+            name="associationactivity",
+            options={
+                "ordering": ["person", "-group"],
+                "verbose_name": "föreningsuppdrag",
+                "verbose_name_plural": "föreningsuppdrag",
+            },
         ),
         migrations.AlterModelOptions(
-            name='associationgroup',
-            options={'ordering': ['year', 'group_type'], 'verbose_name': 'föreningsgrupp', 'verbose_name_plural': 'föreningsgrupp'},
+            name="associationgroup",
+            options={
+                "ordering": ["year", "group_type"],
+                "verbose_name": "föreningsgrupp",
+                "verbose_name_plural": "föreningsgrupp",
+            },
         ),
         migrations.AlterModelOptions(
-            name='associationyear',
-            options={'ordering': ['-end_year'], 'verbose_name': 'verksamhetsår', 'verbose_name_plural': 'verksamhetsår'},
+            name="associationyear",
+            options={
+                "ordering": ["-end_year"],
+                "verbose_name": "verksamhetsår",
+                "verbose_name_plural": "verksamhetsår",
+            },
         ),
         migrations.AlterModelOptions(
-            name='person',
-            options={'ordering': ['member_number'], 'permissions': [('view_private_info', 'Kan se all personinfo oavsett personens inställningar'), ('view_performances', 'Kan se loggade föreställningar'), ('view_medal_candidates', 'Kan lista personer som är berättigade en årsmedalj')], 'verbose_name': 'person', 'verbose_name_plural': 'personer'},
+            name="person",
+            options={
+                "ordering": ["member_number"],
+                "permissions": [
+                    (
+                        "view_private_info",
+                        "Kan se all personinfo oavsett personens inställningar",
+                    ),
+                    ("view_performances", "Kan se loggade föreställningar"),
+                    (
+                        "view_medal_candidates",
+                        "Kan lista personer som är berättigade en årsmedalj",
+                    ),
+                ],
+                "verbose_name": "person",
+                "verbose_name_plural": "personer",
+            },
         ),
         migrations.AddField(
-            model_name='person',
-            name='medal_2',
-            field=models.BooleanField(default=False, verbose_name='medalj 2'),
+            model_name="person",
+            name="medal_2",
+            field=models.BooleanField(default=False, verbose_name="medalj 2"),
         ),
         migrations.AddField(
-            model_name='person',
-            name='medal_4',
-            field=models.BooleanField(default=False, verbose_name='medalj 4'),
+            model_name="person",
+            name="medal_4",
+            field=models.BooleanField(default=False, verbose_name="medalj 4"),
         ),
         migrations.AddField(
-            model_name='person',
-            name='medal_6',
-            field=models.BooleanField(default=False, verbose_name='medalj 6'),
+            model_name="person",
+            name="medal_6",
+            field=models.BooleanField(default=False, verbose_name="medalj 6"),
         ),
         migrations.AlterField(
-            model_name='emaillist',
-            name='alias',
-            field=batadasen.models.EmailField(help_text='Namnet på listan, det som står framför @', max_length=50, primary_key=True, serialize=False, verbose_name='alias'),
+            model_name="emaillist",
+            name="alias",
+            field=batadasen.models.EmailField(
+                help_text="Namnet på listan, det som står framför @",
+                max_length=50,
+                primary_key=True,
+                serialize=False,
+                verbose_name="alias",
+            ),
         ),
         migrations.AlterField(
-            model_name='person',
-            name='privacy_setting',
-            field=models.CharField(choices=[('PVT', 'Privat'), ('OPN', 'Öppen')], default='OPN', help_text='Privat: endast administratörer kan se dina kontaktuppgifter. Öppen: andra inloggade kan se all din information. Inga personuppgifter kommer någonsin vara synliga för icke-inloggade. Medlemsnummer och namn kommer alltid vara synligt för inloggade.', max_length=3, verbose_name='sekretessnivå'),
+            model_name="person",
+            name="privacy_setting",
+            field=models.CharField(
+                choices=[("PVT", "Privat"), ("OPN", "Öppen")],
+                default="OPN",
+                help_text="Privat: endast administratörer kan se dina kontaktuppgifter. Öppen: andra inloggade kan se all din information. Inga personuppgifter kommer någonsin vara synliga för icke-inloggade. Medlemsnummer och namn kommer alltid vara synligt för inloggade.",
+                max_length=3,
+                verbose_name="sekretessnivå",
+            ),
         ),
     ]

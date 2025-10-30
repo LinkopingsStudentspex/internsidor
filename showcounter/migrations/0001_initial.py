@@ -5,57 +5,114 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('batadasen', '0014_person_email_active'),
+        ("batadasen", "0014_person_email_active"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Theatre',
+            name="Theatre",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=100, verbose_name='namn')),
-                ('city', models.CharField(max_length=50, verbose_name='stad')),
-                ('notes', models.CharField(blank=True, max_length=400, verbose_name='anteckningar')),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("name", models.CharField(max_length=100, verbose_name="namn")),
+                ("city", models.CharField(max_length=50, verbose_name="stad")),
+                (
+                    "notes",
+                    models.CharField(
+                        blank=True, max_length=400, verbose_name="anteckningar"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'teater',
-                'verbose_name_plural': 'teatrar',
+                "verbose_name": "teater",
+                "verbose_name_plural": "teatrar",
             },
         ),
         migrations.CreateModel(
-            name='Performance',
+            name="Performance",
             fields=[
-                ('number', models.AutoField(primary_key=True, serialize=False, verbose_name='nummer')),
-                ('date', models.DateField(verbose_name='datum')),
-                ('time', models.TimeField(null=True, verbose_name='time')),
-                ('notes', models.CharField(blank=True, max_length=400, verbose_name='övrigt')),
-                ('tag', models.CharField(blank=True, max_length=20, verbose_name='tag')),
-                ('production', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='performances', to='batadasen.production', verbose_name='uppsättning')),
-                ('theatre', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='performances', to='showcounter.theatre', verbose_name='teater')),
+                (
+                    "number",
+                    models.AutoField(
+                        primary_key=True, serialize=False, verbose_name="nummer"
+                    ),
+                ),
+                ("date", models.DateField(verbose_name="datum")),
+                ("time", models.TimeField(null=True, verbose_name="time")),
+                (
+                    "notes",
+                    models.CharField(blank=True, max_length=400, verbose_name="övrigt"),
+                ),
+                (
+                    "tag",
+                    models.CharField(blank=True, max_length=20, verbose_name="tag"),
+                ),
+                (
+                    "production",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="performances",
+                        to="batadasen.production",
+                        verbose_name="uppsättning",
+                    ),
+                ),
+                (
+                    "theatre",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="performances",
+                        to="showcounter.theatre",
+                        verbose_name="teater",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'föreställning',
-                'verbose_name_plural': 'föreställningar',
+                "verbose_name": "föreställning",
+                "verbose_name_plural": "föreställningar",
             },
         ),
         migrations.CreateModel(
-            name='Participation',
+            name="Participation",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('performance', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='participants', to='showcounter.performance', verbose_name='föreställning')),
-                ('person', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='performances', to='batadasen.person', verbose_name='person')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "performance",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="participants",
+                        to="showcounter.performance",
+                        verbose_name="föreställning",
+                    ),
+                ),
+                (
+                    "person",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="performances",
+                        to="batadasen.person",
+                        verbose_name="person",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'föreställningsdeltagande',
-                'verbose_name_plural': 'föreställningsdeltaganden',
+                "verbose_name": "föreställningsdeltagande",
+                "verbose_name_plural": "föreställningsdeltaganden",
             },
         ),
         migrations.AddConstraint(
-            model_name='participation',
-            constraint=models.UniqueConstraint(fields=('person', 'performance'), name='unique_participation'),
+            model_name="participation",
+            constraint=models.UniqueConstraint(
+                fields=("person", "performance"), name="unique_participation"
+            ),
         ),
     ]
