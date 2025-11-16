@@ -14,6 +14,6 @@ repos:
   rev: 0.9.6
   hooks:
     - id: uv-export
-      args: [--no-hashes -o requirements-dev.txt]
+      args: [--no-hashes, -o requirements-dev.txt]
     - id: uv-export
-      args: [--extra production --no-hashes -o requirements-prod.txt]
+      args: [--extra=production, --no-hashes, -o requirements-prod.txt]

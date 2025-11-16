@@ -14,6 +14,8 @@ dependencies = [
     "pillow==10.4.0",
     "djangorestframework-api-key==3.0.0",
     "django-ajax-selects==2.2.1",
+    "faker>=37.12.0",
+    "factory-boy>=3.3.3",
 ]
 
 [project.optional-dependencies]
