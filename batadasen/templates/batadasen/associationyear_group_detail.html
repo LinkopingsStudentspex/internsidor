@@ -1,17 +1,18 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
-{% block title %}{{ group.group_type.name }} {{ object }}{% endblock %}
+{% block title %}{{ group_shortname }} {{ object }}{% endblock %}
 
 {% block content %}
 <div class="col-xl-8">
     <div class="container-fluid">
         <div class="row h2">
-            <div class="col-2 text-left">{% if previous %}<a class="btn btn-outline-secondary bi bi-caret-left-fill" href="{% url 'batadasen:associationyear_group_detail' previous group.group_type.short_name %}" class="silent-link"></a>{% endif %}</div>
-            <div class="col-8 text-center">{{ group.group_type.name }} <a href="{% url 'batadasen:associationyear_detail' object.end_year %}">{{ object }}</a></div>
-            <div class="col-2 text-right">{% if next %}<a class="btn  btn-outline-secondary bi bi-caret-right-fill" href="{% url 'batadasen:associationyear_group_detail' next group.group_type.short_name %}" class="silent-link"></a>{% endif %}</div>
+            <div class="col-2 text-left">{% if previous %}<a class="btn btn-outline-secondary bi bi-caret-left-fill silent-link" href="{% url 'batadasen:associationyear_group_detail' previous group_shortname %}"></a>{% endif %}</div>
+            <div class="col-8 text-center">{% if group %}{{ group.group_type.name }}{% else %}{{ group_shortname }}{% endif %} <a href="{% url 'batadasen:associationyear_detail' object.end_year %}">{{ object }}</a></div>
+            <div class="col-2 text-right">{% if next %}<a class="btn btn-outline-secondary bi bi-caret-right-fill silent-link" href="{% url 'batadasen:associationyear_group_detail' next group_shortname %}"></a>{% endif %}</div>
         </div>
     </div>
+    {% if group %}
     <table class="table table-sm table-striped">
         <tr class="table-primary"> <th colspan="4">{{ group.group_type.name }} ({{ group.group_type.short_name }})</th></tr>
         {% for activity in activities %}
@@ -21,7 +22,12 @@
             <td>{% if activity.title %}{{ activity.title }}{% endif %}</td>
             <td>{% if activity.to_date %}T.o.m. {{ activity.to_date }}{% endif %}</td>
         </tr>
-        {% endfor %}    
+        {% endfor %}
     </table>
+    {% else %}
+    <div class="alert alert-warning" role="alert">
+        Detta verksamhetsår har ingen grupp som matchar '{{ group_shortname }}'.
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

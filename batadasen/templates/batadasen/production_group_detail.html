@@ -1,37 +1,43 @@
 {% extends 'base.html' %}
 {% load i18n %}
 
-{% block title %}Uppsättningslista {{ object.short_name }}{% endblock %}
+{% block title %}Uppsättningslista {{ group_shortname }}{% endblock %}
 
 {% block content %}
 <div class="col-xl-8">
     <div class="container-fluid">
         <div class="row h2">
-            <div class="col-2 text-left">{% if previous %}<a class="btn btn-outline-secondary bi bi-caret-left-fill" href="{% url 'batadasen:production_group_detail' previous group.group_type.short_name %}" class="silent-link"></a>{% endif %}</div>
-            <div class="col-8 text-center">{{ group.group_type.name }}: <a href="{% url 'batadasen:production_detail' object.number %}">{{ object.short_name }} - {{ object.main_title }}</a></div>
-            <div class="col-2 text-right">{% if next %}<a class="btn  btn-outline-secondary bi bi-caret-right-fill" href="{% url 'batadasen:production_group_detail' next group.group_type.short_name %}" class="silent-link"></a>{% endif %}</div>
+            <div class="col-2 text-left">{% if previous %}<a class="btn btn-outline-secondary bi bi-caret-left-fill silent-link" href="{% url 'batadasen:production_group_detail' previous group_shortname %}"></a>{% endif %}</div>
+            <div class="col-8 text-center">{% if group %}{{ group.group_type.name }}{% else %}{{ group_shortname}}{% endif %}: <a href="{% url 'batadasen:production_detail' object.number %}">{{ object.short_name }} - {{ object.main_title }}</a></div>
+            <div class="col-2 text-right">{% if next %}<a class="btn  btn-outline-secondary bi bi-caret-right-fill silent-link" href="{% url 'batadasen:production_group_detail' next group_shortname %}"></a>{% endif %}</div>
         </div>
     </div>
-<p>Om bakgrunden är röd så är personen inte medlem i föreningen.</p>
 
-<table class="table table-sm table-striped">
-<tr class="table-primary"> <th colspan="4">{{ group.group_type.name }} ({{ group.group_type.short_name }})</th></tr>
-{% for membership in group.memberships.all %}
-{% if not membership.person.currently_member %}
-<tr class = "table-danger">
-{% else %}
-<tr>
-{% endif %}
-    <td><a href="{% url 'batadasen:person_detail' membership.person.member_number %}">{{ membership.person.member_number }}</a></td>
-    <td>
-        {{ membership.person.first_name }} {% if membership.person.spex_name %}"{{ membership.person.spex_name }}" {% endif %}{{ membership.person.last_name }}{% if membership.first_production_id == object.pk %}*{% endif %}
-    </td>
-    <td>{% if membership.title %}{{ membership.title }}{% endif %}</td>
-    <td>{% if membership.comment %}{{ membership.comment }}{% endif %}</td>
-</tr>
-{% endfor %}
-</table>
-<p>* Personens första uppsättning. </p>
-</div>
+    {% if group %}
+    <p>Om bakgrunden är röd så är personen inte medlem i föreningen.</p>
 
+    <table class="table table-sm table-striped">
+    <tr class="table-primary"> <th colspan="4">{{ group.group_type.name }} ({{ group.group_type.short_name }})</th></tr>
+        {% for membership in memberships %}
+            {% if not membership.person.currently_member %}
+    <tr class = "table-danger">
+            {% else %}
+    <tr>
+            {% endif %}
+        <td><a href="{% url 'batadasen:person_detail' membership.person.member_number %}">{{ membership.person.member_number }}</a></td>
+        <td>
+            {{ membership.person.first_name }} {% if membership.person.spex_name %}"{{ membership.person.spex_name }}" {% endif %}{{ membership.person.last_name }}{% if membership.first_production_id == object.pk %}*{% endif %}
+        </td>
+        <td>{% if membership.title %}{{ membership.title }}{% endif %}</td>
+        <td>{% if membership.comment %}{{ membership.comment }}{% endif %}</td>
+    </tr>
+        {% endfor %}
+    </table>
+    <p>* Personens första uppsättning. </p>
+    {% else %}
+    <div class="alert alert-warning" role="alert">
+        Denna uppsättning har ingen grupp som matchar '{{ group_shortname }}'.
+    </div>
+    {% endif %}
+    </div>
 {% endblock %}
