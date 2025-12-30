@@ -1,11 +1,12 @@
 from datetime import datetime
-
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Count, Min
+from django.db import connection
+from django.db.models import Q, Count, Min, F
+from django.db.models.functions import Collate
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
@@ -34,6 +35,15 @@ if settings.PROVISION_GSUITE_ACCOUNTS:
     from . import gsuite
 
 User = get_user_model()
+
+
+def swedish_order(field: str):
+    """Use collation to get Swedish ordering for a field.
+
+    This collation is not available in SQLite so it is skipped during local development."""
+    if connection.vendor == "postgresql":
+        return Collate(F(field), "sv-SE-x-icu")
+    return field
 
 
 def activation_view(request):
@@ -188,7 +198,11 @@ class ProductionDetailView(DetailView):
                 first_production_id=Min(
                     "person__production_memberships__group__production__pk"
                 )
-            ).order_by("-title")
+            ).order_by(
+                "-title",
+                swedish_order("person__first_name"),
+                swedish_order("person__last_name"),
+            )
 
             if not memberships.exists():
                 continue
@@ -228,17 +242,6 @@ class ProductionGroupDetailView(DetailView):
     # This dance is done to order the memberships in each group by title
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        group_shortname = self.kwargs["group_shortname"]
-        group = context["object"].groups.filter(group_type_id=group_shortname).first()
-
-        memberships = group.memberships.annotate(
-            first_production_id=Min(
-                "person__production_memberships__group__production__pk"
-            )
-        ).order_by("-title")
-
-        context["group"] = group
-        context["memberships"] = memberships
 
         previous_production = (
             self.model.objects.filter(number__lt=context["object"].number)
@@ -258,6 +261,27 @@ class ProductionGroupDetailView(DetailView):
             .first()
         )
         context["next"] = next_production.number if next_production else None
+
+        group_shortname = self.kwargs["group_shortname"]
+        context["group_shortname"] = group_shortname
+
+        group = context["object"].groups.filter(group_type_id=group_shortname).first()
+        if not group:
+            return context
+
+        memberships = group.memberships.annotate(
+            first_production_id=Min(
+                "person__production_memberships__group__production__pk"
+            )
+        ).order_by(
+            "-title",
+            swedish_order("person__first_name"),
+            swedish_order("person__last_name"),
+        )
+
+        context["group"] = group
+        context["memberships"] = memberships
+
         return context
 
 
@@ -275,7 +299,12 @@ class AssociationYearDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         groups = []
         for group in context["object"].groups.all():
-            activities = group.activities.order_by("-title")
+            activities = group.activities.order_by(
+                "-title",
+                swedish_order("person__first_name"),
+                swedish_order("person__last_name"),
+            )
+
             if not activities.exists():
                 continue
             result_group = {
@@ -313,10 +342,7 @@ class AssociationYearGroupDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         group_shortname = self.kwargs["group_shortname"]
-        group = context["object"].groups.filter(group_type_id=group_shortname).first()
-        activities = group.activities.order_by("-title")
-        context["group"] = group
-        context["activities"] = activities
+        context["group_shortname"] = group_shortname
 
         previous_year = (
             self.model.objects.filter(end_year__lt=context["object"].end_year)
@@ -333,6 +359,19 @@ class AssociationYearGroupDetailView(DetailView):
             .first()
         )
         context["next"] = next_year.end_year if next_year else None
+
+        group = context["object"].groups.filter(group_type_id=group_shortname).first()
+        if not group:
+            return context
+
+        activities = group.activities.order_by(
+            "-title",
+            swedish_order("person__first_name"),
+            swedish_order("person__last_name"),
+        )
+        context["group"] = group
+        context["activities"] = activities
+
         return context
 
 
