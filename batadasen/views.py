@@ -199,7 +199,7 @@ class ProductionDetailView(DetailView):
                     "person__production_memberships__group__production__pk"
                 )
             ).order_by(
-                "-title",
+                F("title").asc(nulls_last=True),
                 swedish_order("person__first_name"),
                 swedish_order("person__last_name"),
             )
@@ -274,7 +274,7 @@ class ProductionGroupDetailView(DetailView):
                 "person__production_memberships__group__production__pk"
             )
         ).order_by(
-            "-title",
+            F("title").asc(nulls_last=True),
             swedish_order("person__first_name"),
             swedish_order("person__last_name"),
         )
@@ -300,7 +300,7 @@ class AssociationYearDetailView(DetailView):
         groups = []
         for group in context["object"].groups.all():
             activities = group.activities.order_by(
-                "-title",
+                F("title").asc(nulls_last=True),
                 swedish_order("person__first_name"),
                 swedish_order("person__last_name"),
             )
@@ -365,7 +365,7 @@ class AssociationYearGroupDetailView(DetailView):
             return context
 
         activities = group.activities.order_by(
-            "-title",
+            F("title").asc(nulls_last=True),
             swedish_order("person__first_name"),
             swedish_order("person__last_name"),
         )
@@ -422,7 +422,6 @@ class StatisticsView(TemplateView):
 
         now = datetime.now()
         current_association_year = now.year + (now.month > 6)
-        print(now)
         context["years_since_start"] = (
             now.year - 1980 + (now > datetime(now.year, 11, 28))
         )
